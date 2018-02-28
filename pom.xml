@@ -1,0 +1,251 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim</groupId>
+	<artifactId>nemo</artifactId>
+	<packaging>jar</packaging>
+	<!--same version as matsim-->
+	<version>0.10.0-SNAPSHOT</version>
+	<name>NEMO project</name>
+	<description>NEMO project</description>
+
+	<scm>
+		<url>https://gitlab.tubit.tu-berlin.de/vsp/NEMO.git</url>
+		<connection>scm:git:git://gitlab.tubit.tu-berlin.de/vsp/NEMO.git</connection>
+		<developerConnection>scm:git:git@gitlab.tubit.tu-berlin.de:vsp/NEMO.git</developerConnection>
+	</scm>
+
+	<repositories>
+		<repository>
+			<!-- Geotools is not on Maven central -->
+			<id>osgeo</id>
+			<name>Geotools repository</name>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+		<repository>
+			<!-- MATSim is not on Maven central -->
+			<id>matsim</id>
+			<url>https://dl.bintray.com/matsim/matsim</url>
+		</repository>
+		<repository>
+			<id>ojo-snapshots</id>
+			<url>http://oss.jfrog.org/libs-snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim</artifactId>
+			<!-- <version>0.9.0</version> -->
+		 	<version>0.10.0-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Include some MATSim extensions -->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>otfvis</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+		<!--need some bicycle stuff-->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>bicycle</artifactId>
+			<version>0.10.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>cadytsIntegration</artifactId>
+			<version>0.10.0-SNAPSHOT</version>
+		</dependency>
+		<!-- Include the JUnit testing library -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- include poi library to be able to handle excel files -->
+		<dependency>
+  			<groupId>org.apache.poi</groupId>
+        	<artifactId>poi-ooxml</artifactId>
+        	<version>3.12</version>
+    	</dependency>
+		<!--Dont need vsp because agarwalamit depends on it.-->
+		<!--<dependency>-->
+			<!--<groupId>vsp-playground</groupId>-->
+			<!--<artifactId>vsp</artifactId>-->
+			<!--<version>0.10.0-SNAPSHOT</version>-->
+		<!--</dependency>-->
+		<dependency>
+			<groupId>vsp-playground</groupId>
+			<artifactId>agarwalamit</artifactId>
+			<version>0.10.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<showWarnings>false</showWarnings>
+					<showDeprecation>false</showDeprecation>
+					<encoding>UTF-8</encoding>
+					<!-- configure initial and maximal memory for compiling -->
+					<fork>true</fork>
+					<meminitial>128m</meminitial>
+					<maxmem>512m</maxmem>
+					<compilerArguments>
+						<Xmaxwarns>4000</Xmaxwarns>
+						<Xmaxerrs>100</Xmaxerrs>
+					</compilerArguments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19</version>
+				<configuration>
+					<excludes>
+						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
+						<exclude>**/*PerformanceTest.java</exclude>
+					</excludes>
+					<forkMode>once</forkMode>
+					<argLine>-Xmx400m -Djava.awt.headless=true</argLine>
+					<enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<revisionOnScmFailure>unknown</revisionOnScmFailure>
+					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+				</configuration>
+			</plugin>
+			<!--<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-eclipse-plugin</artifactId>
+			  <configuration>
+			    <downloadSources>true</downloadSources>
+			    <downloadJavadocs>true</downloadJavadocs>
+			  </configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>org.matsim.gui.MATSimGUI</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>-->
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.8</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.3.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.2.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<defaultGoal>assembly:assembly</defaultGoal>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-assembly-plugin</artifactId>
+							<configuration>
+								<descriptors>
+									<descriptor>src/main/assembly/assembly-release.xml</descriptor>
+								</descriptors>
+							</configuration>
+						</plugin>
+						<plugin>
+							<artifactId>maven-jar-plugin</artifactId>
+							<configuration>
+								<archive>
+									<manifest>
+										<addClasspath>true</addClasspath>
+										<classpathPrefix>libs/</classpathPrefix>
+									</manifest>
+								</archive>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+</project>
