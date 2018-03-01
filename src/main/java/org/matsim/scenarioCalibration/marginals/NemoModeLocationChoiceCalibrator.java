@@ -20,11 +20,9 @@
 package org.matsim.scenarioCalibration.marginals;
 
 import java.io.File;
-import java.util.Arrays;
 import javax.inject.Inject;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
@@ -32,7 +30,6 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -44,7 +41,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import playground.agarwalamit.utils.NumberUtils;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
@@ -59,7 +55,7 @@ public class NemoModeLocationChoiceCalibrator {
 
     public static void main(String[] args) {
 
-        String configFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/config.xml";
+        String configFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
         String outputDir = "../runs-svn/nemo/marginals/output/testCalib/";
 
         String runId = "run200";
@@ -79,35 +75,14 @@ public class NemoModeLocationChoiceCalibrator {
 
         Config config = ConfigUtils.loadConfig(configFile);
 
-        config.counts().setCountsScaleFactor( (1 / NEMOUtils.SAMPLE_SIZE) * NEMOUtils.RUHR_CAR_SHARE / (NEMOUtils.RUHR_CAR_SHARE + NEMOUtils.RUHR_PT_SHARE) ); // 53% car share
-        config.counts().setWriteCountsInterval(10);
-
-        double flowCapFactor = NEMOUtils.SAMPLE_SIZE * (NEMOUtils.RUHR_CAR_SHARE + NEMOUtils.RUHR_PT_SHARE) / NEMOUtils.RUHR_CAR_SHARE;
-        config.qsim().setFlowCapFactor(NumberUtils.round(flowCapFactor, 2));
-        config.qsim().setStorageCapFactor( NumberUtils.round(     flowCapFactor / Math.pow(flowCapFactor, 0.25)   ,2)  );
-
         config.controler().setOutputDirectory(new File(outputDir).getAbsolutePath());
         config.controler().setRunId(runId);
         config.controler().setLastIteration(lastIt);
-
-        //TODO set following params directly in config.
-        config.plansCalcRoute().setNetworkModes(Arrays.asList(TransportMode.car, TransportMode.ride));
-        config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setBeelineDistanceFactor(1.3);
-        config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk).setBeelineDistanceFactor(1.3);
-        config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setTeleportedModeSpeed(3.205);
-        config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk).setTeleportedModeSpeed(1.068);
-
-        config.planCalcScore().getOrCreateModeParams(TransportMode.car).setConstant(0.);
-        config.planCalcScore().getOrCreateModeParams(TransportMode.bike).setConstant(0.);
-        config.planCalcScore().getOrCreateModeParams(TransportMode.walk).setConstant(0.);
-        config.planCalcScore().getOrCreateModeParams(TransportMode.ride).setConstant(0.);
 
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         }
-
-        config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 
         Scenario scenario = ScenarioUtils.createScenario(config);
         ScenarioUtils.loadScenario(scenario);
