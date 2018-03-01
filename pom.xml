@@ -11,9 +11,9 @@
 	<description>NEMO project</description>
 
 	<scm>
-		<url>https://gitlab.tubit.tu-berlin.de/vsp/NEMO.git</url>
-		<connection>scm:git:git://gitlab.tubit.tu-berlin.de/vsp/NEMO.git</connection>
-		<developerConnection>scm:git:git@gitlab.tubit.tu-berlin.de:vsp/NEMO.git</developerConnection>
+		<url>https://github.com/matsim-vsp/mercator-nemo.git</url>
+		<connection>scm:git:git://github.com/matsim-vsp/mercator-nemo.git</connection>
+		<developerConnection>scm:git:git@github.com:matsim-vsp/mercator-nemo.git</developerConnection>
 	</scm>
 
 	<repositories>
