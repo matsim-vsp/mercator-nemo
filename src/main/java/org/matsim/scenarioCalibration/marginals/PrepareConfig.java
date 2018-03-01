@@ -73,6 +73,9 @@ public class PrepareConfig {
         outConfig.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
         outConfig.plansCalcRoute().removeModeRoutingParams(TransportMode.pt);
 
+        outConfig.travelTimeCalculator().setSeparateModes(true);
+        outConfig.travelTimeCalculator().setAnalyzedModes("car,ride");
+
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.car).setConstant(0.);
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.bike).setConstant(0.);
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.walk).setConstant(0.);
