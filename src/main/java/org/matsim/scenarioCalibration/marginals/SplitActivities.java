@@ -17,30 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim;
+package org.matsim.scenarioCalibration.marginals;
+
+import playground.vsp.demandde.cemdap.output.ActivityTypes;
+import playground.vsp.demandde.cemdap.output.SplitActivityTypesBasedOnDuration;
 
 /**
- * Created by amit on 29.01.18.
+ * Created by amit on 01.03.18.
  */
 
-public final class NEMOUtils {
+public class SplitActivities {
 
-    public static final String NEMO_EPSG = "EPSG:25832";
+    public static void main(String[] args) {
 
-    //shape files
-    public static final String NRW_MUNICIPALITY_SHAPE_FILE = "data/cemdap_input/shapeFiles/sourceShape_NRW/dvg2gem_nw.shp";
-    public static final String Ruhr_MUNICIPALITY_SHAPE_FILE ="data/cemdap_input/shapeFiles/shapeFile_Ruhrgebiet/dvg2gem_ruhrgebiet.shp";
-    public static final String Ruhr_PLZ_SHAPE_FILE = "data/cemdap_input/shapeFiles/plzBasedPopulation/plz-gebiete_Ruhrgebiet/plz-gebiete_Ruhrgebiet_withPopulation.shp";
-    public static final String Ruhr_BOUNDARY_SHAPE_FILE ="data/cemdap_input/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
-    public static final String CORINE_LANDCOVER_NRW_SHAPE_FILE = "data/cemdap_input/shapeFiles/CORINE_landcover_nrw/corine_nrw_src_clc12.shp";
+        final String inputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/plans_1pct_fullChoiceSet_coordsAssigned.xml.gz";
 
-    //feature key for above shape
-    public static final String MUNICIPALITY_SHAPE_FEATURE_KEY = "KN";
-    public static final String Ruhr_PLZ_SHAPE_FEATURE_KEY = "plz";
-    //feature key for CORINE_LANDCOVER -- LandCoverUtils.CORINE_LANDCOVER_TAG_ID;
+        final String outputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
+        final String outputConfigFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/config_take_activity-parametersOnly.xml";
 
-    public static double RUHR_CAR_SHARE = 0.471; // TODO put refernce of the report here.
-    public static double RUHR_PT_SHARE = 0.158; // TODO put refernce of the report here.
-    public static double SAMPLE_SIZE = 0.01;
+        final double timeBinSize_s = 600.;
+        final String[] activities = {ActivityTypes.HOME, ActivityTypes.WORK, ActivityTypes.EDUCATION, ActivityTypes.LEISURE, ActivityTypes.SHOPPING, ActivityTypes.OTHER};
+
+        SplitActivityTypesBasedOnDuration splitAct = new SplitActivityTypesBasedOnDuration(inputPopulationFile);
+        splitAct.run(outputPopulationFile, outputConfigFile, timeBinSize_s, activities);
+    }
 
 }
