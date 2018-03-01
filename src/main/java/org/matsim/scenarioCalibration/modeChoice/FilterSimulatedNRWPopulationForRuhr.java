@@ -52,7 +52,7 @@ import playground.vsp.corineLandcover.GeometryUtils;
  * Created by amit on 12.02.18.
  */
 
-public class FilterNRWPopulationForRuhr {
+public class FilterSimulatedNRWPopulationForRuhr {
 
     private static final String boundaryShape = NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE;
 
@@ -70,7 +70,7 @@ public class FilterNRWPopulationForRuhr {
     private final Network network;
     private final Population outPopulation;
 
-    FilterNRWPopulationForRuhr() {
+    FilterSimulatedNRWPopulationForRuhr() {
         Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(boundaryShape);
         this.combinedGeom = GeometryUtils.combine(features.stream()
                                                           .map(f -> (Geometry) f.getDefaultGeometry())
@@ -81,7 +81,7 @@ public class FilterNRWPopulationForRuhr {
 
     public static void main(String[] args) {
         Population inputPopulation = LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation();
-        new FilterNRWPopulationForRuhr().processAndWritePlans(inputPopulation);
+        new FilterSimulatedNRWPopulationForRuhr().processAndWritePlans(inputPopulation);
     }
 
     void processAndWritePlans(Population inputPopulation) {
@@ -127,7 +127,7 @@ public class FilterNRWPopulationForRuhr {
         return false;
     }
 
-    private Person cloneAndAddPerson(Person person) { // only selected plan
+    private void cloneAndAddPerson(Person person) { // only selected plan
         if (!keepOnlySelectedPlans) {
             throw new RuntimeException("not implemented yet.");
         }
@@ -137,6 +137,5 @@ public class FilterNRWPopulationForRuhr {
         PopulationUtils.copyFromTo(person.getSelectedPlan(), outPlan);
         outPerson.addPlan(outPlan);
         this.outPopulation.addPerson(outPerson);
-        return null;
     }
 }
