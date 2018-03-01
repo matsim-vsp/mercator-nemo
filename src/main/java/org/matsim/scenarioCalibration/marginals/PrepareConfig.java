@@ -38,7 +38,7 @@ import playground.agarwalamit.utils.NumberUtils;
 
 public class PrepareConfig {
     private static final String config_for_activityParams = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/config_take_activity-parametersOnly.xml";
-    private static final String outConfigFile = "\"../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
+    private static final String outConfigFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
 
     public static void main(String[] args) {
 
@@ -67,8 +67,11 @@ public class PrepareConfig {
         outConfig.plansCalcRoute().setNetworkModes(Arrays.asList(TransportMode.car, TransportMode.ride));
         outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setBeelineDistanceFactor(1.3);
         outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk).setBeelineDistanceFactor(1.3);
-        outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setTeleportedModeSpeed(3.205);
-        outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk).setTeleportedModeSpeed(1.068);
+        outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setTeleportedModeSpeed(5.56); //faster -> more attractive
+        outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk).setTeleportedModeSpeed(1.39); //faster -> more attractive
+
+        outConfig.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
+        outConfig.plansCalcRoute().removeModeRoutingParams(TransportMode.pt);
 
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.car).setConstant(0.);
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.bike).setConstant(0.);
