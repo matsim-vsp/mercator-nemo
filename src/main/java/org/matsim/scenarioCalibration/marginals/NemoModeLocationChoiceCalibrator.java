@@ -20,9 +20,11 @@
 package org.matsim.scenarioCalibration.marginals;
 
 import java.io.File;
+import java.util.Arrays;
 import javax.inject.Inject;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
@@ -87,6 +89,18 @@ public class NemoModeLocationChoiceCalibrator {
         config.controler().setOutputDirectory(new File(outputDir).getAbsolutePath());
         config.controler().setRunId(runId);
         config.controler().setLastIteration(lastIt);
+
+        //TODO set following params directly in config.
+        config.plansCalcRoute().setNetworkModes(Arrays.asList(TransportMode.car, TransportMode.ride));
+        config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setBeelineDistanceFactor(1.3);
+        config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk).setBeelineDistanceFactor(1.3);
+        config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setTeleportedModeSpeed(3.205);
+        config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk).setTeleportedModeSpeed(1.068);
+
+        config.planCalcScore().getOrCreateModeParams(TransportMode.car).setConstant(0.);
+        config.planCalcScore().getOrCreateModeParams(TransportMode.bike).setConstant(0.);
+        config.planCalcScore().getOrCreateModeParams(TransportMode.walk).setConstant(0.);
+        config.planCalcScore().getOrCreateModeParams(TransportMode.ride).setConstant(0.);
 
         if (args.length == 0) {
             config.controler()
