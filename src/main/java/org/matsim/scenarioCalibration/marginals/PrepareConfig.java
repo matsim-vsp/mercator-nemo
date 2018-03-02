@@ -52,10 +52,13 @@ public class PrepareConfig {
         outConfig.counts().setWriteCountsInterval(10);
 
         outConfig.plans().setInputFile("plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz");
+        outConfig.plans().setRemovingUnneccessaryPlanAttributes(true);
+
         outConfig.network().setInputFile("tertiaryNemo_10112017_EPSG_25832_filteredcleaned_network.xml.gz");
 
         outConfig.global().setNumberOfThreads(4);
         outConfig.global().setCoordinateSystem(NEMOUtils.NEMO_EPSG);
+        outConfig.global().setInsistingOnDeprecatedConfigVersion(false);
 
         double flowCapFactor = NEMOUtils.SAMPLE_SIZE * (NEMOUtils.RUHR_CAR_SHARE + NEMOUtils.RUHR_PT_SHARE) / NEMOUtils.RUHR_CAR_SHARE;
         outConfig.qsim().setFlowCapFactor(NumberUtils.round(flowCapFactor, 2));
