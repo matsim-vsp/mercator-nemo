@@ -66,6 +66,7 @@ public class PrepareConfig {
         outConfig.qsim().setStuckTime(30.0);
         outConfig.qsim().setUsingFastCapacityUpdate(true);
         outConfig.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
+        outConfig.qsim().setEndTime(30*3600.);
 
         outConfig.plansCalcRoute().setNetworkModes(Arrays.asList(TransportMode.car, TransportMode.ride));
         outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setBeelineDistanceFactor(1.3);

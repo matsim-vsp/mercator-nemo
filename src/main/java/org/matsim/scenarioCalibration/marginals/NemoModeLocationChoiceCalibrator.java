@@ -20,9 +20,12 @@
 package org.matsim.scenarioCalibration.marginals;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 import javax.inject.Inject;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
@@ -82,10 +85,17 @@ public class NemoModeLocationChoiceCalibrator {
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+            config.plans().setInputFile("run200.0.plans.xml.gz");
+
         }
 
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        ScenarioUtils.loadScenario(scenario);
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+
+        // network links --> allow car,ride
+        scenario.getNetwork()
+                .getLinks()
+                .values()
+                .forEach(l -> l.setAllowedModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.ride))));
 
         Controler controler = new Controler(scenario);
 
