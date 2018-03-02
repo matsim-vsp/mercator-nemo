@@ -30,13 +30,13 @@ public class ParametricRunsNEMOMarginals {
     public static void main(String[] args) {
         int runCounter= 201;
 
-        String baseOutDir = "/net/ils4/agarwal/nemo/data/locationChoice/";
-        String matsimDir = "r_1d0ceb502e399ba38762743485c1bb02a6aeedc0_nemo05Feb";
+        String baseOutDir = "/net/ils4/agarwal/nemo/data/marginals/";
+        String matsimDir = "r_3e0c4e8ef53486796e955116184279c4fc88522b_nemoMarginals";
 
         StringBuilder buffer = new StringBuilder();
         PrepareParametricRuns parametricRuns = new PrepareParametricRuns("~/.ssh/known_hosts","~/.ssh/id_rsa_tub_math","agarwal");
 
-        Integer [] lastIts = {200};
+        Integer [] lastIts = {200,300};
         double [] cadytsCountsWts = {15};
         double [] cadytsMarginalsWts = {50,100,500};
 
@@ -62,7 +62,7 @@ public class ParametricRunsNEMOMarginals {
                                 PrepareParametricRuns.newLine,
 
                                 "java -Djava.awt.headless=true -Xmx58G -cp nemo-0.10.0-SNAPSHOT.jar " +
-                                        "org/matsim/scenarioCalibration/locationChoice/NemoLocationChoiceCalibration " +
+                                        "org/matsim/scenarioCalibration/marginals/NemoModeLocationChoiceCalibrator " +
                                         params+" "
                         };
 
