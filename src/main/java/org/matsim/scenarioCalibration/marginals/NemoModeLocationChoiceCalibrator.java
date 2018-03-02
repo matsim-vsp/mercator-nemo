@@ -164,7 +164,7 @@ public class NemoModeLocationChoiceCalibrator {
         inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0,1000.),1316550.0);
         inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0,1000.),101265.0);
 
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(3000.0,3000.),1245468.0);
+        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(1000.0,3000.),1245468.0);
         inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(1000.0,3000.),202657.0);
         inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(1000.0,3000.),863965.0);
         inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(1000.0,3000.),421473.0);
