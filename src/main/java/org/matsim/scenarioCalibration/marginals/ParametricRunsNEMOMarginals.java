@@ -28,7 +28,7 @@ import playground.agarwalamit.parametricRuns.PrepareParametricRuns;
 public class ParametricRunsNEMOMarginals {
 
     public static void main(String[] args) {
-        int runCounter= 201;
+        int runCounter= 207;
 
         String baseOutDir = "/net/ils4/agarwal/nemo/data/marginals/";
         String matsimDir = "r_3e0c4e8ef53486796e955116184279c4fc88522b_nemoMarginals";
@@ -36,17 +36,18 @@ public class ParametricRunsNEMOMarginals {
         StringBuilder buffer = new StringBuilder();
         PrepareParametricRuns parametricRuns = new PrepareParametricRuns("~/.ssh/known_hosts","~/.ssh/id_rsa_tub_math","agarwal");
 
-        Integer [] lastIts = {200,300};
+        Integer [] lastIts = {300,400};
         double [] cadytsCountsWts = {15};
-        double [] cadytsMarginalsWts = {50,100,500};
+        double [] cadytsMarginalsWts = {25,50};
 
-        buffer.append("jobName\tconfigFile\tplansFile\tnetworkFile\tcountsFile\toutputDir\tjobName\tflowCapacityFactor\tstorageCapacityFactor\tlastIteration\tcadytsWt"+ PrepareParametricRuns.newLine);
+        buffer.append("run201 to run206 had util_trav as -6.0. Setting it to zero in subsequent runs.");
+        buffer.append("jobName\tconfigFile\toutputDir\tjobName\tlastIteration\tcadytsCountsWt\tcadytsMarginalsWt"+ PrepareParametricRuns.newLine);
 
         for (int lastIt : lastIts) {
             for (double countsCadytsWt : cadytsCountsWts ) {
                 for(double cadytsMarginalsWt :cadytsMarginalsWts){
 
-                        String configFile = "/net/ils4/agarwal/nemo/data/marginals/input/preparedConfig.xml";
+                        String configFile = "/net/ils4/agarwal/nemo/data/marginals/input/preparedConfig_rideAsMainMode.xml";
                         String jobName = "run"+String.valueOf(runCounter++);
                         String outputDir = baseOutDir+"/"+jobName+"/output/";
 

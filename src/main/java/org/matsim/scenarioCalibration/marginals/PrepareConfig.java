@@ -21,6 +21,7 @@ package org.matsim.scenarioCalibration.marginals;
 
 import java.util.Arrays;
 import org.matsim.NEMOUtils;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,6 +31,10 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 import playground.agarwalamit.utils.NumberUtils;
 
 /**
@@ -38,9 +43,18 @@ import playground.agarwalamit.utils.NumberUtils;
 
 public class PrepareConfig {
     private static final String config_for_activityParams = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/config_take_activity-parametersOnly.xml";
-    private static final String outConfigFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
+    public static final boolean rideAsMainMode = true;
 
     public static void main(String[] args) {
+
+        String outConfigFile ;
+        String vehicleFile ;
+        if (rideAsMainMode) {
+            outConfigFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig_rideAsMainMode.xml";
+            vehicleFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/modeVehicleTypes.xml";
+        } else {
+            outConfigFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
+        }
 
         PlanCalcScoreConfigGroup planCalcScoreConfigGroup = ConfigUtils.loadConfig(config_for_activityParams).planCalcScore();
 
@@ -50,6 +64,7 @@ public class PrepareConfig {
         outConfig.counts().setWriteCountsInterval(10);
         outConfig.counts().setCountsScaleFactor( (1 / NEMOUtils.SAMPLE_SIZE) * NEMOUtils.RUHR_CAR_SHARE / (NEMOUtils.RUHR_CAR_SHARE + NEMOUtils.RUHR_PT_SHARE) );
         outConfig.counts().setWriteCountsInterval(10);
+        outConfig.counts().setOutputFormat("all");
 
         outConfig.plans().setInputFile("plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz");
         outConfig.plans().setRemovingUnneccessaryPlanAttributes(true);
@@ -68,6 +83,25 @@ public class PrepareConfig {
         outConfig.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
         outConfig.qsim().setEndTime(30*3600.);
 
+        if (rideAsMainMode) {
+            outConfig.qsim().setMainModes(Arrays.asList(TransportMode.car, TransportMode.ride));
+            outConfig.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+
+            //prepare mode vehicle type
+            Vehicles vehs = VehicleUtils.createVehiclesContainer();
+            {
+                VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+                vehs.addVehicleType(car);
+
+                VehicleType ride = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.ride, VehicleType.class));
+                ride.setPcuEquivalents(0.);
+                vehs.addVehicleType(ride);
+
+                new VehicleWriterV1(vehs).writeFile(vehicleFile);
+            }
+            outConfig.vehicles().setVehiclesFile("modeVehicleTypes.xml");
+        }
+
         outConfig.plansCalcRoute().setNetworkModes(Arrays.asList(TransportMode.car, TransportMode.ride));
         outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike).setBeelineDistanceFactor(1.3);
         outConfig.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk).setBeelineDistanceFactor(1.3);
@@ -80,10 +114,10 @@ public class PrepareConfig {
         outConfig.travelTimeCalculator().setSeparateModes(true);
         outConfig.travelTimeCalculator().setAnalyzedModes("car,ride");
 
-        outConfig.planCalcScore().getOrCreateModeParams(TransportMode.car).setConstant(0.);
-        outConfig.planCalcScore().getOrCreateModeParams(TransportMode.bike).setConstant(0.);
-        outConfig.planCalcScore().getOrCreateModeParams(TransportMode.walk).setConstant(0.);
-        outConfig.planCalcScore().getOrCreateModeParams(TransportMode.ride).setConstant(0.);
+        outConfig.planCalcScore().getOrCreateModeParams(TransportMode.car).setMarginalUtilityOfTraveling(0.);
+        outConfig.planCalcScore().getOrCreateModeParams(TransportMode.bike).setMarginalUtilityOfTraveling(0.);
+        outConfig.planCalcScore().getOrCreateModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.);
+        outConfig.planCalcScore().getOrCreateModeParams(TransportMode.ride).setMarginalUtilityOfTraveling(0.);
         outConfig.planCalcScore().setFractionOfIterationsToStartScoreMSA(0.8);
         planCalcScoreConfigGroup.getActivityParams().forEach(pm -> outConfig.planCalcScore().addActivityParams(pm));
 

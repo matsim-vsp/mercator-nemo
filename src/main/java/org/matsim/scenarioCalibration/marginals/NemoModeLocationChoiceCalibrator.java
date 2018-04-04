@@ -58,10 +58,16 @@ public class NemoModeLocationChoiceCalibrator {
 
     public static void main(String[] args) {
 
-        String configFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
+        String configFile;
+        if (PrepareConfig.rideAsMainMode) {
+            configFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig_rideAsMainMode.xml";
+        } else {
+            configFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
+        }
+
         String outputDir = "../runs-svn/nemo/marginals/output/testCalib/";
 
-        String runId = "run200";
+        String runId = "run207";
 
         int lastIt = 200; // apparently 200 iterations are fine.
         double cadytsCountsWt = 15.0;
