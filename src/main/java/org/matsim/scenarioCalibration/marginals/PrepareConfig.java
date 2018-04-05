@@ -111,8 +111,12 @@ public class PrepareConfig {
         outConfig.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
         outConfig.plansCalcRoute().removeModeRoutingParams(TransportMode.pt);
 
-        outConfig.travelTimeCalculator().setSeparateModes(true);
-        outConfig.travelTimeCalculator().setAnalyzedModes("car,ride");
+        if ( rideAsMainMode ) {
+            outConfig.travelTimeCalculator().setSeparateModes(true);
+            outConfig.travelTimeCalculator().setAnalyzedModes("car,ride");
+        } else{
+            //using overriding modules
+        }
 
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.car).setMarginalUtilityOfTraveling(0.);
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.bike).setMarginalUtilityOfTraveling(0.);

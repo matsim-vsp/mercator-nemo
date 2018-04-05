@@ -33,6 +33,7 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -92,7 +93,6 @@ public class NemoModeLocationChoiceCalibrator {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
             config.plans().setInputFile("run200.0.plans.xml.gz");
-
         }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -104,6 +104,17 @@ public class NemoModeLocationChoiceCalibrator {
                 .forEach(l -> l.setAllowedModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.ride))));
 
         Controler controler = new Controler(scenario);
+
+        if (! PrepareConfig.rideAsMainMode) {
+            // use car-travel time calculator for ride mode to teleport them yet affected by congestion.
+            controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    addTravelTimeBinding("ride").to(networkTravelTime());
+                    addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
+                }
+            });
+        }
 
         // marginals cadyts
         DistanceDistribution inputDistanceDistribution = getDistanceDistribution();
