@@ -22,7 +22,7 @@ package org.matsim.scenarioCreation.matsimPlans;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import playground.vsp.demandde.cemdap.output.CemdapStops2MatsimPlansConverter;
+import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansConverter;
 
 /**
  * Created by amit on 22.09.17.
@@ -90,7 +90,7 @@ public class CemdapStops2MatsimPlans {
         shapeFileToFeatureKey.put(zonalShapeFile, zoneIdTag);
         shapeFileToFeatureKey.put(spatialRefinementShapeFile, featureKeySpatialRefinement);
 
-        CemdapStops2MatsimPlansConverter.convert(cemdapDataRoot, numberOfFirstCemdapOutputFile, numberOfPlans, outputDirectory,
+        CemdapOutput2MatsimPlansConverter.convert(cemdapDataRoot, numberOfFirstCemdapOutputFile, numberOfPlans, outputDirectory,
                 shapeFileToFeatureKey, allowVariousWorkAndEducationLocations, addStayHomePlan,
                 useLandCoverData, landCoverFile, stopFile, activityFile,simplifyGeometries, combiningGeoms, assignCoordinatesToActivities, activityDurationThreshold_s);
     }

@@ -19,8 +19,8 @@
 
 package org.matsim.scenarioCalibration.marginals;
 
-import playground.vsp.demandde.cemdap.output.ActivityTypes;
-import playground.vsp.demandde.cemdap.output.SplitActivityTypesBasedOnDuration;
+import playground.vsp.openberlinscenario.cemdap.output.ActivityTypes;
+import playground.vsp.openberlinscenario.planmodification.SplitActivityTypesBasedOnDuration;
 
 /**
  * Created by amit on 01.03.18.

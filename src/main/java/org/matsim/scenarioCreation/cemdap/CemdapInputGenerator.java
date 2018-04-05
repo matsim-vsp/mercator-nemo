@@ -27,8 +27,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import playground.vsp.demandde.cemdap.input.DemandGeneratorCensus;
-import playground.vsp.demandde.cemdap.input.ZoneAndLOSGeneratorV2;
+import playground.vsp.openberlinscenario.cemdap.input.DemandGeneratorCensus;
+import playground.vsp.openberlinscenario.cemdap.input.ZoneAndLOSGeneratorV2;
 
 /**
  * Created by amit on 22.06.17.
@@ -80,9 +80,9 @@ public class CemdapInputGenerator {
                     Arrays.asList("05"), defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio);
             demandGeneratorCensus.setWriteMatsimPlanFiles(writeMatsimPlanFiles);
             demandGeneratorCensus.setIncludeChildren(includeChildren);
-            demandGeneratorCensus.setIdsOfMunicipalityForSpatialRefinement(new ArrayList<>(new LinkedHashSet<String>(idsOfMunicipalitiesConsideredForSpatialRefinement)));
-            demandGeneratorCensus.setFeatureKeyInShapeFileForRefinement(plzFeatureKey);
-            demandGeneratorCensus.setMunicipalityFeatureKeyInShapeFile(municipalityFeatureKey);
+            demandGeneratorCensus.setIdsOfMunicipalitiesForSpatialRefinement(new ArrayList<>(new LinkedHashSet<String>(idsOfMunicipalitiesConsideredForSpatialRefinement)));
+            demandGeneratorCensus.setRefinementFeatureKeyInShapefile(plzFeatureKey);
+            demandGeneratorCensus.setMunicipalityFeatureKeyInShapefile(municipalityFeatureKey);
             demandGeneratorCensus.setShapeFileForSpatialRefinement(spatialRefinementShapeFile);
 
             demandGeneratorCensus.generateDemand();
