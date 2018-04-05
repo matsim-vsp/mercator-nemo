@@ -73,6 +73,7 @@ public class NemoModeLocationChoiceCalibrator {
         int lastIt = 200; // apparently 200 iterations are fine.
         double cadytsCountsWt = 15.0;
         double cadytsMarginalsWt = 50.0;
+        boolean rideAsMainMode = false;
 
         if (args.length > 0) {
             configFile = args[0];
@@ -81,6 +82,7 @@ public class NemoModeLocationChoiceCalibrator {
             lastIt = Integer.valueOf(args[3]);
             cadytsCountsWt = Double.valueOf(args[4]);
             cadytsMarginalsWt = Double.valueOf(args[5]);
+            rideAsMainMode = Boolean.valueOf(args[6]);
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -105,7 +107,7 @@ public class NemoModeLocationChoiceCalibrator {
 
         Controler controler = new Controler(scenario);
 
-        if (! PrepareConfig.rideAsMainMode) {
+        if (! rideAsMainMode ) {
             // use car-travel time calculator for ride mode to teleport them yet affected by congestion.
             controler.addOverridingModule(new AbstractModule() {
                 @Override

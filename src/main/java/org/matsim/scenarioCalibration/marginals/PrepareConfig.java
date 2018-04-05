@@ -118,6 +118,7 @@ public class PrepareConfig {
             //using overriding modules
         }
 
+        outConfig.planCalcScore().setWriteExperiencedPlans(true);
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.car).setMarginalUtilityOfTraveling(0.);
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.bike).setMarginalUtilityOfTraveling(0.);
         outConfig.planCalcScore().getOrCreateModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.);

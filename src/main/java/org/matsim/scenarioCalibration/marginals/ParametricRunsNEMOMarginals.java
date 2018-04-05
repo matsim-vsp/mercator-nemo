@@ -31,7 +31,7 @@ public class ParametricRunsNEMOMarginals {
         int runCounter= 207;
 
         String baseOutDir = "/net/ils4/agarwal/nemo/data/marginals/";
-        String matsimDir = "r_3e0c4e8ef53486796e955116184279c4fc88522b_nemoMarginals";
+        String matsimDir = "r_835f86d56474897281286c921b4b7cca90590e64_nemoMarginals";
 
         StringBuilder buffer = new StringBuilder();
         PrepareParametricRuns parametricRuns = new PrepareParametricRuns("~/.ssh/known_hosts","~/.ssh/id_rsa_tub_math","agarwal");
