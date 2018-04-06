@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -202,7 +203,7 @@ public class BikeCountsCreator {
 		log.info("finished conversion of data...");
 		log.info("writing counts to " + this.output + "BikeCounts.xml");
 		CountsWriter writer = new CountsWriter(container);
-		writer.write(this.output + "BikeCounts_" + LocalDate.now().toString() + ".xml");
+		writer.write(this.output + "BikeCounts_" + new SimpleDateFormat("ddMMyyyy").format(new Date()) + ".xml");
 		log.info("finished writing counts file");
 	}
 
