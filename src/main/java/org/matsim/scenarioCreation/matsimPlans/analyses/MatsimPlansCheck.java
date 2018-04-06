@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCreation.matsimPlans;
+package org.matsim.scenarioCreation.matsimPlans.analyses;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
