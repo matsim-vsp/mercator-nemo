@@ -202,7 +202,7 @@ public class BikeCountsCreator {
 		log.info("finished conversion of data...");
 		log.info("writing counts to " + this.output + "BikeCounts.xml");
 		CountsWriter writer = new CountsWriter(container);
-		writer.write(this.output + "BikeCounts.xml");
+		writer.write(this.output + "BikeCounts_" + LocalDate.now().toString() + ".xml");
 		log.info("finished writing counts file");
 	}
 
