@@ -63,7 +63,7 @@
 		<dependency>
 		    <groupId>com.github.matsim-vsp.vsp-playgrounds</groupId>
 		    <artifactId>agarwalamit</artifactId>
-		    <version>-SNAPSHOT</version>
+		    <version>master-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Include the JUnit testing library -->
