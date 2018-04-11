@@ -1,98 +1,77 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.matsim</groupId>
+	<groupId>nemo</groupId>
 	<artifactId>nemo</artifactId>
-	<packaging>jar</packaging>
-	<!--same version as matsim-->
-	<version>0.10.0-SNAPSHOT</version>
-	<name>NEMO project</name>
-	<description>NEMO project</description>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<scm>
-		<url>https://github.com/matsim-vsp/mercator-nemo.git</url>
-		<connection>scm:git:git://github.com/matsim-vsp/mercator-nemo.git</connection>
-		<developerConnection>scm:git:git@github.com:matsim-vsp/mercator-nemo.git</developerConnection>
+		<url>https://gitlab.tubit.tu-berlin.de/vsp/nemo.git</url>
+		<connection>scm:git:git://gitlab.tubit.tu-berlin.de/vsp/nemo.git</connection>
+		<developerConnection>scm:git:git@gitlab.tubit.tu-berlin.de:vsp/nemo.git</developerConnection>
 	</scm>
 
 	<repositories>
+		
 		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
+			<!-- MATSim is not on Maven central -->
+			<id>matsim</id>
+			<url>https://dl.bintray.com/matsim/matsim</url>
 		</repository>
+		
 		<repository>
 			<!-- Geotools is not on Maven central -->
 			<id>osgeo</id>
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
+		
 		<repository>
-			<!-- MATSim is not on Maven central -->
-			<id>matsim</id>
-			<url>https://dl.bintray.com/matsim/matsim</url>
-		</repository>
-		<repository>
+			<!-- Required for MATSim snaphots -->
 			<id>ojo-snapshots</id>
 			<url>http://oss.jfrog.org/libs-snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
 		</repository>
+		
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+		
 	</repositories>
 
 	<dependencies>
+		
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<!-- <version>0.9.0</version> -->
-		 	<version>0.11.0-SNAPSHOT</version>
+			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Include some MATSim extensions -->
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>0.9.0</version>
+			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
-		<!--need some bicycle stuff-->
+		
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>bicycle</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
+		
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>cadytsIntegration</artifactId>
+			<groupId>vsp-playground</groupId>
+			<artifactId>agarwalamit</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
+
 		<!-- Include the JUnit testing library -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
-		</dependency>
-		
-		<!-- include poi library to be able to handle excel files -->
-		<dependency>
-  			<groupId>org.apache.poi</groupId>
-        	<artifactId>poi-ooxml</artifactId>
-        	<version>3.12</version>
-    	</dependency>
-		<!--Dont need vsp because agarwalamit depends on it.-->
-		<!--<dependency>-->
-			<!--<groupId>vsp-playground</groupId>-->
-			<!--<artifactId>vsp</artifactId>-->
-			<!--<version>0.10.0-SNAPSHOT</version>-->
-		<!--</dependency>-->
-		<dependency>
-			<groupId>com.github.matsim-vsp.vsp-playgrounds</groupId>
-			<artifactId>agarwalamit</artifactId>
-			<version>master-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -121,7 +100,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19</version>
 				<configuration>
 					<excludes>
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
@@ -252,4 +230,5 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
 </project>
