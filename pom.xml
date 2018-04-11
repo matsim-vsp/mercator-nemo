@@ -61,9 +61,9 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.github.matsim-vsp.vsp-playgrounds</groupId>
-			<artifactId>agarwalamit</artifactId>
-			<version>master-SNAPSHOT</version>
+		    <groupId>com.github.matsim-vsp.vsp-playgrounds</groupId>
+		    <artifactId>agarwalamit</artifactId>
+		    <version>master-0eefccb274-1</version>
 		</dependency>
 
 		<!-- Include the JUnit testing library -->
