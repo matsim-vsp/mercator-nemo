@@ -45,19 +45,19 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class RuhrDetailedNetworkGenerator {
 
-    private static final boolean useMultiModalNetworkCleaner = false;
+    private static final boolean useMultiModalNetworkCleaner = true;
     private static final boolean readOSMFileAndCreateNetwork = true;
 
     public static void main(String[] args) {
-    	String svnDir = "C:/Users/Work/svn/shared-svn/projects/nemo_mercator/";
-        String osmfile = svnDir + "data/matsim_input/zz_archive/network/06042018/NRW_completeTransportNet.osm.gz";
+    	String svnDir = "../../repos/shared-svn/";
+        String osmfile = svnDir + "projects/nemo_mercator/data/matsim_input/zz_archive/network/06042018/NRW_completeTransportNet.osm.gz";
         List<String> inputCountNodeMappingFiles = Arrays.asList(
-        		svnDir + "data/matsim_input/zz_archive/counts/mapmatching/OSMNodeIDs_Dauerzaehlstellen.csv",
-        		svnDir + "data/matsim_input/zz_archive/counts/mapmatching/Nemo_kurzfristZaehlstellen_OSMNodeIDs_UTM33N-allStationsInclNotFound.csv");
+        		svnDir + "projects/nemo_mercator/data/matsim_input/zz_archive/counts/mapmatching/OSMNodeIDs_Dauerzaehlstellen.csv",
+        		svnDir + "projects/nemo_mercator/data/matsim_input/zz_archive/counts/mapmatching/Nemo_kurzfristZaehlstellen_OSMNodeIDs_UTM33N-allStationsInclNotFound.csv");
         String epsg = NEMOUtils.NEMO_EPSG;
         String prefix = "detailedRuhr_Network_" + new SimpleDateFormat("ddMMyyyy").format(new Date());
-        String outDir = svnDir + "data/matsim_input/2018-04-12_RuhrDetailedNet_unCleaned/";
-        String shapeFile = svnDir + "data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
+        String outDir = svnDir + "projects/nemo_mercator/data/matsim_input/2018-04-19_RuhrDetailedNet_unCleaned/";
+        String shapeFile = svnDir + "projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
         if ( readOSMFileAndCreateNetwork ){
             NemoNetworkCreator nemoNetworkCreator = new NemoNetworkCreator(osmfile,
                     inputCountNodeMappingFiles,
