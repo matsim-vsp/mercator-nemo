@@ -63,12 +63,12 @@ public class NemoModeLocationChoiceCalibrator {
 
         String configFile;
         if (PrepareConfig.rideAsMainMode) {
-            configFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig_rideAsMainMode.xml";
+            configFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig_rideAsMainMode.xml";
         } else {
-            configFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
+            configFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
         }
 
-        String outputDir = "../runs-svn/nemo/marginals/output/testCalib/";
+        String outputDir = "../../repos/runs-svn/nemo/marginals/output/testCalib/";
 
         String runId = "run207";
 

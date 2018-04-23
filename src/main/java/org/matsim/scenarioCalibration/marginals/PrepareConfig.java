@@ -76,8 +76,8 @@ public class PrepareConfig {
         outConfig.global().setInsistingOnDeprecatedConfigVersion(false);
 
         double flowCapFactor = NEMOUtils.SAMPLE_SIZE * (NEMOUtils.RUHR_CAR_SHARE + NEMOUtils.RUHR_PT_SHARE) / NEMOUtils.RUHR_CAR_SHARE;
-        outConfig.qsim().setFlowCapFactor(NumberUtils.round(flowCapFactor, 2));
-        outConfig.qsim().setStorageCapFactor( NumberUtils.round(     flowCapFactor / Math.pow(flowCapFactor, 0.25)   ,2)  );
+        outConfig.qsim().setFlowCapFactor(NumberUtils.round(flowCapFactor, 3));//TODO why 1% only
+        outConfig.qsim().setStorageCapFactor( NumberUtils.round(     flowCapFactor / Math.pow(flowCapFactor, 0.25)   ,3)  );
         outConfig.qsim().setStuckTime(30.0);
         outConfig.qsim().setUsingFastCapacityUpdate(true);
         outConfig.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
