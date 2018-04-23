@@ -45,8 +45,10 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
+import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
@@ -120,7 +122,18 @@ public class NemoModeLocationChoiceCalibrator {
 
         // marginals cadyts
         DistanceDistribution inputDistanceDistribution = getDistanceDistribution();
-        controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
+        if (cadytsMarginalsWt!=0.){
+            controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
+        } else { //get the analysis at least
+            controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    this.bind(DistanceDistribution.class).toInstance(inputDistanceDistribution);
+                    this.bind(BeelineDistanceCollector.class);
+                    this.addControlerListenerBinding().to(ModalDistanceDistributionControlerListener.class);
+                }
+            });
+        }
         final double cadytsMarginalsScoringWeight = cadytsMarginalsWt * config.planCalcScore().getBrainExpBeta();
 
         // counts cadyts
@@ -150,13 +163,15 @@ public class NemoModeLocationChoiceCalibrator {
                         cadytsContext);
                 scoringFunctionCounts.setWeightOfCadytsCorrection(cadytsCountsScoringWeight);
 
-                final CadytsScoring<ModalDistanceBinIdentifier> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
-                        config,
-                        marginalCadytsContext);
-                scoringFunctionMarginals.setWeightOfCadytsCorrection(cadytsMarginalsScoringWeight);
+                if(cadytsCountsScoringWeight==0.){
+                    final CadytsScoring<ModalDistanceBinIdentifier> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
+                            config,
+                            marginalCadytsContext);
+                    scoringFunctionMarginals.setWeightOfCadytsCorrection(cadytsMarginalsScoringWeight);
+                    sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
+                }
 
                 sumScoringFunction.addScoringFunction(scoringFunctionCounts);
-                sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
 
                 return sumScoringFunction;
             }
