@@ -74,7 +74,7 @@ public class NemoModeLocationChoiceCalibrator {
 
         int lastIt = 200; // apparently 200 iterations are fine.
         double cadytsCountsWt = 15.0;
-        double cadytsMarginalsWt = 50.0;
+        double cadytsMarginalsWt = 0.0;
         boolean rideAsMainMode = false;
 
         if (args.length > 0) {
@@ -122,8 +122,9 @@ public class NemoModeLocationChoiceCalibrator {
 
         // marginals cadyts
         DistanceDistribution inputDistanceDistribution = getDistanceDistribution();
-        if (cadytsMarginalsWt!=0.){
+        if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
+
         } else { //get the analysis at least
             controler.addOverridingModule(new AbstractModule() {
                 @Override
@@ -134,49 +135,76 @@ public class NemoModeLocationChoiceCalibrator {
                 }
             });
         }
-        final double cadytsMarginalsScoringWeight = cadytsMarginalsWt * config.planCalcScore().getBrainExpBeta();
 
         // counts cadyts
         controler.addOverridingModule(new CadytsCarModule());
         final double cadytsCountsScoringWeight = cadytsCountsWt * config.planCalcScore().getBrainExpBeta();
 
-        controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-            @Inject
-            private CadytsContext cadytsContext;
-            @Inject
-            ScoringParametersForPerson parameters;
-            @Inject
-            private ModalDistanceCadytsContext marginalCadytsContext;
+        if (cadytsMarginalsWt!=0.) {
+            final double cadytsMarginalsScoringWeight = cadytsMarginalsWt * config.planCalcScore().getBrainExpBeta();
+            controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+                @Inject
+                private CadytsContext cadytsContext;
+                @Inject
+                ScoringParametersForPerson parameters;
 
-            @Override
-            public ScoringFunction createNewScoringFunction(Person person) {
-                SumScoringFunction sumScoringFunction = new SumScoringFunction();
+                @Inject private ModalDistanceCadytsContext marginalCadytsContext;
 
-                final ScoringParameters params = parameters.getScoringParameters(person);
-                sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-                        controler.getScenario().getNetwork()));
-                sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
-                sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+                @Override
+                public ScoringFunction createNewScoringFunction(Person person) {
+                    SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
-                final CadytsScoring<Link> scoringFunctionCounts = new CadytsScoring<Link>(person.getSelectedPlan(),
-                        config,
-                        cadytsContext);
-                scoringFunctionCounts.setWeightOfCadytsCorrection(cadytsCountsScoringWeight);
+                    final ScoringParameters params = parameters.getScoringParameters(person);
+                    sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
+                            controler.getScenario().getNetwork()));
+                    sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+                    sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-                if(cadytsCountsScoringWeight==0.){
-                    final CadytsScoring<ModalDistanceBinIdentifier> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
+                    final CadytsScoring<Link> scoringFunctionCounts = new CadytsScoring<Link>(person.getSelectedPlan(),
                             config,
-                            marginalCadytsContext);
+                            cadytsContext);
+                    scoringFunctionCounts.setWeightOfCadytsCorrection(cadytsCountsScoringWeight);
+
+                    final CadytsScoring<ModalDistanceBinIdentifier> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
+                                config,
+                                marginalCadytsContext);
+
                     scoringFunctionMarginals.setWeightOfCadytsCorrection(cadytsMarginalsScoringWeight);
                     sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
+
+                    sumScoringFunction.addScoringFunction(scoringFunctionCounts);
+
+                    return sumScoringFunction;
                 }
+            });
+        } else {
+            controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+                @Inject
+                private CadytsContext cadytsContext;
+                @Inject
+                ScoringParametersForPerson parameters;
 
-                sumScoringFunction.addScoringFunction(scoringFunctionCounts);
+                @Override
+                public ScoringFunction createNewScoringFunction(Person person) {
+                    SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
-                return sumScoringFunction;
-            }
-        });
+                    final ScoringParameters params = parameters.getScoringParameters(person);
+                    sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
+                            controler.getScenario().getNetwork()));
+                    sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+                    sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
+                    final CadytsScoring<Link> scoringFunctionCounts = new CadytsScoring<Link>(person.getSelectedPlan(),
+                            config,
+                            cadytsContext);
+                    scoringFunctionCounts.setWeightOfCadytsCorrection(cadytsCountsScoringWeight);
+
+                    sumScoringFunction.addScoringFunction(scoringFunctionCounts);
+
+                    return sumScoringFunction;
+                }
+            });
+        }
         controler.run();
     }
 
