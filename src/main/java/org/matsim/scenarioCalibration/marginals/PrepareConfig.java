@@ -60,7 +60,7 @@ public class PrepareConfig {
 
         Config outConfig = ConfigUtils.createConfig();
 
-        outConfig.counts().setInputFile("NemoCounts_data_allCounts_Pkw_24Nov2017.xml");
+        outConfig.counts().setInputFile("NemoCounts_data_allCounts_Pkw_24Nov2017_filteredForRuhr.xml");
         outConfig.counts().setWriteCountsInterval(10);
         outConfig.counts().setCountsScaleFactor( (1 / NEMOUtils.SAMPLE_SIZE) * NEMOUtils.RUHR_CAR_SHARE / (NEMOUtils.RUHR_CAR_SHARE + NEMOUtils.RUHR_PT_SHARE) );
         outConfig.counts().setWriteCountsInterval(10);
