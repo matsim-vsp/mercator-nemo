@@ -1,0 +1,1 @@
+01 Mär 2018 12:11:44,130 0    [main] INFO  org.matsim.scenarioCreation.network.NemoNetworkCreator  - ---set the coordinate system for network to be created to EPSG:25832 ---

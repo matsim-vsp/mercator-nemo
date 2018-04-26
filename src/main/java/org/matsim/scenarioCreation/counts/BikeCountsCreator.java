@@ -67,13 +67,13 @@ import org.matsim.counts.CountsWriter;
 public class BikeCountsCreator {
 
 	//----------------------INPUT FILES---------------------------------------------
-	private static final String COUNT_DATA_FILE = "C:/Users/Work/svn/shared-svn/projects/nemo_mercator/data/matsim_input/zz_archive/bike_counts/CountData.csv";
-	private static final String COUNT_LOCALISATION_FILE = "C:/Users/Work/svn/shared-svn/projects/nemo_mercator/data/matsim_input/zz_archive/bike_counts/CountLocations_test.csv";
-	private static final String NETWORK_FILE = "C:/Users/Work/svn/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-13_RuhrDetailedNet_unCleaned/detailedRuhr_Network_15032018unfiltered_network_bike.xml";
+	private static final String COUNT_DATA_FILE = "Z:/WinHome/shared-svn/projects/nemo_mercator/data/original_files/counts_rohdaten/bike/CountData.csv";
+	private static final String COUNT_LOCALISATION_FILE = "Z:/WinHome/shared-svn/projects/nemo_mercator/data/original_files/counts_rohdaten/bike/CountLocations.csv";
+	private static final String NETWORK_FILE = "Z:/WinHome/shared-svn/projects/nemo_mercator/data/matsim_input/2018-04-12_RuhrDetailedNet/detailedRuhr_Network_19042018filteredsimplified_network.xml.gz";
 //	private static final String NETWORK_FILE = "";
 	
 	//----------------------OUTPUT FILES---------------------------------------------
-	private static String outputPath = "C:/Users/Work/svn/shared-svn/projects/nemo_mercator/data/matsim_input/bikeCounts/";
+	private static String outputPath = "Z:/WinHome/shared-svn/projects/nemo_mercator/data/matsim_input/bikeCounts/";
 	
 	//-------------------------------------------------------------------------------
 	protected Logger log = Logger.getLogger(this.getClass().getName());
@@ -157,7 +157,7 @@ public class BikeCountsCreator {
 					countDirOne = container.createAndAddCount(linkIDDirectionOne, dataObject.getId() + "_R1" );
 					countDirTwo = container.createAndAddCount(linkIDDirectionTwo, dataObject.getId() + "_R2" );
 
-				for(int i = 1; i < 25; i++) {
+				for(int i = 0; i < 24; i++) {
 					Double valueDirOne = dataObject.getR1Values().get(i);
 					Double valueDirTwo = dataObject.getR2Values().get(i);
 
@@ -171,8 +171,8 @@ public class BikeCountsCreator {
 						log.warning( problem + " Error occured at creation nr " + cnt);
 						valueDirTwo = -1.0;
 					}
-						if(countDirOne != null)	countDirOne.createVolume(i, Math.ceil(valueDirOne));
-						if(countDirTwo != null) countDirTwo.createVolume(i, Math.ceil(valueDirTwo));
+						if(countDirOne != null)	countDirOne.createVolume(i+1, Math.ceil(valueDirOne));
+						if(countDirTwo != null) countDirTwo.createVolume(i+1, Math.ceil(valueDirTwo));
 				}
 				
 				allDataStations.remove(stationID);
