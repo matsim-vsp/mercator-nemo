@@ -213,7 +213,7 @@ public class NemoModeLocationChoiceCalibrator {
 
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car",1.3); //+pt
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("bike",1.3);
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("walk",1.3);
+        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("walk",1.1);
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("ride",1.3);
 
         inputDistanceDistribution.setModeToScalingFactor("car", (1 / NEMOUtils.SAMPLE_SIZE) * NEMOUtils.RUHR_CAR_SHARE / (NEMOUtils.RUHR_CAR_SHARE + NEMOUtils.RUHR_PT_SHARE) ); // -> (carShare + pt Shapre ) * 100 / carShare
