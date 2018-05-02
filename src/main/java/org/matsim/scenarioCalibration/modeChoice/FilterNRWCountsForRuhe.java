@@ -32,7 +32,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.corineLandcover.GeometryUtils;
 
 /**
@@ -60,7 +59,7 @@ public class FilterNRWCountsForRuhe {
         this.combinedGeom = GeometryUtils.combine(features.stream()
                                                           .map(f -> (Geometry) f.getDefaultGeometry())
                                                           .collect(Collectors.toList()));
-        this.network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
+        this.network = NEMOUtils.loadScenarioFromNetwork(networkFile).getNetwork();
     }
 
     public static void main(String[] args) {

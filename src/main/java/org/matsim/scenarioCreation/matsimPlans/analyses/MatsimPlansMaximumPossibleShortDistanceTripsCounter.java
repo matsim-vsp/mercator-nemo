@@ -19,6 +19,7 @@
 
 package org.matsim.scenarioCreation.matsimPlans.analyses;
 
+import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -26,7 +27,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Created by amit on 04.04.18.
@@ -42,7 +42,7 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
 
         String inputPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
 
-        Population population = LoadMyScenarios.loadScenarioFromPlans(inputPlansFile).getPopulation();
+        Population population = NEMOUtils.loadScenarioFromPlans(inputPlansFile).getPopulation();
 
         // go through with all plans and take plan which has most number of short trips (0-1km)
         int shortTripsCounter = 0;

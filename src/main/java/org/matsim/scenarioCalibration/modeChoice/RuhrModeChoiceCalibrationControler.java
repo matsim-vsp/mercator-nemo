@@ -26,17 +26,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
-import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
-import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
-import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 
 /**
  *
@@ -134,18 +128,19 @@ public class RuhrModeChoiceCalibrationControler {
         }
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addTravelTimeBinding(TransportMode.bike).to(FreeSpeedTravelTimeForBike.class);
-
-                this.bind(ModalShareEventHandler.class);
-                this.addControlerListenerBinding().to(ModalShareControlerListener.class);
-
-                this.bind(ModalTripTravelTimeHandler.class);
-                this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
-            }
-        });
+            //commenting following, move classes to vsp if required. Amit May'18
+//        controler.addOverridingModule(new AbstractModule() {
+//            @Override
+//            public void install() {
+//                addTravelTimeBinding(TransportMode.bike).to(FreeSpeedTravelTimeForBike.class);
+//
+//                this.bind(ModalShareEventHandler.class);
+//                this.addControlerListenerBinding().to(ModalShareControlerListener.class);
+//
+//                this.bind(ModalTripTravelTimeHandler.class);
+//                this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
+//            }
+//        });
         controler.run();
     }
 }

@@ -37,7 +37,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Created by amit on 15.02.18.
@@ -80,7 +79,7 @@ public class RuhrDetailedNetworkGenerator {
             nemoNetworkCreator.writeNetwork();
         } else {
             if ( useMultiModalNetworkCleaner ){
-                Network network = LoadMyScenarios
+                Network network = NEMOUtils
                         .loadScenarioFromNetwork(outDir + "detailedRuhr_Network_17022018filteredcleaned_network.xml.gz")
                         .getNetwork();
                 MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);

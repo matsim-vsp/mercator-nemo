@@ -21,6 +21,7 @@ package org.matsim.scenarioCreation.matsimPlans;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -28,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Created by amit on 29.01.18.
@@ -41,7 +41,7 @@ public class PersonActivityLocationWriter {
 
         String plansFile = "data/input/plans/2018_jan_24/plans_1pct_fullChoiceSet_coordsAssigned.xml.gz";
 
-        Population population = LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation();
+        Population population = NEMOUtils.loadScenarioFromPlans(plansFile).getPopulation();
 
         String outFile = "data/input/plans/2018_jan_24/plans_1pct_activityLocations.txt";
 

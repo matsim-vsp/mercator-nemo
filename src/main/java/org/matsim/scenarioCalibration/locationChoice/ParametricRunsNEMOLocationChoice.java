@@ -19,7 +19,7 @@
 
 package org.matsim.scenarioCalibration.locationChoice;
 
-import playground.agarwalamit.parametricRuns.PrepareParametricRuns;
+import playground.vsp.parametricRuns.PrepareParametricRuns;
 
 /**
  * Created by amit.

@@ -19,12 +19,12 @@
 
 package org.matsim.scenarioCreation.matsimPlans.analyses;
 
+import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Created by amit on 06.02.18.
@@ -38,7 +38,7 @@ public class MatsimPlansCheck {
     }
 
     private void checkForSameHomeCoord(String plansFile){
-        Population population = LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation();
+        Population population = NEMOUtils.loadScenarioFromPlans(plansFile).getPopulation();
 
         for(Person person : population.getPersons().values()){
             String homZoneId = null;

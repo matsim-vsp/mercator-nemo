@@ -19,7 +19,7 @@
 
 package org.matsim.scenarioCalibration.modeChoice;
 
-import playground.agarwalamit.parametricRuns.PrepareParametricRuns;
+import playground.vsp.parametricRuns.PrepareParametricRuns;
 
 /**
  * Created by amit on 15.02.18.

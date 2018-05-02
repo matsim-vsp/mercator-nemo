@@ -33,7 +33,6 @@ import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Created by amit on 29.01.18.
@@ -48,7 +47,7 @@ public class NemoMatsimNetworkToShapeFile {
         String epsg = NEMOUtils.NEMO_EPSG;
 
 
-        Network network = LoadMyScenarios.loadScenarioFromNetwork(inputNetwork).getNetwork();
+        Network network = NEMOUtils.loadScenarioFromNetwork(inputNetwork).getNetwork();
 
 
         CoordinateReferenceSystem crs = MGC.getCRS(epsg);//i have tried 2842 3659,2455  32035 and  32135

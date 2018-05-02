@@ -42,7 +42,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.corineLandcover.GeometryUtils;
 
 /**
@@ -75,12 +74,12 @@ public class FilterSimulatedNRWPopulationForRuhr {
         this.combinedGeom = GeometryUtils.combine(features.stream()
                                                           .map(f -> (Geometry) f.getDefaultGeometry())
                                                           .collect(Collectors.toList()));
-        this.network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
+        this.network = NEMOUtils.loadScenarioFromNetwork(networkFile).getNetwork();
         this.outPopulation = ScenarioUtils.loadScenario(ConfigUtils.createConfig()).getPopulation();
     }
 
     public static void main(String[] args) {
-        Population inputPopulation = LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation();
+        Population inputPopulation = NEMOUtils.loadScenarioFromPlans(plansFile).getPopulation();
         new FilterSimulatedNRWPopulationForRuhr().processAndWritePlans(inputPopulation);
     }
 

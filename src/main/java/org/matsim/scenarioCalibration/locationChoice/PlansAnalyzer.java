@@ -19,8 +19,6 @@
 
 package org.matsim.scenarioCalibration.locationChoice;
 
-import playground.agarwalamit.utils.plans.OutputPlansConsistencyCheck;
-
 /**
  * Created by amit on 09.11.17.
  */
@@ -32,7 +30,8 @@ public class PlansAnalyzer {
         String initialPlansFile = "data/input/plans/2018_jan_22/plans_1pct_fullChoiceSet_coordsAssigned.xml.gz";
         String initialConfig = "data/locationChoice/input/config.xml";
         String outputFile = "data/input/plans/2018_jan_22/";
-        new OutputPlansConsistencyCheck(initialPlansFile, initialConfig, outputFile).run();
+        //commenting following for time being, if required, move to vsp. Amit May'18
+//        new OutputPlansConsistencyCheck(initialPlansFile, initialConfig, outputFile).run();
 
     }
 
