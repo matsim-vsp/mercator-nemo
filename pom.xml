@@ -69,7 +69,8 @@
 			<!--it appears, that vsp playground is provided by jitpack but not any other submodule.-->
             <!--<artifactId>agarwalamit</artifactId>-->
 			<artifactId>vsp</artifactId>
-		    <version>master-SNAPSHOT</version>
+		    <!-- <version>master-SNAPSHOT</version> -->
+		    <version>branch4NEMO-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Include the JUnit testing library -->
