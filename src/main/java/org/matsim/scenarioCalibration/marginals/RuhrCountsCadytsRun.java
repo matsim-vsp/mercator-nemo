@@ -41,6 +41,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import playground.agarwalamit.utils.NumberUtils;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
@@ -70,6 +71,12 @@ public class RuhrCountsCadytsRun {
         Config config = ConfigUtils.loadConfig(configFile);
         config.controler().setRunId(runID);
         config.controler().setOutputDirectory(outDir);
+        double flowCapFactor = NumberUtils.round(1 * NEMOUtils.SAMPLE_SIZE / NEMOUtils.RUHR_CAR_SHARE,2); //0.021
+        config.qsim().setFlowCapFactor(  flowCapFactor);
+        config.qsim().setStorageCapFactor(0.3);
+
+        double countScaleFactor = NumberUtils.round(1/flowCapFactor,2);
+        config.counts().setCountsScaleFactor(countScaleFactor);
 
         if (args.length == 0) {
             config.controler()
@@ -81,7 +88,7 @@ public class RuhrCountsCadytsRun {
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new CadytsCarModule());
 
-        DistanceDistribution inputDistanceDistribution = getDistanceDistribution();
+        DistanceDistribution inputDistanceDistribution = getDistanceDistribution(countScaleFactor);
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -120,14 +127,14 @@ public class RuhrCountsCadytsRun {
         controler.run();
     }
 
-    private static DistanceDistribution getDistanceDistribution(){
+    private static DistanceDistribution getDistanceDistribution(double countScaleFactor){
         DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
 
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car",1.3); //+pt
+        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car",1.3);
 
-        inputDistanceDistribution.setModeToScalingFactor("car", (1 / NEMOUtils.SAMPLE_SIZE) * NEMOUtils.RUHR_CAR_SHARE / (1) ); // -> (carShare + pt Shapre ) * 100 / carShare
+        inputDistanceDistribution.setModeToScalingFactor("car", countScaleFactor ); // similar to counts scale factor
 
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0,1000.),1745861.0); //car+PT
+        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0,1000.),1745861.0);
         inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(1000.0,3000.),2733563.0);
         inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(3000.0,5000.),2026614.0);
         inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(5000.0,10000.),3103984.0);
