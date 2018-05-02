@@ -19,31 +19,17 @@
 
 package org.matsim.scenarioCalibration.locationChoice.analysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import org.matsim.NEMOAreaFilter;
 import org.matsim.NEMOUtils;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.tripDistance.TripDistanceHandler;
-import playground.agarwalamit.utils.FileUtils;
-import playground.agarwalamit.utils.ListUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.agarwalamit.utils.MapUtils;
 
 /**
  * Created by amit on 01.02.18.
@@ -83,65 +69,65 @@ public class NRWZonalTripDistanceDistribution {
                 NEMOUtils.Ruhr_MUNICIPALITY_SHAPE_FILE,
                 NEMOUtils.MUNICIPALITY_SHAPE_FEATURE_KEY);
 
-        String outputFilesDir = FileUtils.RUNS_SVN + "/nemo/locationChoice/" + runNr + "/output/";
-        Network network = LoadMyScenarios.loadScenarioFromNetwork(outputFilesDir + "/" + runNr + ".output_network.xml.gz")
+        String outputFilesDir =  "../../runs-svn/nemo/locationChoice/" + runNr + "/output/";
+        Network network = NEMOUtils.loadScenarioFromNetwork(outputFilesDir + "/" + runNr + ".output_network.xml.gz")
                                          .getNetwork();
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
         PersonHomeLocationHandler homeLocationHandler = new PersonHomeLocationHandler(areaFilter, network);
         eventsManager.addHandler(homeLocationHandler);
 
-        TripDistanceHandler tripDistanceHandler = new TripDistanceHandler(network);
-        eventsManager.addHandler(tripDistanceHandler);
-
-        new MatsimEventsReader(eventsManager).readFile(outputFilesDir + "/" + runNr + ".output_events.xml.gz");
-
-        Map<String, List<Id<Person>>> zoneNameToListOfPersons = homeLocationHandler.getZoneNameToListOfPersons();
-        Map<Id<Person>, List<Double>> idListMap = tripDistanceHandler.getMode2PersonId2TravelDistances().get(TransportMode.car);
-
-        Map<String, List<Double>> zoneNameToListOfTripDistances =
-                zoneNameToListOfPersons.entrySet()
-                                       .stream()
-                                       .collect(Collectors.toMap(Map.Entry::getKey,
-                                               e -> e.getValue().stream()
-                                                       .flatMap(p -> idListMap.get(p).stream())
-                                                       .collect(Collectors.toList())));
-
-        String analysisDir = outputFilesDir+"/analysis/";
-        if (! new File(analysisDir).exists() ) new File(analysisDir).mkdir();
-
-        BufferedWriter writer = IOUtils.getBufferedWriter(analysisDir+"/avgTripDistances.txt");
-        try {
-            writer.write("Zone\tavgTripDistanceInM\tnumberOfTrips\n");
-            for(String zone : zoneNameToListOfTripDistances.keySet()){
-                writer.write(zone+"\t"+String.valueOf(
-                        ListUtils.doubleMean(zoneNameToListOfTripDistances.get(zone) ) ) + "\t"+ zoneNameToListOfTripDistances.get(zone).size() +"\n" );
-            }
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Data is not written/read. Reason : " + e);
-        }
-
-        for(String zone : zoneNameToListOfTripDistances.keySet()) {
-            SortedMap<Double, Integer> distanceClass2TripCount = getDistanceBinToCounts(nameToDistanceClasses.get(zone), zoneNameToListOfTripDistances.get(zone));
-
-            String outFile = analysisDir+"/tripDistanceDistribution_"+zone+".txt";
-            writeResults(distanceClass2TripCount, outFile);
-        }
+//        TripDistanceHandler tripDistanceHandler = new TripDistanceHandler(network);
+//        eventsManager.addHandler(tripDistanceHandler);
+//
+//        new MatsimEventsReader(eventsManager).readFile(outputFilesDir + "/" + runNr + ".output_events.xml.gz");
+//
+//        Map<String, List<Id<Person>>> zoneNameToListOfPersons = homeLocationHandler.getZoneNameToListOfPersons();
+//        Map<Id<Person>, List<Double>> idListMap = tripDistanceHandler.getMode2PersonId2TravelDistances().get(TransportMode.car);
+//
+//        Map<String, List<Double>> zoneNameToListOfTripDistances =
+//                zoneNameToListOfPersons.entrySet()
+//                                       .stream()
+//                                       .collect(Collectors.toMap(Map.Entry::getKey,
+//                                               e -> e.getValue().stream()
+//                                                       .flatMap(p -> idListMap.get(p).stream())
+//                                                       .collect(Collectors.toList())));
+//
+//        String analysisDir = outputFilesDir+"/analysis/";
+//        if (! new File(analysisDir).exists() ) new File(analysisDir).mkdir();
+//
+//        BufferedWriter writer = IOUtils.getBufferedWriter(analysisDir+"/avgTripDistances.txt");
+//        try {
+//            writer.write("Zone\tavgTripDistanceInM\tnumberOfTrips\n");
+//            for(String zone : zoneNameToListOfTripDistances.keySet()){
+//                writer.write(zone+"\t"+String.valueOf(
+//                        ListUtils.doubleMean(zoneNameToListOfTripDistances.get(zone) ) ) + "\t"+ zoneNameToListOfTripDistances.get(zone).size() +"\n" );
+//            }
+//            writer.close();
+//        } catch (IOException e) {
+//            throw new RuntimeException("Data is not written/read. Reason : " + e);
+//        }
+//
+//        for(String zone : zoneNameToListOfTripDistances.keySet()) {
+//            SortedMap<Double, Integer> distanceClass2TripCount = getDistanceBinToCounts(nameToDistanceClasses.get(zone), zoneNameToListOfTripDistances.get(zone));
+//
+//            String outFile = analysisDir+"/tripDistanceDistribution_"+zone+".txt";
+//            writeResults(distanceClass2TripCount, outFile);
+//        }
     }
 
     private void writeResults(SortedMap<Double, Integer> distanceClassToTrips, String outFile) {
-        SortedMap<Double, Double> distanceClass2ShareOfTrips = MapUtils.getIntPercentShare(distanceClassToTrips);
-        BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
-        try {
-            writer.write("distanceClassInMeters\tnumberOfTrips\ttripShare\n");
-            for (Double distClass : distanceClass2ShareOfTrips.keySet()){
-                writer.write(String.valueOf(distClass+"+")+"\t"+distanceClassToTrips.get(distClass)+"\t"+distanceClass2ShareOfTrips.get(distClass)+"\n");
-            }
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Data is not written/read. Reason : " + e);
-        }
+//        SortedMap<Double, Double> distanceClass2ShareOfTrips = MapUtils.getIntPercentShare(distanceClassToTrips);
+//        BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
+//        try {
+//            writer.write("distanceClassInMeters\tnumberOfTrips\ttripShare\n");
+//            for (Double distClass : distanceClass2ShareOfTrips.keySet()){
+//                writer.write(String.valueOf(distClass+"+")+"\t"+distanceClassToTrips.get(distClass)+"\t"+distanceClass2ShareOfTrips.get(distClass)+"\n");
+//            }
+//            writer.close();
+//        } catch (IOException e) {
+//            throw new RuntimeException("Data is not written/read. Reason : " + e);
+//        }
     }
 
     private SortedMap<Double, Integer> getDistanceBinToCounts(List<Double> distanceClasses, List<Double> distances){

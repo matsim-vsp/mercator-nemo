@@ -42,9 +42,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.utils.FileUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.agarwalamit.utils.NumberUtils;
 
 /**
  * Created by amit on 01.02.18.
@@ -77,8 +74,8 @@ public class NRWZonalActivityTypeDistributionWriter {
                 NEMOUtils.Ruhr_MUNICIPALITY_SHAPE_FILE,
                 NEMOUtils.MUNICIPALITY_SHAPE_FEATURE_KEY);
 
-        String outputFilesDir = FileUtils.RUNS_SVN + "/nemo/locationChoice/" + runNr + "/output/";
-        Network network = LoadMyScenarios.loadScenarioFromNetwork(outputFilesDir + "/" + runNr + ".output_network.xml.gz")
+        String outputFilesDir =  "../../runs-svn/nemo/locationChoice/" + runNr + "/output/";
+        Network network = NEMOUtils.loadScenarioFromNetwork(outputFilesDir + "/" + runNr + ".output_network.xml.gz")
                                          .getNetwork();
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -129,7 +126,7 @@ public class NRWZonalActivityTypeDistributionWriter {
         try {
             writer.write("actType\tnumberOfTrips\ttripShare\n");
             for (String act : act2Counter.keySet()) {
-                writer.write(act + "\t" + act2Counter.get(act) + "\t" + String.valueOf(NumberUtils.round(act2Counter.get(
+                writer.write(act + "\t" + act2Counter.get(act) + "\t" + String.valueOf(NEMOUtils.round(act2Counter.get(
                         act) * 100.0 / totalActs, 2)) + "\n");
             }
             writer.close();
