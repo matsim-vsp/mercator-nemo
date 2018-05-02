@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import javax.inject.Inject;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -121,7 +120,7 @@ public class NemoModeLocationChoiceCalibrator {
         }
 
         // marginals cadyts
-        DistanceDistribution inputDistanceDistribution = getDistanceDistribution();
+        DistanceDistribution inputDistanceDistribution = getDistanceDistribution(config.counts().getCountsScaleFactor());
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
 
@@ -208,7 +207,7 @@ public class NemoModeLocationChoiceCalibrator {
         controler.run();
     }
 
-    private static DistanceDistribution getDistanceDistribution(){
+    private static DistanceDistribution getDistanceDistribution(double carCountScaleFactor){
         DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
 
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car",1.3); //+pt
@@ -216,7 +215,7 @@ public class NemoModeLocationChoiceCalibrator {
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("walk",1.1);
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("ride",1.3);
 
-        inputDistanceDistribution.setModeToScalingFactor("car", (1 / NEMOUtils.SAMPLE_SIZE) * NEMOUtils.RUHR_CAR_SHARE / (NEMOUtils.RUHR_CAR_SHARE + NEMOUtils.RUHR_PT_SHARE) ); // -> (carShare + pt Shapre ) * 100 / carShare
+        inputDistanceDistribution.setModeToScalingFactor("car", carCountScaleFactor ); 
         inputDistanceDistribution.setModeToScalingFactor("bike", 100.0);
         inputDistanceDistribution.setModeToScalingFactor("walk", 100.0);
         inputDistanceDistribution.setModeToScalingFactor("ride", 100.0 );

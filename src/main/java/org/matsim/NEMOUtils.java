@@ -39,7 +39,7 @@ public final class NEMOUtils {
     public static final String Ruhr_PLZ_SHAPE_FEATURE_KEY = "plz";
     //feature key for CORINE_LANDCOVER -- LandCoverUtils.CORINE_LANDCOVER_TAG_ID;
 
-    // following is derived from the excel-sheet
+    // following is derived from the excel-sheet (repos/shared-svn/projects/nemo_mercator/doc/50_conceptual/trip_distances.xlsx)
     public static double RUHR_CAR_SHARE = 0.471;
     public static double RUHR_PT_SHARE = 0.158;
     public static double SAMPLE_SIZE = 0.01;
