@@ -19,6 +19,10 @@
 
 package org.matsim;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioUtils;
+
 /**
  * Created by amit on 29.01.18.
  */
@@ -43,5 +47,32 @@ public final class NEMOUtils {
     public static double RUHR_CAR_SHARE = 0.471;
     public static double RUHR_PT_SHARE = 0.158;
     public static double SAMPLE_SIZE = 0.01;
+
+    // copying few methods from agarwalamit to depend only on 'vsp'
+
+    public static double round(double number, int decimalPlace){
+        double multiplier = Math.pow(10, decimalPlace);
+        return Math.round(number * multiplier) / multiplier;
+    }
+
+    /**
+     * Returns scenario containing only network file location.
+     */
+    public static Scenario loadScenarioFromNetwork(String networkFile) {
+        Config config = new Config();
+        config.addCoreModules();
+        config.network().setInputFile(networkFile);
+        return ScenarioUtils.loadScenario(config);
+    }
+
+    /**
+     * Returns scenario containing only plans file location.
+     */
+    public static Scenario loadScenarioFromPlans(String plansFile) {
+        Config config = new Config();
+        config.addCoreModules();
+        config.plans().setInputFile(plansFile);
+        return ScenarioUtils.loadScenario(config);
+    }
 
 }

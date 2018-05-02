@@ -42,7 +42,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import playground.agarwalamit.utils.FileUtils;
 
 /**
  * Created by amit on 03.11.17.
@@ -52,11 +51,11 @@ public class NemoLocationChoiceCalibration {
 
     public static void main(String[] args) {
 
-        String configFile = FileUtils.RUNS_SVN+"/nemo/locationChoice/input/config.xml";
+        String configFile = "../../repos/runs-svn/nemo/locationChoice/input/config.xml";
         String plansFile = "data/input/plans/2018_jan_24/plans_1pct_fullChoiceSet_coordsAssigned.xml.gz";
         String networkFile = "data/input/network/allWaysNRW/tertiaryNemo_10112017_EPSG_25832_filteredcleaned_network.xml.gz";
         String countsFile = "data/input/counts/24112017/NemoCounts_data_allCounts_Pkw.xml";
-        String outputDir = FileUtils.RUNS_SVN+"/nemo/locationChoice/output/testCalib/";
+        String outputDir = "../../repos/runs-svn/nemo/locationChoice/output/testCalib/";
         String runId = "run1";
         double flowCapFactor = 0.015;
         double storageCapFactor = 0.03;

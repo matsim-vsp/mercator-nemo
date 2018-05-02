@@ -41,7 +41,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import playground.agarwalamit.utils.NumberUtils;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
@@ -71,11 +70,11 @@ public class RuhrCountsCadytsRun {
         Config config = ConfigUtils.loadConfig(configFile);
         config.controler().setRunId(runID);
         config.controler().setOutputDirectory(outDir);
-        double flowCapFactor = NumberUtils.round(1 * NEMOUtils.SAMPLE_SIZE / NEMOUtils.RUHR_CAR_SHARE,2); //0.021
+        double flowCapFactor = NEMOUtils.round(1 * NEMOUtils.SAMPLE_SIZE / NEMOUtils.RUHR_CAR_SHARE,2); //0.021
         config.qsim().setFlowCapFactor(  flowCapFactor);
         config.qsim().setStorageCapFactor(0.3);
 
-        double countScaleFactor = NumberUtils.round(1/flowCapFactor,2);
+        double countScaleFactor = NEMOUtils.round(1/flowCapFactor,2);
         config.counts().setCountsScaleFactor(countScaleFactor);
 
         if (args.length == 0) {

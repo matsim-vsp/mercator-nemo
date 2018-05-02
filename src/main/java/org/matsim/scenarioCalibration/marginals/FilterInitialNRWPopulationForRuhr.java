@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansConverter;
 
 /**
@@ -67,7 +66,7 @@ public class FilterInitialNRWPopulationForRuhr {
     }
 
     public static void main(String[] args) {
-        Population inputPopulation = LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation();
+        Population inputPopulation = NEMOUtils.loadScenarioFromPlans(plansFile).getPopulation();
         new FilterInitialNRWPopulationForRuhr().processAndWritePlans(inputPopulation);
     }
 

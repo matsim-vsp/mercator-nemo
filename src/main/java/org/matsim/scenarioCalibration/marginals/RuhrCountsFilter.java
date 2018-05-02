@@ -20,7 +20,12 @@
 package org.matsim.scenarioCalibration.marginals;
 
 import java.util.Collection;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.NEMOUtils;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -29,8 +34,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.agarwalamit.utils.geometry.GeometryUtils;
 
 /**
  * Created by amit on 24.04.18.
@@ -51,7 +54,7 @@ public class RuhrCountsFilter {
         MatsimCountsReader reader = new MatsimCountsReader(counts);
         reader.readFile(inputCountsFile);
 
-        Network network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
+        Network network = NEMOUtils.loadScenarioFromNetwork(networkFile).getNetwork();
 
         //outputCounts
         Counts<Link> filteredCounts = new Counts<>();
@@ -62,13 +65,30 @@ public class RuhrCountsFilter {
         counts.getCounts()
               .entrySet()
               .stream()
-              .filter(e -> GeometryUtils.isLinkInsideFeatures(features, network.getLinks().get(e.getKey())))
+              .filter(e -> isLinkInsideFeatures(features, network.getLinks().get(e.getKey())))
               .forEach(e -> {
                   Count<Link> out = filteredCounts.createAndAddCount(e.getKey(), e.getValue().getCsLabel());
                   e.getValue().getVolumes().forEach((key, value) -> out.createVolume(key, value.getValue()));
               });
 
         new CountsWriter(filteredCounts).write(outputCountsFile);
+    }
+
+    private static boolean isLinkInsideFeatures(final Collection<SimpleFeature> features, final Link link) {
+        GeometryFactory GF = new GeometryFactory();
+        Coord coord = link.getCoord();
+        Point geo = GF.createPoint(new Coordinate(coord.getX(), coord.getY()));
+        return isPointInsideFeatures(features, geo);
+    }
+
+    private static boolean isPointInsideFeatures(final Collection<SimpleFeature> features, final Point point) {
+        if (features.isEmpty()) throw new RuntimeException("Collection of features is empty.");
+        for(SimpleFeature sf : features){
+            if ( (playground.vsp.corineLandcover.GeometryUtils.getSimplifiedGeom( (Geometry) sf.getDefaultGeometry() ) ).contains(point) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
