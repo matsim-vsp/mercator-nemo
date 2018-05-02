@@ -160,7 +160,7 @@
 		</pluginManagement> -->
 	</build>
 
-	<!-- <profiles>
+	 <profiles>
 		<profile>
 			<id>release</id>
 			<build>
@@ -190,6 +190,6 @@
 				</pluginManagement>
 			</build>
 		</profile>
-	</profiles> -->
+	</profiles> 
 	
 </project>
