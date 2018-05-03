@@ -178,10 +178,8 @@ public class NemoLongTermCountsCreator {
 		for(String combination : this.countsPerColumnCombination.keySet()){
 			Counts container = this.countsPerColumnCombination.get(combination) ;
 			if(container == null){
-				container = new Counts();
-				container.setDescription(countsDescription);
-			}
-			else{
+				throw new RuntimeException("Counts container should not be empty at this point.");
+			} else{
 				container.setDescription(container.getDescription() + countsDescription);
 			}
 			container.setYear(this.lastDayOfAnalysis.getYear());
@@ -209,12 +207,15 @@ public class NemoLongTermCountsCreator {
 			
 			Id<Link> linkIDDirectionOne = this.linkIDsOfCountingStations.get(stationID + "_R1");
 			Id<Link> linkIDDirectionTwo = this.linkIDsOfCountingStations.get(stationID + "_R2");
+
 			if(container == null){
-				log.severe("container is null..cannot convert..");
+				throw new RuntimeException("Counts container should not be empty at this point.");
 			}
+
 			if(data == null){
 				log.severe("can not access the basthourlycountdata... the countNrString was " + countNrString );
 			}
+
 			if(linkIDDirectionOne == null && !this.notLocatedCountingStations.contains(stationID + "_R1")){
 				String problem = "direction 1 of the counting station " + stationID + " was not localised in the given csv file";
 				log.severe(problem);
@@ -272,9 +273,7 @@ public class NemoLongTermCountsCreator {
 				e.printStackTrace();
 				
 				this.problemsPerCountingStation.put(stationID, e.getMessage() + str);
-				continue;
 			}
-			
 			
 		}
 	}
@@ -327,8 +326,7 @@ public class NemoLongTermCountsCreator {
 							notLocatedCountingStations.add(row[0]);
 							return;
 						}
-						
-						
+
 						for(Link outlink : fromNode.getOutLinks().values()){
 							if(outlink.getToNode().getId().equals(toNodeID)){
 								countLinkID = outlink.getId();
@@ -384,7 +382,6 @@ public class NemoLongTermCountsCreator {
 			  log.severe("something is wrong with the input directory .... please look here: " + rootDirOfYear.getAbsolutePath());
 			  this.finish();
 		  }
-		
 	}
 
 	/**

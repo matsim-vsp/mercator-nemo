@@ -131,7 +131,7 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 		Map<String, Counts> countsPerColumnCombination = new HashMap<>();
 		for(String combination: combinations){
 			if(combination!=null){
-				countsPerColumnCombination.put(combination, null);
+				countsPerColumnCombination.put(combination, new Counts());
 			}
 		}
 
