@@ -40,7 +40,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -48,13 +47,14 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.counts.Counts;
 import org.matsim.scenarioCreation.UnZipFile;
 
 /**
  * @author tschlenther
  *
  */
-public class NemoShortTermCountsCreator extends NemoCountsCreator {
+public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 
 	/**
 	 * @param network
@@ -62,12 +62,22 @@ public class NemoShortTermCountsCreator extends NemoCountsCreator {
 	 * @param pathToCountStationToOSMNodesMappingFile
 	 * @param outputPath
 	 */
-	public NemoShortTermCountsCreator(String[] columnAggregation, Network network, String pathToCountDataRootDirectory,
-			String pathToCountStationToOSMNodesMappingFile, String outputPath, int firstYear, int lastYear) {
-		super(columnAggregation, network, pathToCountDataRootDirectory, pathToCountStationToOSMNodesMappingFile, outputPath);
+	public NemoShortTermCountsCreator(Map<String,Counts> countsPerColumnCombination, Network network, String pathToCountDataRootDirectory,
+									  String pathToCountStationToOSMNodesMappingFile, String outputPath, int firstYear, int lastYear) {
+		super(countsPerColumnCombination, network, pathToCountDataRootDirectory, pathToCountStationToOSMNodesMappingFile, outputPath);
 
 		this.setFirstDayOfAnalysis(LocalDate.of(firstYear,1,1));
 		this.setLastDayOfAnalysis(LocalDate.of(lastYear,12,31));
+	}
+
+	@Override
+	public void setFirstDayOfAnalysis(LocalDate day){
+		throw new RuntimeException("Please dont set it for short term counting stations.");
+	}
+
+	@Override
+	public void setLastDayOfAnalysis(LocalDate day){
+		throw new RuntimeException("Please dont set it for short term counting stations.");
 	}
 
 	@Override

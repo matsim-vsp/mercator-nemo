@@ -156,12 +156,11 @@ public class NemoNetworkCreator {
 
 			log.info("start parsing from osm file " + INPUT_OSMFILE);
 	
-			//old OSMReader
 			OsmNetworkReader networkReader;
 			if (this.includeBicyclePaths) {
-				networkReader = new BicycleOsmNetworkReaderV2(network, ct, null, true, "bike", 0.25);
+				networkReader = new BicycleOsmNetworkReaderV2(network, ct, null, true, "bike", 0.25, true);
 			} else {
-				networkReader = new OsmNetworkReader(network,ct);
+				networkReader = new OsmNetworkReader(network,ct, true, true);
 			}
 
 			networkReader.setKeepPaths(false);
