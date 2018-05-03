@@ -60,24 +60,24 @@ import org.matsim.counts.Counts;
  */
 public class NemoLongTermCountsCreator {
 
-	protected Logger log = Logger.getLogger(this.getClass().getName());
+	public static final Logger log = Logger.getLogger(NemoLongTermCountsCreator.class.getName());
 
-	protected String outputPath;
-	protected String pathToCountData;
-	protected String pathToOSMMappingFile;
-	protected Network network;
+	private final String outputPath;
+	private final String pathToCountData;
+	private final String pathToOSMMappingFile;
+	final Network network;
 	
 	private LocalDate firstDayOfAnalysis = null;
 	private LocalDate lastDayOfAnalysis = null;
-	private List<LocalDate> datesToIgnore = new ArrayList<LocalDate>();
+	private final List<LocalDate> datesToIgnore = new ArrayList<LocalDate>();
 	
 	private int monthRange_min = 1;
 	private int monthRange_max = 12;
-	
-	protected int weekRange_min = 1;
-	protected int weekRange_max = 5;
-	
-	protected Map<String,Map<String,HourlyCountData>> countingStationsData  = new HashMap<String,Map<String,HourlyCountData>>();
+
+	int weekRange_min = 1;
+	int weekRange_max = 5;
+
+	Map<String,Map<String,HourlyCountData>> countingStationsData  = new HashMap<String,Map<String,HourlyCountData>>();
 	
 //	protected Map<String,HourlyCountData> kfzCountingStationsData = new HashMap<String,HourlyCountData>();
 //	protected Map<String,HourlyCountData> svCountingStationsData = new HashMap<String,HourlyCountData>();
@@ -85,16 +85,16 @@ public class NemoLongTermCountsCreator {
 	private Map<String,String> countingStationNames = new HashMap<String,String>();
 	private Map<String,String> problemsPerCountingStation = new HashMap<String,String>();
 	private List<String> notLocatedCountingStations = new ArrayList<String>();
-	protected List<String> notMapMatchedStations = new ArrayList<String>();
+	private final List<String> notMapMatchedStations = new ArrayList<String>();
 	
-	protected Map<String,Id<Link>> linkIDsOfCountingStations = new HashMap<String,Id<Link>>();
-	protected List<Long> countingStationsToOmit = new ArrayList<Long>();
+	private Map<String,Id<Link>> linkIDsOfCountingStations = new HashMap<String,Id<Link>>();
+	final List<Long> countingStationsToOmit = new ArrayList<Long>();
 
 	//elements of this array specify which columns of input data to consider and which ones to sum up
-	protected final Map<String,Counts> countsPerColumnCombination ;
+	private final Map<String,Counts> countsPerColumnCombination ;
 	
 
-	protected List<String> allNeededColumnHeaders = new ArrayList<String>();
+	final List<String> allNeededColumnHeaders = new ArrayList<String>();
 
 	public NemoLongTermCountsCreator(Map<String, Counts> countsPerColumnCombination, Network network,
 									 String pathToCountDataRootDirectory, String pathToCountStationToOSMNodesMappingFile, String outputPath) {
@@ -750,10 +750,6 @@ public class NemoLongTermCountsCreator {
 //		this.outputPath = newOutputPath;
 //	}
 	
-	public void setNetwork(Network network){
-		this.network = network;
-	}
-	
 	public void setFirstDayOfAnalysis(LocalDate day){
 		this.firstDayOfAnalysis = day;
 	}
@@ -763,17 +759,14 @@ public class NemoLongTermCountsCreator {
 	}
 
 	public void setDatesToIgnore(List<LocalDate> datesToIgnore) {
-		this.datesToIgnore = datesToIgnore;
+		this.datesToIgnore.clear();
+		this.datesToIgnore.addAll(datesToIgnore);
 	}
 
 	public void addToStationsToOmit(Long stationID){
 		this.countingStationsToOmit.add(stationID);
 	}
 	
-	public void setStationsToOmit(List<Long> listOfStationsToOmit){
-		this.countingStationsToOmit = listOfStationsToOmit;
-	}
-
 	public void setMonthRangeMin(int monthRange_min) {
 		this.monthRange_min = monthRange_min;
 	}
@@ -795,7 +788,8 @@ public class NemoLongTermCountsCreator {
 	}
 
 	public void setCountingStationsToOmit(List<Long> countingStationsToOmit) {
-		this.countingStationsToOmit = countingStationsToOmit;
+		this.countingStationsToOmit.clear();
+		this.countingStationsToOmit.addAll(countingStationsToOmit);
 	}
 	
 //-----------------------------------------------------------------  GETTERS  ----------------------------------------------------------------------------------------

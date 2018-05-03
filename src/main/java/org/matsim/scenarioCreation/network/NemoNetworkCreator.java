@@ -56,7 +56,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  */
 public class NemoNetworkCreator {
 	
-	private final Logger log = Logger.getLogger(NemoNetworkCreator.class);
+	private static final Logger log = Logger.getLogger(NemoNetworkCreator.class);
 
 	private final String INPUT_OSMFILE ;
 	private final List<String> INPUT_COUNT_NODE_MAPPINGS;
