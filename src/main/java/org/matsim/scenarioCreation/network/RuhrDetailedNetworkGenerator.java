@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCalibration.modeChoice;
+package org.matsim.scenarioCreation.network;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,7 +35,6 @@ import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -48,7 +47,7 @@ public class RuhrDetailedNetworkGenerator {
     private static final boolean readOSMFileAndCreateNetwork = true;
 
     public static void main(String[] args) {
-    	String svnDir = "../../repos/shared-svn/";
+    	String svnDir = "../shared-svn/";
         String osmfile = svnDir + "projects/nemo_mercator/data/matsim_input/zz_archive/network/06042018/NRW_completeTransportNet.osm.gz";
         List<String> inputCountNodeMappingFiles = Arrays.asList(
         		svnDir + "projects/nemo_mercator/data/matsim_input/zz_archive/counts/mapmatching/OSMNodeIDs_Dauerzaehlstellen.csv",
