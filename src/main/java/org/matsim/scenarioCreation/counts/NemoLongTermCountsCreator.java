@@ -120,9 +120,12 @@ public class NemoLongTermCountsCreator {
 		  
 		writeOutListOfAnalyzedCountStations();
 		if(network!=null){
+			log.info("Number of nodes in the link: "+network.getNodes().size());
+			log.info("Number of links in the link: "+network.getLinks().size());
+
 			readNodeIDsOfCountingStationsAndGetLinkIDs();
 		}
-		  
+
 		String description = "--Nemo long period count data-- start date: " + this.firstDayOfAnalysis.toString() + " end date:" + this.lastDayOfAnalysis.toString();
 		SimpleDateFormat format = new SimpleDateFormat("YY_MM_dd_HHmmss");
 		String now = format.format(Calendar.getInstance().getTime());
@@ -134,6 +137,8 @@ public class NemoLongTermCountsCreator {
 
 	protected void readData() {
 		File rootDirectory = new File(this.pathToCountData);
+		if (! rootDirectory.exists()) throw new RuntimeException(this.pathToCountData + " does not exists.");
+
 		 File[] filesInRoot = rootDirectory.listFiles();
 		  if (filesInRoot != null) {
 		    for (File fileInRootDir : filesInRoot) {
@@ -151,10 +156,6 @@ public class NemoLongTermCountsCreator {
 	}
 
 	protected void init() {
-		//list counting stations that might lead to some calibration problems or where data/localization is not clear
-		countingStationsToOmit.add(5002l);
-		countingStationsToOmit.add(5025l);		//not clear where exactly the counting station is located (hauptfahrbahn?)
-		
 		for(String combination: this.countsPerColumnCombination.keySet()){
 			Map<String,HourlyCountData> dataMap = new HashMap<String,HourlyCountData>();
 			this.countingStationsData.put(combination, dataMap);
@@ -301,6 +302,7 @@ public class NemoLongTermCountsCreator {
 						notMapMatchedStations.add(row[0]);
 					}
 					else{
+						boolean missingNodes = false;
 						Node fromNode = network.getNodes().get(Id.createNodeId(Long.parseLong(row[1])));
 						if(fromNode == null){
 							String problem = "could not find fromNode " + row[1] + " of station " + row[0];
@@ -311,7 +313,7 @@ public class NemoLongTermCountsCreator {
 							linkIDsOfCounts.put(row[0], Id.createLinkId("noFromNode_" + row[0]));
 							header = false;
 							notLocatedCountingStations.add(row[0]);
-							return;
+							missingNodes = true;
 						}
 						Id<Node> toNodeID = Id.createNodeId(Long.parseLong(row[2]));
 						Node toNode = network.getNodes().get(toNodeID);
@@ -324,8 +326,10 @@ public class NemoLongTermCountsCreator {
 							linkIDsOfCounts.put(row[0], Id.createLinkId("noToNode_" + row[0]));
 							header = false;
 							notLocatedCountingStations.add(row[0]);
-							return;
+							missingNodes = true;
 						}
+
+						if (missingNodes) return;
 
 						for(Link outlink : fromNode.getOutLinks().values()){
 							if(outlink.getToNode().getId().equals(toNodeID)){

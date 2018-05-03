@@ -52,18 +52,18 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 
 	private final static String INPUT_OSMFILE = "../shared-svn/projects/nemo_mercator/data/matsim_input/zz_archive/network/06042018/NRW_completeTransportNet.osm.gz";
 	
-	private final static String INPUT_LONGTERM_COUNT_DATA_ROOT_DIR = "../shared-svn/projects/nemo_mercator/original_files/counts_rohdaten/dauerzaehlstellen";
+	private final static String INPUT_LONGTERM_COUNT_DATA_ROOT_DIR = "../shared-svn/projects/nemo_mercator/data/original_files/counts_rohdaten/dauerzaehlstellen";
 	private final static String INPUT_COUNT_NODES_MAPPING_CSV= "../shared-svn/projects/nemo_mercator/data/matsim_input/zz_archive/counts/mapmatching/OSMNodeIDs_Dauerzaehlstellen.csv";
 
-	private final static String INPUT_SHORTTERM_COUNT_DATA_ROOT_DIR = "../shared-svn/projects/nemo_mercator/data/original_files/counts_rohdaten/verkehrszaehlung_2015/complete_Data/complete_Data";
+	private final static String INPUT_SHORTTERM_COUNT_DATA_ROOT_DIR = "../shared-svn/projects/nemo_mercator/data/original_files/counts_rohdaten/verkehrszaehlung_2015/complete_Data";
 //	private final static String INPUT_SHORTTERM_COUNT_MAPPING_CSV = "data/input/counts/mapmatching/Nemo_kurzfristZaehlstellen_OSMNodeIDs_UTM33N-Master.csv";
 	private final static String INPUT_SHORTTERM_COUNT_MAPPING_CSV = "../shared-svn/projects/nemo_mercator/data/matsim_input/zz_archive/counts/mapmatching/Nemo_kurzfristZaehlstellen_OSMNodeIDs_UTM33N-allStationsInclNotFound.csv";
 	
-	private static String INPUT_NETWORK = null;	// a network can be read in, in case it already exists, so network creation can be skipped or only simplifying and cleaning can be performed
+	private static String INPUT_NETWORK = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-03_vspDefault_OSM_net/2018-05-03_NRW_coarse_filteredcleaned_network.xml.gz";	// a network can be read in, in case it already exists, so network creation can be skipped or only simplifying and cleaning can be performed
 	private final static String INPUT_NETWORK_SHAPE_FILTER = "../shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
 	
 	private final static boolean doSimplify = false;
-	private final static boolean doCleaning = true;
+	private final static boolean doCleaning = false;
 	private final static String networkCoordinateSystem = NEMOUtils.NEMO_EPSG;
 	
 	private static String OUTPUT_DIR_NETWORK = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-03_vspDefault_OSM_net/";
@@ -95,14 +95,19 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 					Arrays.asList(INPUT_COUNT_NODES_MAPPING_CSV,INPUT_SHORTTERM_COUNT_MAPPING_CSV), networkCoordinateSystem, OUTPUT_DIR_NETWORK,"2018-05-03_NRW_coarse_");
 			netCreator.setShapeFileToFilter(INPUT_NETWORK_SHAPE_FILTER);
 			netCreator.createNetwork(doSimplify, doCleaning);
+			netCreator.writeNetwork();
 		} else {
 			//working with existing network (2)
 			//a)
 			MatsimNetworkReader netReader = new MatsimNetworkReader(network);
 			netReader.readFile(INPUT_NETWORK);
-			//b) //TODO if required, also put under a switch rather than commented code.
-//		NemoNetworkCreator netCreator = new NemoNetworkCreator(network,INPUT_OSMFILE,
-//				Arrays.asList(INPUT_COUNT_NODES_MAPPING_CSV,INPUT_SHORTTERM_COUNT_MAPPING_CSV),networkCoordinateSystem,OUTPUT_DIR_NETWORK,OUTPUT_PREFIX_NETWORK);
+			if (doCleaning || doSimplify ){
+				//b)
+				NemoNetworkCreator netCreator = new NemoNetworkCreator(network,INPUT_OSMFILE,
+						Arrays.asList(INPUT_COUNT_NODES_MAPPING_CSV,INPUT_SHORTTERM_COUNT_MAPPING_CSV),networkCoordinateSystem,OUTPUT_DIR_NETWORK,OUTPUT_PREFIX_NETWORK);
+				netCreator.setShapeFileToFilter(INPUT_NETWORK_SHAPE_FILTER);
+				netCreator.createNetwork(doSimplify, doCleaning);
+			}
 		}
 
 		/*	specify which counts files you want to generate:
@@ -126,7 +131,7 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 		combinations[0] = RawDataVehicleTypes.Pkw.toString();
 //		combinations[1] = RawDataVehicleTypes.Rad.toString();
 //		combinations[2] = RawDataVehicleTypes.SV.toString();
-//		combinations[3] = RawDataVehicleTypes.KFZ.toString();
+		combinations[3] = RawDataVehicleTypes.KFZ.toString();
 
 		Map<String, Counts> countsPerColumnCombination = new HashMap<>();
 		for(String combination: combinations){
@@ -151,6 +156,10 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 		/*if you want to omit specific count data, you can add a list of their station numbers (see rohdaten)**/
 //		longTermCountsCreator.setCountingStationsToOmit(new ArrayList<Long>());
 //		longTermCountsCreator.addToStationsToOmit(lll);
+
+		//list counting stations that might lead to some calibration problems or where data/localization is not clear
+		longTermCountsCreator.addToStationsToOmit(5002l);
+		longTermCountsCreator.addToStationsToOmit(5025l);		//not clear where exactly the counting station is located (hauptfahrbahn?)
 		
 		/*specify which months to analyze by setting monthRange_min and monthRange_max. 1 stands for january, 12 for december*/
 //		longTermCountsCreator.setMonthRange_min(monthRange_min);

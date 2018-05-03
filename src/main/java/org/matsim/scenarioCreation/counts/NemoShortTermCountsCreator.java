@@ -66,8 +66,8 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 									  String pathToCountStationToOSMNodesMappingFile, String outputPath, int firstYear, int lastYear) {
 		super(countsPerColumnCombination, network, pathToCountDataRootDirectory, pathToCountStationToOSMNodesMappingFile, outputPath);
 
-		this.setFirstDayOfAnalysis(LocalDate.of(firstYear,1,1));
-		this.setLastDayOfAnalysis(LocalDate.of(lastYear,12,31));
+		super.setFirstDayOfAnalysis(LocalDate.of(firstYear,1,1));
+		super.setLastDayOfAnalysis(LocalDate.of(lastYear,12,31));
 	}
 
 	@Override
