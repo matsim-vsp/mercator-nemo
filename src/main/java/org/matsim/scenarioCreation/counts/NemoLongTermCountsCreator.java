@@ -93,12 +93,12 @@ public class NemoLongTermCountsCreator {
 	final List<Long> countingStationsToOmit = new ArrayList<Long>();
 
 	//elements of this array specify which columns of input data to consider and which ones to sum up
-	private final Map<String,Counts> countsPerColumnCombination ;
+	private final Map<String,Counts<Link>> countsPerColumnCombination ;
 	
 
 	final List<String> allNeededColumnHeaders = new ArrayList<String>();
 
-	public NemoLongTermCountsCreator(Map<String, Counts> countsPerColumnCombination, Network network,
+	public NemoLongTermCountsCreator(Map<String, Counts<Link>> countsPerColumnCombination, Network network,
 									 String pathToCountDataRootDirectory, String pathToCountStationToOSMNodesMappingFile, String outputPath) {
 		this.countsPerColumnCombination = countsPerColumnCombination;
 		this.network = network;
@@ -817,10 +817,4 @@ public class NemoLongTermCountsCreator {
 		return this.countsPerColumnCombination.get(columnHeaderCombination);
 	}
 
-	public Map<String, Counts> getCountsPerColumnCombinationMap() {
-		return countsPerColumnCombination;
-	}
-
-
-	
 }

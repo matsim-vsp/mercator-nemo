@@ -45,6 +45,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Counts;
@@ -62,7 +63,7 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 	 * @param pathToCountStationToOSMNodesMappingFile
 	 * @param outputPath
 	 */
-	public NemoShortTermCountsCreator(Map<String,Counts> countsPerColumnCombination, Network network, String pathToCountDataRootDirectory,
+	public NemoShortTermCountsCreator(Map<String,Counts<Link>> countsPerColumnCombination, Network network, String pathToCountDataRootDirectory,
 									  String pathToCountStationToOSMNodesMappingFile, String outputPath, int firstYear, int lastYear) {
 		super(countsPerColumnCombination, network, pathToCountDataRootDirectory, pathToCountStationToOSMNodesMappingFile, outputPath);
 

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.matsim.NEMOUtils;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -62,8 +63,8 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 	private static String INPUT_NETWORK = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-03_vspDefault_OSM_net/2018-05-03_NRW_coarse_filteredcleaned_network.xml.gz";	// a network can be read in, in case it already exists, so network creation can be skipped or only simplifying and cleaning can be performed
 	private final static String INPUT_NETWORK_SHAPE_FILTER = "../shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
 	
-	private final static boolean doSimplify = false;
-	private final static boolean doCleaning = false;
+	private static boolean doSimplify = false;
+	private static boolean doCleaning = false;
 	private final static String networkCoordinateSystem = NEMOUtils.NEMO_EPSG;
 	
 	private static String OUTPUT_DIR_NETWORK = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-03_vspDefault_OSM_net/";
@@ -132,10 +133,10 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 //		combinations[1] = RawDataVehicleTypes.Rad.toString();
 //		combinations[2] = RawDataVehicleTypes.SV.toString();
 
-		Map<String, Counts> countsPerColumnCombination = new HashMap<>();
+		Map<String, Counts<Link>> countsPerColumnCombination = new HashMap<>();
 		for(String combination: combinations){
 			if(combination!=null){
-				countsPerColumnCombination.put(combination, new Counts());
+				countsPerColumnCombination.put(combination, new Counts<Link>());
 			}
 		}
 
@@ -181,7 +182,7 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 		writeOutput(OUTPUT_COUNTS_DIR, "allCounts", countsPerColumnCombination);
 	}
 
-	public static void writeOutput(String outputPath, String countFilesName, Map<String,Counts> countsPerColumnCombination){
+	public static void writeOutput(String outputPath, String countFilesName, Map<String,Counts<Link>> countsPerColumnCombination){
 
 		String out = "NemoCounts_data_";
 		for(String combination : countsPerColumnCombination.keySet()){

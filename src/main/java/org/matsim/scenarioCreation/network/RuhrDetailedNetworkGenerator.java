@@ -54,7 +54,7 @@ public class RuhrDetailedNetworkGenerator {
         		svnDir + "projects/nemo_mercator/data/matsim_input/zz_archive/counts/mapmatching/Nemo_kurzfristZaehlstellen_OSMNodeIDs_UTM33N-allStationsInclNotFound.csv");
         String epsg = NEMOUtils.NEMO_EPSG;
         String prefix = "detailedRuhr_Network_" + new SimpleDateFormat("ddMMyyyy").format(new Date());
-        String outDir = svnDir + "projects/nemo_mercator/data/matsim_input/2018-04-19_RuhrDetailedNet_unCleaned/";
+        String outDir = svnDir + "projects/nemo_mercator/data/matsim_input/2018-05-03_vspDefault_OSM_net/";
         String shapeFile = svnDir + "projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
         if ( readOSMFileAndCreateNetwork ){
             NemoNetworkCreator nemoNetworkCreator = new NemoNetworkCreator(osmfile,
@@ -79,13 +79,13 @@ public class RuhrDetailedNetworkGenerator {
         } else {
             if ( useMultiModalNetworkCleaner ){
                 Network network = NEMOUtils
-                        .loadScenarioFromNetwork(outDir + "detailedRuhr_Network_17022018filteredcleaned_network.xml.gz")
+                        .loadScenarioFromNetwork(outDir + "2018-05-03_NRW_coarse_filteredcleaned_network.xml.gz")
                         .getNetwork();
                 MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
                 cleaner.run(Collections.singleton(TransportMode.car)); // will not affect bike links--> biggest cluster for car mode
                 cleaner.run(Collections.singleton(TransportMode.bike)); // will not affect car links --> biggest cluster for bike mode
                 cleaner.removeNodesWithoutLinks();
-                new NetworkWriter(network).write(outDir + "detailedRuhr_Network_17022018filteredcleaned_network_2.xml.gz");
+                new NetworkWriter(network).write(outDir + "2018-05-03_NRW_coarse_filteredcleaned_network.xml.gz");
             }
         }
     }
