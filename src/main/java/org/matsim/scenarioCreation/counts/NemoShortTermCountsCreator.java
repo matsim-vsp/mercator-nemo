@@ -183,24 +183,9 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 				}
 			}
 			//need to do this manually for KFZ and SV, as they are written in small letters in the short term excel files
-			if(allNeededColumnHeaders.contains(RawDataVehicleTypes.KFZ.toString())){
-				baseColumnsOfVehicleTypes.put(RawDataVehicleTypes.KFZ.toString(), 5);
-			}
 			if(allNeededColumnHeaders.contains(RawDataVehicleTypes.SV.toString())){
 				baseColumnsOfVehicleTypes.put(RawDataVehicleTypes.SV.toString(), 6);
 			}
-			
-//			HourlyCountData kfzCountData = this.kfzCountingStationsData.get(countID);
-//			HourlyCountData svCountData = this.kfzCountingStationsData.get(countID);
-//			
-//			if(kfzCountData == null){
-//				kfzCountData = new HourlyCountData(name, null);	//ID = countID_countName_streetID
-//			}
-//			
-//			if(svCountData == null){
-//				svCountData = new HourlyCountData(name, null);		//ID = countID_countName_streetID
-//			}
-			
 			
 			for(int currentRow = 21; currentRow <= sheet.getLastRowNum(); currentRow ++){
 				row = sheet.getRow(currentRow);
@@ -232,7 +217,7 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 					for(String header: baseColumnsOfVehicleTypes.keySet()){
 						int vlmDir1 = getIntegerValue(row.getCell(baseColumnsOfVehicleTypes.get(header)));
 						int vlmDir2;
-						if(header.equals(RawDataVehicleTypes.KFZ.toString()) || header.equals(RawDataVehicleTypes.SV)){
+						if(header.equals(header.equals(RawDataVehicleTypes.SV))){
 							vlmDir2 = getIntegerValue(row.getCell(baseColumnsOfVehicleTypes.get(header) + 2));
 						} else{
 							vlmDir2 = getIntegerValue(row.getCell(baseColumnsOfVehicleTypes.get(header) + 10));

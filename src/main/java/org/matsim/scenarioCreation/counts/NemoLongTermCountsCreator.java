@@ -76,6 +76,8 @@ public class NemoLongTermCountsCreator {
 
 	int weekRange_min = 1;
 	int weekRange_max = 5;
+	
+	private static final boolean USE_DATA_WITH_LESS_THAN_9_VEHICLE_CLASSES = true;
 
 	Map<String,Map<String,HourlyCountData>> countingStationsData  = new HashMap<String,Map<String,HourlyCountData>>();
 	
@@ -163,7 +165,12 @@ public class NemoLongTermCountsCreator {
 			for (String s : types){
 				if(!this.allNeededColumnHeaders.contains(s)){
 					this.allNeededColumnHeaders.add(s);
+					if(s.equals(RawDataVehicleTypes.Pkw.toString())) {
+						this.allNeededColumnHeaders.add("PLZ");
+						this.allNeededColumnHeaders.add("PkwÄ");
+					}
 				}
+				
 			}
 		}
 		
@@ -429,8 +436,19 @@ public class NemoLongTermCountsCreator {
 					int nrOfLanesDir1 = Integer.parseInt(headerTwo.substring(1, 3));
 					int nrOfLanesDir2 = Integer.parseInt(headerTwo.substring(4, 6));
 					
-					int nrOfVehicleGroups = Integer.parseInt(headerThree.substring(1, 3));	// either 1 => all vehicles in one class or 2 => distinction of heavy traffic
+					
 					int nrOfVehicleTypes = Integer.parseInt(headerThree.substring(4, 6));
+					if(nrOfVehicleTypes <9) {
+						log.warning("data of count " + countID + "" + countName + " is not differentiating Pkw from at least one other class");
+						if(!USE_DATA_WITH_LESS_THAN_9_VEHICLE_CLASSES) {
+							log.warning("skipping data set of station " + countID + " because accurancy is not high enough");
+						}
+					}
+					int nrOfVehicleGroups = Integer.parseInt(headerThree.substring(1, 3));	// either 1 => all vehicles in one class or 2 => distinction of heavy traffic
+					if(nrOfVehicleGroups == 1) {
+						log.info("skipping data set of station " + countID + "" + countName + " because it doesn't differentiate heavy vehicles from normal ones..");
+						continue;
+					}
 					
 					Map<String,Integer> baseColumnsOfVehicleTypes = new HashMap<String,Integer>();
 					
@@ -440,7 +458,7 @@ public class NemoLongTermCountsCreator {
 					for(int i = 2; i < headerThreeArray.length ; i++){
 						String vehicleType = headerThreeArray[i];
 						if(this.allNeededColumnHeaders.contains(vehicleType)){
-							if( !(vehicleType.equals(RawDataVehicleTypes.KFZ.toString()) || vehicleType.equals(RawDataVehicleTypes.SV.toString())) ){
+							if( !vehicleType.equals(RawDataVehicleTypes.SV.toString()) ){
 								baseColumnsOfVehicleTypes.put(vehicleType, nrOfVehicleGroups*(nrOfLanesDir1 + nrOfLanesDir2) + i -2);
 							}else{
 								baseColumnsOfVehicleTypes.put(vehicleType, i);
@@ -487,7 +505,7 @@ public class NemoLongTermCountsCreator {
 								//read traffic volumes for each needed vehicle type (summing up every lane per direction)
 								for(String header: baseColumnsOfVehicleTypes.keySet()){
 									int jumpLength;
-									if(header.equals(RawDataVehicleTypes.KFZ.toString()) || header.equals(RawDataVehicleTypes.SV.toString())){
+									if(header.equals(header.equals(RawDataVehicleTypes.SV.toString()))){
 										jumpLength = nrOfVehicleGroups;
 									}
 									else{

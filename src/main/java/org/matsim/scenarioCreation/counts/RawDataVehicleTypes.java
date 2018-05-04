@@ -20,17 +20,9 @@ package org.matsim.scenarioCreation.counts;
 
 public enum RawDataVehicleTypes {
 
-	KFZ,
 	SV,
 	Mot,
 	Pkw,
-	Lfw,
-	PmA,
-	Bus,
-	LoA,
-	LmA,
-	Sat,
-	Son,
 	Rad
 	
 	

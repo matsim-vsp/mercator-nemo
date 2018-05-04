@@ -131,7 +131,6 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 		combinations[0] = RawDataVehicleTypes.Pkw.toString();
 //		combinations[1] = RawDataVehicleTypes.Rad.toString();
 //		combinations[2] = RawDataVehicleTypes.SV.toString();
-		combinations[3] = RawDataVehicleTypes.KFZ.toString();
 
 		Map<String, Counts> countsPerColumnCombination = new HashMap<>();
 		for(String combination: combinations){
