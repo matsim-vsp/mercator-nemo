@@ -45,7 +45,7 @@ public class CemdapInputGenerator {
         if (args.length > 0) {
             baseDir = args[0];
         } else {
-            baseDir = "data/cemdap_input/";
+            baseDir = "../shared-svn/projects/nemo_mercator/data/original_files/";
         }
 
         String commuterFileOutgoing1 = baseDir + "/pendlerstatistik/modified/051NRW2009Ga.txt";
@@ -55,7 +55,7 @@ public class CemdapInputGenerator {
         String commuterFileOutgoing5 = baseDir + "/pendlerstatistik/modified/059NRW2009Ga.txt";
 
         String censusFile = baseDir + "/zensus_2011/Zensus11_Datensatz_Bevoelkerung_NRW.csv";
-        String outputBase = baseDir + "/200_" + new SimpleDateFormat("ddMMMyyyy").format(new Date()) + "/";
+        String outputBase = baseDir + "/400_" + new SimpleDateFormat("ddMMMyyyy").format(new Date()) + "/";
 
         //plz file
         String spatialRefinementShapeFile = baseDir+"/shapeFiles/plzBasedPopulation/plz-gebiete_Ruhrgebiet/plz-gebiete_Ruhrgebiet_withPopulation.shp";
@@ -91,9 +91,12 @@ public class CemdapInputGenerator {
 
             String shapeFileLors = baseDir + "/shapeFiles/sourceShape_NRW/dvg2gem_nw.shp";
             ZoneAndLOSGeneratorV2 zoneAndLOSGeneratorV2 = new ZoneAndLOSGeneratorV2(commuterFilesOutgoing, shapeFileLors, outputBase+"/zoneAndLOS/", municipalityFeatureKey);
-            zoneAndLOSGeneratorV2.setDefaultIntraZoneDistance(1.72); // 1.72 miles --> 2.76 km (default value)
+//            zoneAndLOSGeneratorV2.setDefaultIntraZoneDistance(1.72); // 1.72 miles --> 2.76 km (default value)
+            zoneAndLOSGeneratorV2.setDefaultIntraZoneDistance(1.2); // 1.72 miles --> 2.76 km (default value)
             zoneAndLOSGeneratorV2.setShapeFileForRefinement(spatialRefinementShapeFile, plzFeatureKey);
-            zoneAndLOSGeneratorV2.setDefaultIntraZoneDistanceForSpatialRefinement(1.1); // 1.1 miles --> 1.77 km
+//            zoneAndLOSGeneratorV2.setDefaultIntraZoneDistanceForSpatialRefinement(1.1); // 1.1 miles --> 1.77 km
+            zoneAndLOSGeneratorV2.setDefaultIntraZoneDistanceForSpatialRefinement(1.0); // 1.1 miles --> 1.77 km
+
             // assuming average speed of 24 kph in peak hr
             // (see https://de.statista.com/statistik/daten/studie/37200/umfrage/durchschnittsgeschwindigkeit-in-den-15-groessten-staedten-der-welt-2009/)
             zoneAndLOSGeneratorV2.setDurantionDistanceOffPeakRatio_min_mile(3.2); // 3.2 --> 30kph // 1.6 --> 60kph (default value)
