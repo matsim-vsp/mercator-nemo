@@ -59,12 +59,14 @@ public class RuhrCountsCadytsRun {
         String runID = "run000";
 
         double cadytsWt = 15;
+        double storageCapFactor = 0.3;
 
         if(args.length>0){
             configFile = args[0] ;
             outDir = args[1];
             runID = args[2];
             cadytsWt = Double.valueOf(args[3]);
+            storageCapFactor = Double.valueOf(args[4]);
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -72,7 +74,7 @@ public class RuhrCountsCadytsRun {
         config.controler().setOutputDirectory(outDir);
         double flowCapFactor = NEMOUtils.round(1 * NEMOUtils.SAMPLE_SIZE / NEMOUtils.RUHR_CAR_SHARE,2); //0.021
         config.qsim().setFlowCapFactor(  flowCapFactor);
-        config.qsim().setStorageCapFactor(0.3);
+        config.qsim().setStorageCapFactor(storageCapFactor);
 
         double countScaleFactor = NEMOUtils.round(1/flowCapFactor,2);
         config.counts().setCountsScaleFactor(countScaleFactor);
