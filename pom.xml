@@ -75,7 +75,7 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>vsp-playground</groupId>
+			<groupId>org.matsim.vsp.vsp-playgrounds</groupId>
 			<artifactId>vsp</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
