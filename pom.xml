@@ -36,12 +36,16 @@
 			<id>ojo-snapshots</id>
 			<url>http://oss.jfrog.org/libs-snapshot</url>
 		</repository>
-		
 		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
+			<id>matsim-vsp-vsp-playgrounds</id>
+			<url>https://packagecloud.io/matsim-vsp/vsp-playgrounds/maven2</url>
+			<!--<releases>-->
+				<!--<enabled>true</enabled>-->
+			<!--</releases>-->
+			<!--<snapshots>-->
+				<!--<enabled>true</enabled>-->
+			<!--</snapshots>-->
 		</repository>
-		
 	</repositories>
 
 	<dependencies>
@@ -57,7 +61,13 @@
 			<artifactId>otfvis</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>cadytsIntegration</artifactId>
+			<version>0.11.0-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>bicycle</artifactId>
@@ -65,11 +75,9 @@
 		</dependency>
 		
 		<dependency>
-		    <groupId>com.github.matsim-vsp.vsp-playgrounds</groupId>
-			<!--it appears, that vsp playground is provided by jitpack but not any other submodule.-->
-            <!--<artifactId>agarwalamit</artifactId>-->
+			<groupId>vsp-playground</groupId>
 			<artifactId>vsp</artifactId>
-		    <version>master-SNAPSHOT</version>
+			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Include the JUnit testing library -->
@@ -137,26 +145,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
-		<!-- <pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.8</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.3.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<version>2.2.1</version>
-				</plugin>
-			</plugins>
-		</pluginManagement> -->
 	</build>
 
 	 <profiles>
