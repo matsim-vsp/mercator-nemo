@@ -17,6 +17,11 @@
 	</properties>
 
 	<repositories>
+	
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
 		
 		<repository>
 			<!-- MATSim is not on Maven central -->
@@ -93,6 +98,13 @@
 			<artifactId>poi</artifactId>
 			<version>3.12</version>
 		</dependency>
+		
+		<dependency>
+	    		<groupId>com.github.matsim-org</groupId>
+	    		<artifactId>GTFS2MATSim</artifactId>
+	   	 	<version>-SNAPSHOT</version>
+		</dependency>
+	
 	</dependencies>
 
 	<build>
