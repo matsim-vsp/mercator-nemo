@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -92,6 +93,9 @@ public class NemoModeLocationChoiceCalibrator {
         config.controler().setRunId(runId);
         config.controler().setLastIteration(lastIt);
 
+        config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
+        config.strategy().setMaxAgentPlanMemorySize(12);
+
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -105,6 +109,17 @@ public class NemoModeLocationChoiceCalibrator {
                 .getLinks()
                 .values()
                 .forEach(l -> l.setAllowedModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.ride))));
+
+        //go through all the plans and set the score  (10 times beta) to stayHome plans
+        scenario.getPopulation()
+                .getPersons()
+                .values()
+                .stream()
+                .flatMap(p -> ((Person) p).getPlans().stream())
+                .filter(pl -> ((Plan) pl).getPlanElements().size() == 0)
+                .forEach(pl -> ((Plan) pl).setScore(10 * scenario.getConfig()
+                                                                 .planCalcScore()
+                                                                 .getPerforming_utils_hr()));
 
         Controler controler = new Controler(scenario);
 
@@ -207,7 +222,7 @@ public class NemoModeLocationChoiceCalibrator {
         controler.run();
     }
 
-    private static DistanceDistribution getDistanceDistribution(double carCountScaleFactor){
+     static DistanceDistribution getDistanceDistribution(double carCountScaleFactor){
         DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
 
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car",1.3); //+pt
