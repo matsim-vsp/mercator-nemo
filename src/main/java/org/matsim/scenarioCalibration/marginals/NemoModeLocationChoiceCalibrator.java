@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -115,9 +114,9 @@ public class NemoModeLocationChoiceCalibrator {
                 .getPersons()
                 .values()
                 .stream()
-                .flatMap(p -> ((Person) p).getPlans().stream())
-                .filter(pl -> ((Plan) pl).getPlanElements().size() == 0)
-                .forEach(pl -> ((Plan) pl).setScore(10 * scenario.getConfig()
+                .flatMap(p -> p.getPlans().stream())
+                .filter(pl -> pl.getPlanElements().size() == 1 )
+                .forEach(pl -> pl.setScore(10 * scenario.getConfig()
                                                                  .planCalcScore()
                                                                  .getPerforming_utils_hr()));
 
