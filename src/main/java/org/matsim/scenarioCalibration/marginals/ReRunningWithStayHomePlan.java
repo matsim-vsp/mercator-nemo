@@ -210,26 +210,35 @@ public class ReRunningWithStayHomePlan {
 					@Override
 					public void notifyIterationEnds(IterationEndsEvent event) {
 						for (Person person : population.getPersons().values()) {
-						
-							Activity existAct = ((Activity) person.getSelectedPlan().getPlanElements().get(0));
-							Activity homeAct = population.getFactory().createActivityFromCoord("home_86400.0", existAct.getCoord());
-							homeAct.setLinkId(existAct.getLinkId());
 
-							Plan newPlan = population.getFactory().createPlan();
-							newPlan.setScore( scoreToSet );
-							newPlan.addActivity(homeAct);
-							
-							person.addPlan(newPlan);
+						    Plan plan = getStayHomePlan(person);
+						    if (plan==null){
+                                Activity existAct = ((Activity) person.getSelectedPlan().getPlanElements().get(0));
+                                Activity homeAct = population.getFactory().createActivityFromCoord("home_86400.0", existAct.getCoord());
+                                homeAct.setLinkId(existAct.getLinkId());
+                                existAct.getAttributes()
+                                        .getAsMap()
+                                        .forEach((key, value) -> homeAct.getAttributes().putAttribute(key, value));
+
+                                plan = population.getFactory().createPlan();
+                                plan.addActivity(homeAct);
+                                person.addPlan(plan);
+                            }
+						    plan.setScore(scoreToSet);
 						}
 					}
 				});
-				
 			}
 		});
         
         controler.run();
 	}
 	
-	
+	private static Plan getStayHomePlan (Person person) {
+        for (Plan plan : person.getPlans()) {
+            if (plan.getPlanElements().size() == 1) return plan;
+        }
+        return null;
+    }
 
 }
