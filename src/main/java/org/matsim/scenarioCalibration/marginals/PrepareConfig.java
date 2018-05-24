@@ -42,7 +42,7 @@ import org.matsim.vehicles.Vehicles;
 
 public class PrepareConfig {
     private static final String config_for_activityParams = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/config_take_activity-parametersOnly.xml";
-    public static final boolean rideAsMainMode = true;
+    public static final boolean rideAsMainMode = false;
 
     public static void main(String[] args) {
 

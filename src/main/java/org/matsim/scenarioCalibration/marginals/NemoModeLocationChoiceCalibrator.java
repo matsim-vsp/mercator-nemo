@@ -26,12 +26,14 @@ import javax.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -60,12 +62,7 @@ public class NemoModeLocationChoiceCalibrator {
 
     public static void main(String[] args) {
 
-        String configFile;
-        if (PrepareConfig.rideAsMainMode) {
-            configFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig_rideAsMainMode.xml";
-        } else {
-            configFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
-        }
+        String configFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
 
         String outputDir = "../../repos/runs-svn/nemo/marginals/output/testCalib/";
 
@@ -95,6 +92,8 @@ public class NemoModeLocationChoiceCalibrator {
         config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
         config.strategy().setMaxAgentPlanMemorySize(12);
 
+        config.qsim().setEndTime(3600.);
+
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -109,16 +108,21 @@ public class NemoModeLocationChoiceCalibrator {
                 .values()
                 .forEach(l -> l.setAllowedModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.ride))));
 
-        //go through all the plans and set the score  (10 times beta) to stayHome plans
+        //go through all the plans and set the score  (uniform=10 times beta, relative = beta * typDur) to stayHome plans
+        PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
         scenario.getPopulation()
                 .getPersons()
                 .values()
                 .stream()
                 .flatMap(p -> p.getPlans().stream())
                 .filter(pl -> pl.getPlanElements().size() == 1 )
-                .forEach(pl -> pl.setScore(10 * scenario.getConfig()
-                                                                 .planCalcScore()
-                                                                 .getPerforming_utils_hr()));
+                .forEach(pl -> {
+                    Activity activity = ((Activity)pl.getPlanElements().get(0));
+                    pl.setScore( planCalcScoreConfigGroup.getActivityParams(activity.getType()).getTypicalDuration() * planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.);
+//                    pl.setScore(10 * scenario.getConfig()
+//                                             .planCalcScore()
+//                                             .getPerforming_utils_hr());
+                });
 
         Controler controler = new Controler(scenario);
 

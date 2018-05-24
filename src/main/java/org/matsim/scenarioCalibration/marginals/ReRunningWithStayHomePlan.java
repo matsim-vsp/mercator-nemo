@@ -1,5 +1,6 @@
 package org.matsim.scenarioCalibration.marginals;
 
+import java.io.File;
 import javax.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -18,7 +19,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -41,21 +41,49 @@ public class ReRunningWithStayHomePlan {
 	
 	public static void main(String[] args) {
 		
+		String parentDir;
+        String runIdForInputFiles;
+		String runId;
+
+		int firstIt = 240; // --> 300*0.8;
+		int lastIt = 300;
+
+		double stayHomePlanScore = 144.0; //beta * typDur
+
+        double cadytsCountsWt = 15.0;
+        double cadytsMarginalsWt = 0.0;
+
+		if (args.length>0) {
+
+            parentDir = args[0];
+            runIdForInputFiles = args[1];
+            runId = args[2];
+            stayHomePlanScore = Double.valueOf(args[3]);
+
+            cadytsCountsWt = Double.valueOf(args[4]);
+            cadytsMarginalsWt = Double.valueOf(args[5]);
+
+        } else {
+            parentDir = "../../repos/runs-svn/nemo/marginals/";
+            runIdForInputFiles = "run249_SHP";
+
+            runId = runIdForInputFiles+"_planSelection";
+        }
+
+        String configFile = parentDir+runIdForInputFiles+"/output/"+runIdForInputFiles+".output_config.xml";
+		String plansFile = parentDir+runIdForInputFiles+"/output/ITERS/it."+firstIt+"/"+runIdForInputFiles+"."+firstIt+".plans.xml.gz";
+
+		Config config = ConfigUtils.loadConfig(configFile);
+
+		config.plans().setInputFile(new File(plansFile).getAbsolutePath());
+		config.plans().setInputPersonAttributeFile(runIdForInputFiles+".output_personAttributes.xml.gz");
 		
-		String dir = "../../repos/runs-svn/nemo/marginals/run249/output/";
-		String outputDirectory = "../../repos/runs-svn/nemo/marginals/run255/onlyPlanSelection/";
-		String runNr = "run249";
+		config.network().setInputFile(runIdForInputFiles+".output_network.xml.gz");
+		config.counts().setInputFile(runIdForInputFiles+".output_counts.xml.gz");
 		
-		Config config = ConfigUtils.loadConfig(dir+runNr+".output_config.xml");
-		config.plans().setInputFile(runNr+".output_plans.xml.gz");
-		config.plans().setInputPersonAttributeFile(runNr+".output_personAttributes.xml.gz");
+		config.vehicles().setVehiclesFile(runIdForInputFiles+".output_vehicles.xml.gz");
 		
-		config.network().setInputFile(runNr+".output_network.xml.gz");
-		config.counts().setInputFile(runNr+".output_counts.xml.gz");
-		
-		config.vehicles().setVehiclesFile(runNr+".output_vehicles.xml.gz");
-		
-		config.strategy().clearStrategySettings();
+		config.strategy().clearStrategySettings(); // only plan selection
 		
 		StrategySettings stratSets = new StrategySettings();
 		stratSets.setWeight(1.0);
@@ -64,15 +92,11 @@ public class ReRunningWithStayHomePlan {
 		config.strategy().addStrategySettings(stratSets);
 		config.strategy().setMaxAgentPlanMemorySize(12);
 		
-		config.controler().setOutputDirectory(outputDirectory);
-		config.controler().setRunId(runNr+"_sel");
+		config.controler().setOutputDirectory(parentDir+runId+"/output/");
+		config.controler().setRunId(runId);
 		
-		int iteration =20;
-		double cadytsCountsWt = 15.0;
-        double cadytsMarginalsWt = 0.0;
-        
-        config.controler().setFirstIteration(config.controler().getLastIteration());
-        config.controler().setLastIteration(config.controler().getLastIteration()+iteration);
+        config.controler().setFirstIteration(firstIt);
+        config.controler().setLastIteration(lastIt);
 
         if (args.length == 0) {
             config.controler()
@@ -173,7 +197,8 @@ public class ReRunningWithStayHomePlan {
                 }
             });
         }
-        
+
+        final double scoreToSet = stayHomePlanScore;
         controler.addOverridingModule(new AbstractModule() {
 			
 			@Override
@@ -183,16 +208,15 @@ public class ReRunningWithStayHomePlan {
 					@Inject private Population population;
 					
 					@Override
-					public void notifyIterationEnds(IterationEndsEvent arg0) {
+					public void notifyIterationEnds(IterationEndsEvent event) {
 						for (Person person : population.getPersons().values()) {
 						
 							Activity existAct = ((Activity) person.getSelectedPlan().getPlanElements().get(0));
 							Activity homeAct = population.getFactory().createActivityFromCoord("home_86400.0", existAct.getCoord());
 							homeAct.setLinkId(existAct.getLinkId());
-//							homeAct.setEndTime(existAct.getEndTime());
 
 							Plan newPlan = population.getFactory().createPlan();
-							newPlan.setScore( 60.0 );
+							newPlan.setScore( scoreToSet );
 							newPlan.addActivity(homeAct);
 							
 							person.addPlan(newPlan);
