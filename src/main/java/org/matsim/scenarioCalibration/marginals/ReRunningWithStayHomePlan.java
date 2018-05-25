@@ -29,6 +29,10 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
+import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
+import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
+import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTripTravelTimeHandler;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
@@ -197,6 +201,18 @@ public class ReRunningWithStayHomePlan {
                 }
             });
         }
+
+        //analyses
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                this.bind(ModalShareEventHandler.class);
+                this.addControlerListenerBinding().to(ModalShareControlerListener.class);
+
+                this.bind(ModalTripTravelTimeHandler.class);
+                this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
+            }
+        });
 
         final double scoreToSet = stayHomePlanScore;
         controler.addOverridingModule(new AbstractModule() {
