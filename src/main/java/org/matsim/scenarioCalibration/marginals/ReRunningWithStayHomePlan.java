@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -59,6 +60,7 @@ public class ReRunningWithStayHomePlan {
         double cadytsMarginalsWt = 0.0;
 
         boolean useUtilPerf4ScoreStayHomePlan = false;
+        int preparatoryIterations = 50;
 
 		if (args.length>0) {
 
@@ -72,6 +74,7 @@ public class ReRunningWithStayHomePlan {
             cadytsMarginalsWt = Double.valueOf(args[5]);
 
             useUtilPerf4ScoreStayHomePlan = Boolean.valueOf(args[6]); // if false, args[3] doesn't matter.
+            preparatoryIterations = Integer.valueOf(args[7]);
 
         } else {
             parentDir = "../../repos/runs-svn/nemo/marginals/";
@@ -111,6 +114,10 @@ public class ReRunningWithStayHomePlan {
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        }
+
+        if ( ! useUtilPerf4ScoreStayHomePlan) {
+            ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class).setPreparatoryIterations(preparatoryIterations);
         }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
