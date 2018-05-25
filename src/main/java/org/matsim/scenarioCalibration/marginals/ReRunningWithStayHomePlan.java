@@ -116,12 +116,15 @@ public class ReRunningWithStayHomePlan {
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         }
 
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+
         if ( ! useUtilPerf4ScoreStayHomePlan) {
-            ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class).setPreparatoryIterations(preparatoryIterations);
+            ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.class).setPreparatoryIterations(preparatoryIterations);
+
+            // remove the scores of all plans
+            scenario.getPopulation().getPersons().values().stream().flatMap(p->p.getPlans().stream()).forEach(pl -> pl.setScore(null));
         }
 
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new AbstractModule() {
             @Override
