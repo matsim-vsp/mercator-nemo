@@ -29,6 +29,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.scenarioCalibration.marginals.stayHomePlan.StayHomeScoreUpdater;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
 import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
@@ -57,6 +58,8 @@ public class ReRunningWithStayHomePlan {
         double cadytsCountsWt = 15.0;
         double cadytsMarginalsWt = 0.0;
 
+        boolean useUtilPerf4ScoreStayHomePlan = false;
+
 		if (args.length>0) {
 
             parentDir = args[0];
@@ -64,8 +67,11 @@ public class ReRunningWithStayHomePlan {
             runId = args[2];
             stayHomePlanScore = Double.valueOf(args[3]);
 
+
             cadytsCountsWt = Double.valueOf(args[4]);
             cadytsMarginalsWt = Double.valueOf(args[5]);
+
+            useUtilPerf4ScoreStayHomePlan = Boolean.valueOf(args[6]); // if false, args[3] doesn't matter.
 
         } else {
             parentDir = "../../repos/runs-svn/nemo/marginals/";
@@ -214,39 +220,48 @@ public class ReRunningWithStayHomePlan {
             }
         });
 
-        final double scoreToSet = stayHomePlanScore;
-        controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
-				addControlerListenerBinding().toInstance(new IterationEndsListener() {
-					
-					@Inject private Population population;
-					
-					@Override
-					public void notifyIterationEnds(IterationEndsEvent event) {
-						for (Person person : population.getPersons().values()) {
+        if (useUtilPerf4ScoreStayHomePlan ) {
+            final double scoreToSet = stayHomePlanScore;
+            controler.addOverridingModule(new AbstractModule() {
 
-						    Plan plan = getStayHomePlan(person);
-						    if (plan==null){
-                                Activity existAct = ((Activity) person.getSelectedPlan().getPlanElements().get(0));
-                                Activity homeAct = population.getFactory().createActivityFromCoord("home_86400.0", existAct.getCoord());
-                                homeAct.setLinkId(existAct.getLinkId());
-                                existAct.getAttributes()
-                                        .getAsMap()
-                                        .forEach((key, value) -> homeAct.getAttributes().putAttribute(key, value));
+                @Override
+                public void install() {
+                    addControlerListenerBinding().toInstance(new IterationEndsListener() {
 
-                                plan = population.getFactory().createPlan();
-                                plan.addActivity(homeAct);
-                                person.addPlan(plan);
+                        @Inject private Population population;
+
+                        @Override
+                        public void notifyIterationEnds(IterationEndsEvent event) {
+                            for (Person person : population.getPersons().values()) {
+
+                                Plan plan = getStayHomePlan(person);
+                                if (plan==null){
+                                    Activity existAct = ((Activity) person.getSelectedPlan().getPlanElements().get(0));
+                                    Activity homeAct = population.getFactory().createActivityFromCoord("home_86400.0", existAct.getCoord());
+                                    homeAct.setLinkId(existAct.getLinkId());
+                                    existAct.getAttributes()
+                                            .getAsMap()
+                                            .forEach((key, value) -> homeAct.getAttributes().putAttribute(key, value));
+
+                                    plan = population.getFactory().createPlan();
+                                    plan.addActivity(homeAct);
+                                    person.addPlan(plan);
+                                }
+                                plan.setScore(scoreToSet);
                             }
-						    plan.setScore(scoreToSet);
-						}
-					}
-				});
-			}
-		});
-        
+                        }
+                    });
+                }
+            });
+        } else {
+            controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    addControlerListenerBinding().to(StayHomeScoreUpdater.class);
+                }
+            });
+        }
+
         controler.run();
 	}
 	
