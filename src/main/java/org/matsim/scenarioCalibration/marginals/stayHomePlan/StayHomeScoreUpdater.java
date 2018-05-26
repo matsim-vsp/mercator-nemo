@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -48,6 +49,7 @@ public class StayHomeScoreUpdater implements IterationStartsListener {
     @Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
     @Inject private CadytsConfigGroup cadytsConfigGroup; // cadyts plan effect starts at preparatoryIterations
     @Inject private Population population;
+    @Inject private ControlerConfigGroup controlerConfigGroup;
 
     private static final String personStayHomePlanScore = "stay_home_plan_score";
 
@@ -90,7 +92,7 @@ public class StayHomeScoreUpdater implements IterationStartsListener {
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        if ( event.getIteration() == this.cadytsConfigGroup.getPreparatoryIterations()){
+        if ( event.getIteration() ==  this.controlerConfigGroup.getFirstIteration() + this.cadytsConfigGroup.getPreparatoryIterations()){
             // store person stay home plan score here..capped by util_perf
             for (Person person : this.population.getPersons().values()) {
                 double maxScoreOfPlans = person.getPlans()
@@ -101,7 +103,7 @@ public class StayHomeScoreUpdater implements IterationStartsListener {
                 plan.setScore( maxScoreOfPlans);
                 this.population.getPersonAttributes().putAttribute(person.getId().toString(), personStayHomePlanScore, maxScoreOfPlans);
             }
-        } else if ( event.getIteration() > this.cadytsConfigGroup.getPreparatoryIterations()) {
+        } else if ( event.getIteration() > this.controlerConfigGroup.getFirstIteration() + this.cadytsConfigGroup.getPreparatoryIterations()) {
             // put stay home plan in there if does not exists
             this.population.getPersons().values().forEach(p -> {
                 double score = (double) this.population.getPersonAttributes().getAttribute(p.getId().toString(), personStayHomePlanScore);
