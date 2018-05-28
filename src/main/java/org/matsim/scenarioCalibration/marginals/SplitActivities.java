@@ -30,7 +30,7 @@ public class SplitActivities {
 
     public static void main(String[] args) {
 
-        final String inputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned.xml.gz";
+        final String inputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_stayHomePlans.xml.gz";
 
         final String outputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
         final String outputConfigFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/config_take_activity-parametersOnly.xml";

@@ -19,6 +19,7 @@
 
 package org.matsim.scenarioCreation.matsimPlans;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -26,6 +27,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansConverter;
 
 /**
  *
@@ -43,12 +45,14 @@ public class SampledPlansMerger {
         int numberOfPlans = 5;
         String plansBaseDir = "data/input/matsim_initial_plans/";
         String outPlans = plansBaseDir+"/plans_1pct_fullChoiceSet.xml.gz";
+        boolean addStayHomePlan = true;
 
         if(args.length>0) {
             numberOfFirstCemdapOutputFile = Integer.valueOf(args[0]);
             numberOfPlans = Integer.valueOf(args[1]);
             plansBaseDir = args[2];
             outPlans = args[3];
+            addStayHomePlan = Boolean.parseBoolean(args[4]);
         }
 
         String sampledPlans = plansBaseDir+"/"+numberOfFirstCemdapOutputFile+"/sampling/plans_1pct.xml.gz";
@@ -90,6 +94,20 @@ public class SampledPlansMerger {
                 } else{
                     throw new RuntimeException("Unsampled person "+ sampledPerson.getId() + " should have less than 3 plans in choice set. It has "+person.getPlans().size()+" in his choice set.");
                 }
+            }
+        }
+
+        if (addStayHomePlan) {
+            for (Person person : sampledPop.getPersons().values()) {
+                Plan firstPlan = person.getPlans().get(0);
+                Activity firstActivity = (Activity) firstPlan.getPlanElements().get(0); // Get first (i.e. presumably "home") activity from agent's first plan
+
+                Plan stayHomePlan = sampledPop.getFactory().createPlan();
+                // Create new activity with type and coordinates (but without end time) and add it to stay-home plan
+                Activity Activity2 = sampledPop.getFactory().createActivityFromCoord(firstActivity.getType(), firstActivity.getCoord());
+                Activity2.getAttributes().putAttribute(CemdapOutput2MatsimPlansConverter.activityZoneId_attributeKey, firstActivity.getAttributes().getAttribute(CemdapOutput2MatsimPlansConverter.activityZoneId_attributeKey));
+                stayHomePlan.addActivity(Activity2);
+                person.addPlan(stayHomePlan);
             }
         }
 
