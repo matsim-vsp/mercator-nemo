@@ -30,16 +30,16 @@ public class SplitActivities {
 
     public static void main(String[] args) {
 
-        final String inputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/plans_1pct_fullChoiceSet_coordsAssigned.xml.gz";
+        final String inputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned.xml.gz";
 
-        final String outputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
-        final String outputConfigFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/config_take_activity-parametersOnly.xml";
+        final String outputPopulationFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
+        final String outputConfigFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/config_take_activity-parametersOnly.xml";
 
         final double timeBinSize_s = 600.;
         final String[] activities = {ActivityTypes.HOME, ActivityTypes.WORK, ActivityTypes.EDUCATION, ActivityTypes.LEISURE, ActivityTypes.SHOPPING, ActivityTypes.OTHER};
 
         SplitActivityTypesBasedOnDuration splitAct = new SplitActivityTypesBasedOnDuration(inputPopulationFile);
-        splitAct.run(outputPopulationFile, outputConfigFile, timeBinSize_s, activities);
+        splitAct.run(outputPopulationFile, outputConfigFile, timeBinSize_s, activities, 3600.0*3.0);
     }
 
 }

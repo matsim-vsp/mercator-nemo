@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCalibration.marginals;
+package org.matsim.scenarioCalibration.marginals.controler;
 
 import javax.inject.Inject;
 import org.matsim.NEMOUtils;

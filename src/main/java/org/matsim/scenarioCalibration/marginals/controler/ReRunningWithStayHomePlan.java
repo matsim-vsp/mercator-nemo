@@ -1,7 +1,8 @@
-package org.matsim.scenarioCalibration.marginals;
+package org.matsim.scenarioCalibration.marginals.controler;
 
 import java.io.File;
 import javax.inject.Inject;
+import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -136,7 +137,7 @@ public class ReRunningWithStayHomePlan {
             }
         });
         
-        DistanceDistribution inputDistanceDistribution = NemoModeLocationChoiceCalibrator.getDistanceDistribution(config.counts().getCountsScaleFactor());
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor());
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
 

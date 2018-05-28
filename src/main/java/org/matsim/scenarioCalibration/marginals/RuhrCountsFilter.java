@@ -43,9 +43,9 @@ public class RuhrCountsFilter {
 
     public static void main(String[] args) {
 
-        String inputCountsFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/NemoCounts_data_allCounts_Pkw_24Nov2017.xml";
-        String outputCountsFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/NemoCounts_data_allCounts_Pkw_24Nov2017_filteredForRuhr.xml";
-        String networkFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/tertiaryNemo_10112017_EPSG_25832_filteredcleaned_network.xml.gz";
+        String inputCountsFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/NemoCounts_data_allCounts_Pkw_28May2018.xml";
+        String outputCountsFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/NemoCounts_data_allCounts_Pkw_28May2018.xml_filteredForRuhr.xml";
+        String networkFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/2018-05-03_NRW_coarse_filteredcleaned_network.xml.gz";
 
         Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE);
 

@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCalibration.marginals;
+package org.matsim.scenarioCalibration.marginals.controler;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import javax.inject.Inject;
+import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -46,15 +47,16 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
 import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
 import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTripTravelTimeHandler;
+import playground.vsp.cadyts.marginals.AgentFilter;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
 import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
-import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
 
@@ -142,9 +144,15 @@ public class NemoModeLocationChoiceCalibrator {
         }
 
         // marginals cadyts
-        DistanceDistribution inputDistanceDistribution = getDistanceDistribution(config.counts().getCountsScaleFactor());
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor());
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
+            controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bind(AgentFilter.class).to(RuhrAgentsFilter.class);
+                }
+            });
 
         } else { //get the analysis at least
             controler.addOverridingModule(new AbstractModule() {
@@ -153,6 +161,7 @@ public class NemoModeLocationChoiceCalibrator {
                     this.bind(DistanceDistribution.class).toInstance(inputDistanceDistribution);
                     this.bind(BeelineDistanceCollector.class);
                     this.addControlerListenerBinding().to(ModalDistanceDistributionControlerListener.class);
+                    bind(AgentFilter.class).to(RuhrAgentsFilter.class);
                 }
             });
         }
@@ -241,43 +250,5 @@ public class NemoModeLocationChoiceCalibrator {
         controler.run();
     }
 
-     static DistanceDistribution getDistanceDistribution(double carCountScaleFactor){
-        DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
 
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car",1.3); //+pt
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("bike",1.3);
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("walk",1.1);
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("ride",1.3);
-
-        inputDistanceDistribution.setModeToScalingFactor("car", carCountScaleFactor ); 
-        inputDistanceDistribution.setModeToScalingFactor("bike", 100.0);
-        inputDistanceDistribution.setModeToScalingFactor("walk", 100.0);
-        inputDistanceDistribution.setModeToScalingFactor("ride", 100.0 );
-
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0,1000.),254109.0); //car+PT
-        inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(0.0,1000.),73937.0);
-        inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0,1000.),1316550.0);
-        inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0,1000.),101265.0);
-
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(1000.0,3000.),1245468.0);
-        inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(1000.0,3000.),202657.0);
-        inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(1000.0,3000.),863965.0);
-        inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(1000.0,3000.),421473.0);
-
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(3000.0,5000.),1396007.0);
-        inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(3000.0,5000.),141827.0);
-        inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(3000.0,5000.),156114.0);
-        inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(3000.0,5000.),332666.0);
-
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(5000.0,10000.),2425851.0);
-        inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(5000.0,10000.),70926.0);
-        inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(5000.0,10000.),39799.0);
-        inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(5000.0,10000.),567408.0);
-
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(10000.0,1000000.),2512780.0);
-        inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(10000.0,1000000.),47364.0);
-        inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(10000.0,1000000.),0.0);
-        inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(10000.0,1000000.),292190.);
-        return inputDistanceDistribution;
-    }
 }

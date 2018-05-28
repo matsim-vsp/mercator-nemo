@@ -41,9 +41,9 @@ import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansC
 
 public class FilterInitialNRWPopulationForRuhr {
 
-    private static final String plansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
+    private static final String plansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
 
-    private static final String outPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
+    private static final String outPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
 
     //some assumptions
     private static final boolean keepOnlySelectedPlans = false;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCalibration.marginals;
+package org.matsim.scenarioCalibration.marginals.controler;
 
 import playground.vsp.parametricRuns.PrepareParametricRuns;
 
