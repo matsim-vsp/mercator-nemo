@@ -41,9 +41,10 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
+import playground.vsp.cadyts.marginals.AgentFilter;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
-import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 
 /**
@@ -56,7 +57,7 @@ public class RuhrCountsCadytsRun {
 
         String configFile = "../../repos/runs-svn/nemo/marginals/input/preparedConfig_allCarsPlainMATSimRun.xml";
         String outDir = "../../repos/runs-svn/nemo/marginals/testCalib/";
-        String runID = "run000";
+        String runID = "allCars_3";
 
         double cadytsWt = 15;
         double storageCapFactor = 0.3;
@@ -89,13 +90,14 @@ public class RuhrCountsCadytsRun {
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new CadytsCarModule());
 
-        DistanceDistribution inputDistanceDistribution = getDistanceDistribution(countScaleFactor);
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(countScaleFactor);
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 this.bind(DistanceDistribution.class).toInstance(inputDistanceDistribution);
                 this.bind(BeelineDistanceCollector.class);
                 this.addControlerListenerBinding().to(ModalDistanceDistributionControlerListener.class);
+                bind(AgentFilter.class).to(RuhrAgentsFilter.class);
             }
         });
 
@@ -127,20 +129,4 @@ public class RuhrCountsCadytsRun {
         });
         controler.run();
     }
-
-    private static DistanceDistribution getDistanceDistribution(double countScaleFactor){
-        DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
-
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car",1.3);
-
-        inputDistanceDistribution.setModeToScalingFactor("car", countScaleFactor ); // similar to counts scale factor
-
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0,1000.),1745861.0);
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(1000.0,3000.),2733563.0);
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(3000.0,5000.),2026614.0);
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(5000.0,10000.),3103984.0);
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(10000.0,1000000.),2852334);
-        return inputDistanceDistribution;
-    }
-
 }

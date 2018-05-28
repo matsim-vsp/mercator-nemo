@@ -28,7 +28,7 @@ import playground.vsp.parametricRuns.PrepareParametricRuns;
 public class ParametricRunsNEMOMarginals {
 
     public static void main(String[] args) {
-        int runCounter= 207;
+        int runCounter= 260;
 
         String baseOutDir = "/net/ils4/agarwal/nemo/data/marginals/";
         String matsimDir = "r_835f86d56474897281286c921b4b7cca90590e64_nemoMarginals";
@@ -36,9 +36,9 @@ public class ParametricRunsNEMOMarginals {
         StringBuilder buffer = new StringBuilder();
         PrepareParametricRuns parametricRuns = new PrepareParametricRuns("~/.ssh/known_hosts","~/.ssh/id_rsa_tub_math","agarwal");
 
-        Integer [] lastIts = {300,400};
-        double [] cadytsCountsWts = {15};
-        double [] cadytsMarginalsWts = {25,50};
+        Integer [] lastIts = {300};
+        double [] cadytsCountsWts = {0, 15};
+        double [] cadytsMarginalsWts = {0, 5, 10, 15};
 
         buffer.append("run201 to run206 had util_trav as -6.0. Setting it to zero in subsequent runs.");
         buffer.append("jobName\tconfigFile\toutputDir\tjobName\tlastIteration\tcadytsCountsWt\tcadytsMarginalsWt"+ PrepareParametricRuns.newLine);
@@ -47,7 +47,9 @@ public class ParametricRunsNEMOMarginals {
             for (double countsCadytsWt : cadytsCountsWts ) {
                 for(double cadytsMarginalsWt :cadytsMarginalsWts){
 
-                        String configFile = "/net/ils4/agarwal/nemo/data/marginals/input/preparedConfig_rideAsMainMode.xml";
+                        if (countsCadytsWt ==0.0 && cadytsMarginalsWt == 0.0) continue;;
+
+                        String configFile = "/net/ils4/agarwal/nemo/data/marginals/input/preparedConfig.xml";
                         String jobName = "run"+String.valueOf(runCounter++);
                         String outputDir = baseOutDir+"/"+jobName+"/output/";
 
@@ -62,8 +64,8 @@ public class ParametricRunsNEMOMarginals {
                                 "cd /net/ils4/agarwal/matsim/"+matsimDir+"/",
                                 PrepareParametricRuns.newLine,
 
-                                "java -Djava.awt.headless=true -Xmx58G -cp nemo-0.10.0-SNAPSHOT.jar " +
-                                        "org/matsim/scenarioCalibration/marginals/NemoModeLocationChoiceCalibrator " +
+                                "java -Djava.awt.headless=true -Xmx58G -cp nemo-0.0.1-SNAPSHOT.jar " +
+                                        "org/matsim/scenarioCalibration/marginals/controler/NemoModeLocationChoiceCalibrator " +
                                         params+" "
                         };
 

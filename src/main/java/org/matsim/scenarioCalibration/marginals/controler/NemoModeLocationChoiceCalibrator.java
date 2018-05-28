@@ -35,9 +35,9 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -77,7 +77,6 @@ public class NemoModeLocationChoiceCalibrator {
         int lastIt = 200; // apparently 200 iterations are fine.
         double cadytsCountsWt = 15.0;
         double cadytsMarginalsWt = 0.0;
-        boolean rideAsMainMode = false;
 
         if (args.length > 0) {
             configFile = args[0];
@@ -86,7 +85,6 @@ public class NemoModeLocationChoiceCalibrator {
             lastIt = Integer.valueOf(args[3]);
             cadytsCountsWt = Double.valueOf(args[4]);
             cadytsMarginalsWt = Double.valueOf(args[5]);
-            rideAsMainMode = Boolean.valueOf(args[6]);
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -99,12 +97,13 @@ public class NemoModeLocationChoiceCalibrator {
         config.strategy().setMaxAgentPlanMemorySize(12);
 
         config.qsim().setEndTime(3600.);
+        config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 
-        if (args.length == 0) {
-            config.controler()
-                  .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-            config.plans().setInputFile("run200.0.plans.xml.gz");
-        }
+//        if (args.length == 0) {
+//            config.controler()
+//                  .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+//            config.plans().setInputFile("run200.0.plans.xml.gz");
+//        }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -132,16 +131,14 @@ public class NemoModeLocationChoiceCalibrator {
 
         Controler controler = new Controler(scenario);
 
-        if (! rideAsMainMode ) {
-            // use car-travel time calculator for ride mode to teleport them yet affected by congestion.
-            controler.addOverridingModule(new AbstractModule() {
-                @Override
-                public void install() {
-                    addTravelTimeBinding("ride").to(networkTravelTime());
-                    addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
-                }
-            });
-        }
+        // use car-travel time calculator for ride mode to teleport them yet affected by congestion.
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addTravelTimeBinding("ride").to(networkTravelTime());
+                addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
+            }
+        });
 
         // marginals cadyts
         DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor());
@@ -170,7 +167,7 @@ public class NemoModeLocationChoiceCalibrator {
         controler.addOverridingModule(new CadytsCarModule());
         final double cadytsCountsScoringWeight = cadytsCountsWt * config.planCalcScore().getBrainExpBeta();
 
-        if (cadytsMarginalsWt!=0.) {
+        if (cadytsMarginalsWt != 0.) {
             final double cadytsMarginalsScoringWeight = cadytsMarginalsWt * config.planCalcScore().getBrainExpBeta();
             controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
                 @Inject
