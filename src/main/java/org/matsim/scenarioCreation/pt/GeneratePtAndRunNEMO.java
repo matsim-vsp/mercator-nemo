@@ -72,7 +72,7 @@ public class GeneratePtAndRunNEMO {
 		// adjust these directories
 		final String projectDirectory = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/";
 		final String gtfsZipFile = projectDirectory + "data/pt/google_transit_vrr_2018_05_11_corrected-v1.zip"; 
-		final String directory = projectDirectory + "data/pt/corrected-gtfs-file-v1/";
+		final String directory = projectDirectory + "data/pt/corrected-gtfs-file-v1b/";
 		
 		// #######################################################
 		// do not adjust the following lines (or talk to me, ik)
