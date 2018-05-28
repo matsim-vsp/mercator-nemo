@@ -31,7 +31,7 @@ public class ParametricRunsNEMOMarginals {
         int runCounter= 260;
 
         String baseOutDir = "/net/ils4/agarwal/nemo/data/marginals/";
-        String matsimDir = "r_835f86d56474897281286c921b4b7cca90590e64_nemoMarginals";
+        String matsimDir = "r_a4b888c8fc313061533ca8c08d498fa898ca3db7_nemo_28May2018";
 
         StringBuilder buffer = new StringBuilder();
         PrepareParametricRuns parametricRuns = new PrepareParametricRuns("~/.ssh/known_hosts","~/.ssh/id_rsa_tub_math","agarwal");
@@ -40,7 +40,7 @@ public class ParametricRunsNEMOMarginals {
         double [] cadytsCountsWts = {0, 15};
         double [] cadytsMarginalsWts = {0, 5, 10, 15};
 
-        buffer.append("run201 to run206 had util_trav as -6.0. Setting it to zero in subsequent runs.");
+//        buffer.append("run201 to run206 had util_trav as -6.0. Setting it to zero in subsequent runs.");
         buffer.append("jobName\tconfigFile\toutputDir\tjobName\tlastIteration\tcadytsCountsWt\tcadytsMarginalsWt"+ PrepareParametricRuns.newLine);
 
         for (int lastIt : lastIts) {
