@@ -120,6 +120,8 @@ public class ReRunningWithStayHomePlan {
 
         if ( ! useUtilPerf4ScoreStayHomePlan) {
             ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.class).setPreparatoryIterations(preparatoryIterations);
+            //also update last iteration
+            config.controler().setLastIteration(lastIt+preparatoryIterations);
 
             // remove the scores of all plans
             scenario.getPopulation().getPersons().values().stream().flatMap(p->p.getPlans().stream()).forEach(pl -> pl.setScore(null));
