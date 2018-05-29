@@ -23,6 +23,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import javax.inject.Inject;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -78,6 +80,8 @@ public class NemoModeLocationChoiceCalibrator {
         double cadytsCountsWt = 15.0;
         double cadytsMarginalsWt = 0.0;
 
+        String shapeFile = NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE;
+
         if (args.length > 0) {
             configFile = args[0];
             outputDir = args[1];
@@ -85,6 +89,7 @@ public class NemoModeLocationChoiceCalibrator {
             lastIt = Integer.valueOf(args[3]);
             cadytsCountsWt = Double.valueOf(args[4]);
             cadytsMarginalsWt = Double.valueOf(args[5]);
+            shapeFile = args[6];
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -141,6 +146,7 @@ public class NemoModeLocationChoiceCalibrator {
         });
 
         // marginals cadyts
+        final String shapeFile_final = shapeFile;
         DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor());
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
@@ -148,6 +154,7 @@ public class NemoModeLocationChoiceCalibrator {
                 @Override
                 public void install() {
                     bind(AgentFilter.class).to(RuhrAgentsFilter.class);
+                    bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(shapeFile_final);
                 }
             });
 
@@ -159,6 +166,7 @@ public class NemoModeLocationChoiceCalibrator {
                     this.bind(BeelineDistanceCollector.class);
                     this.addControlerListenerBinding().to(ModalDistanceDistributionControlerListener.class);
                     bind(AgentFilter.class).to(RuhrAgentsFilter.class);
+                    bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(shapeFile_final);
                 }
             });
         }

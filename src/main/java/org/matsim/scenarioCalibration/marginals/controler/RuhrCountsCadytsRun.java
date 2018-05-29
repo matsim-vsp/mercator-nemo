@@ -20,6 +20,8 @@
 package org.matsim.scenarioCalibration.marginals.controler;
 
 import javax.inject.Inject;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -62,12 +64,15 @@ public class RuhrCountsCadytsRun {
         double cadytsWt = 15;
         double storageCapFactor = 0.3;
 
+        String shapeFile = NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE;
+
         if(args.length>0){
             configFile = args[0] ;
             outDir = args[1];
             runID = args[2];
             cadytsWt = Double.valueOf(args[3]);
             storageCapFactor = Double.valueOf(args[4]);
+            shapeFile = args[5];
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -90,6 +95,7 @@ public class RuhrCountsCadytsRun {
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new CadytsCarModule());
 
+        final String shapeFile_final = shapeFile;
         DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(countScaleFactor);
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -98,6 +104,7 @@ public class RuhrCountsCadytsRun {
                 this.bind(BeelineDistanceCollector.class);
                 this.addControlerListenerBinding().to(ModalDistanceDistributionControlerListener.class);
                 bind(AgentFilter.class).to(RuhrAgentsFilter.class);
+                bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(shapeFile_final);
             }
         });
 

@@ -21,9 +21,9 @@ package org.matsim.scenarioCalibration.marginals;
 
 import java.util.Collection;
 import javax.inject.Inject;
+import javax.inject.Named;
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -39,15 +39,18 @@ import playground.vsp.cadyts.marginals.AgentFilter;
 
 public class RuhrAgentsFilter implements AgentFilter {
 
+    public static final String ruhr_boundary_shape = "ruhr_boundary_shape";
+
     private static final Logger LOG = Logger.getLogger(RuhrAgentsFilter.class);
 
-    private final Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE);
+    private final Collection<SimpleFeature> features ;
 
     private final Population population;
 
     @Inject
-    public RuhrAgentsFilter(Population population) {
+    public RuhrAgentsFilter(Population population, @Named(RuhrAgentsFilter.ruhr_boundary_shape) String shapeFile) {
         this.population = population;
+        this.features = ShapeFileReader.getAllFeatures(shapeFile);
     }
 
     @Override
