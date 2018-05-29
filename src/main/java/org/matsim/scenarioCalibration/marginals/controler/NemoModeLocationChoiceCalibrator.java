@@ -101,7 +101,6 @@ public class NemoModeLocationChoiceCalibrator {
         config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
         config.strategy().setMaxAgentPlanMemorySize(12);
 
-        config.qsim().setEndTime(3600.);
         config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 
 //        if (args.length == 0) {
