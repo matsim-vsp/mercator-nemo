@@ -28,10 +28,10 @@ import playground.vsp.parametricRuns.PrepareParametricRuns;
 public class ParametricRunsNEMOMarginals {
 
     public static void main(String[] args) {
-        int runCounter= 260;
+        int runCounter= 1260;
 
         String baseOutDir = "/net/ils4/agarwal/nemo/data/marginals/";
-        String matsimDir = "r_a4b888c8fc313061533ca8c08d498fa898ca3db7_nemo_28May2018";
+        String matsimDir = "r_823a955c798f0883989dbb0d06aabaad89e90e72_nemo_29May";
 
         StringBuilder buffer = new StringBuilder();
         PrepareParametricRuns parametricRuns = new PrepareParametricRuns("~/.ssh/known_hosts","~/.ssh/id_rsa_tub_math","agarwal");
@@ -40,7 +40,6 @@ public class ParametricRunsNEMOMarginals {
         double [] cadytsCountsWts = {0, 15};
         double [] cadytsMarginalsWts = {0, 5, 10, 15};
 
-//        buffer.append("run201 to run206 had util_trav as -6.0. Setting it to zero in subsequent runs.");
         buffer.append("jobName\tconfigFile\toutputDir\tjobName\tlastIteration\tcadytsCountsWt\tcadytsMarginalsWt"+ PrepareParametricRuns.newLine);
 
         for (int lastIt : lastIts) {
@@ -64,12 +63,12 @@ public class ParametricRunsNEMOMarginals {
                                 "cd /net/ils4/agarwal/matsim/"+matsimDir+"/",
                                 PrepareParametricRuns.newLine,
 
-                                "java -Djava.awt.headless=true -Xmx58G -cp nemo-0.0.1-SNAPSHOT.jar " +
+                                "java -Djava.awt.headless=true -Xmx12G -cp nemo-0.0.1-SNAPSHOT.jar " +
                                         "org/matsim/scenarioCalibration/marginals/controler/NemoModeLocationChoiceCalibrator " +
-                                        params+" "
+                                        params+" "+"/net/ils4/agarwal/nemo/data/marginals/input/ruhrgebiet_boundary.shp"
                         };
 
-                        parametricRuns.appendJobParameters("-l mem_free=15G");// 4 cores with 15G each
+                        parametricRuns.appendJobParameters("-l mem_free=7.5G");// 4 cores with 7.5G each
                         parametricRuns.run(additionalLines, baseOutDir, jobName);
 
                         buffer.append(jobName+"\t" + params.replace(' ','\t') + PrepareParametricRuns.newLine);
