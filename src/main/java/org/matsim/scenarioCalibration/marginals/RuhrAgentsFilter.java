@@ -20,6 +20,8 @@
 package org.matsim.scenarioCalibration.marginals;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import com.vividsolutions.jts.geom.Geometry;
@@ -45,26 +47,45 @@ public class RuhrAgentsFilter implements AgentFilter {
 
     private final Collection<SimpleFeature> features ;
 
-    private final Population population;
+    private final Map<Id<Person>,Boolean> personIdMap  = new HashMap<>();
 
     @Inject
     public RuhrAgentsFilter(Population population, @Named(RuhrAgentsFilter.ruhr_boundary_shape) String shapeFile) {
-        this.population = population;
         this.features = ShapeFileReader.getAllFeatures(shapeFile);
+        for (Person person : population.getPersons().values()) {
+            Activity activity = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+            if (! activity.getType().startsWith("home")) {
+                LOG.warn("First activity is not type home. Excluding such agents...");
+                this.personIdMap.put(person.getId(), false);
+            }
+
+            this.personIdMap.put(person.getId(), isActivityInside(activity));
+        }
     }
 
-    @Override
-    public boolean includeAgent(Id<Person> id) {
-        Activity activity = (Activity) population.getPersons().get(id).getSelectedPlan().getPlanElements().get(0);
-        if (! activity.getType().startsWith("home")) {
-            LOG.warn("First activity is not type home. Excluding such agents...");
-            return false;
-        }
+    private boolean isActivityInside(Activity activity){
         for (SimpleFeature feature : features) {
             if ( ((Geometry)feature.getDefaultGeometry()).contains(MGC.coord2Point(activity.getCoord()))  ) {
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean includeAgent(Id<Person> id) {
+//        Activity activity = (Activity) population.getPersons().get(id).getSelectedPlan().getPlanElements().get(0);
+//        if (! activity.getType().startsWith("home")) {
+//            LOG.warn("First activity is not type home. Excluding such agents...");
+//            return false;
+//        }
+//        for (SimpleFeature feature : features) {
+//            if ( ((Geometry)feature.getDefaultGeometry()).contains(MGC.coord2Point(activity.getCoord()))  ) {
+//                return true;
+//            }
+//        }
+//        return false;
+        // check for every agent again and again is expensive...
+        return this.personIdMap.get(id);
     }
 }

@@ -63,12 +63,12 @@ public class ParametricRunsNEMOMarginals {
                                 "cd /net/ils4/agarwal/matsim/"+matsimDir+"/",
                                 PrepareParametricRuns.newLine,
 
-                                "java -Djava.awt.headless=true -Xmx12G -cp nemo-0.0.1-SNAPSHOT.jar " +
+                                "java -Djava.awt.headless=true -Xmx58G -cp nemo-0.0.1-SNAPSHOT.jar " +
                                         "org/matsim/scenarioCalibration/marginals/controler/NemoModeLocationChoiceCalibrator " +
                                         params+" "+"/net/ils4/agarwal/nemo/data/marginals/input/ruhrgebiet_boundary.shp"
                         };
 
-                        parametricRuns.appendJobParameters("-l mem_free=7.5G");// 4 cores with 7.5G each
+                        parametricRuns.appendJobParameters("-l mem_free=15G");// 4 cores with 7.5G each
                         parametricRuns.run(additionalLines, baseOutDir, jobName);
 
                         buffer.append(jobName+"\t" + params.replace(' ','\t') + PrepareParametricRuns.newLine);

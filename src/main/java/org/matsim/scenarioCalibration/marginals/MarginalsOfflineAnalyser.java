@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -43,22 +44,41 @@ import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
 
 public class MarginalsOfflineAnalyser {
 
-
     public static void main(String[] args) {
+        String dir = "../../repos/runs-svn/nemo/marginals/";
+        String runCases [] = {/*"allCars_3","run263",*/"run264"/*, "run266"*/};
+//        String runCases [] = {"run000", "run249","run250","run251","run252","run253","run254","run255","run256","run257","run258","run259"};
+        for (String runCase : runCases ){
 
-        String runId = "run249_SHP";
-        String eventsFile = "../../repos/runs-svn/nemo/marginals/"+runId+"/output/"+runId+".output_events.xml.gz";
-        String configFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
-        String outputFile = "../../repos/runs-svn/nemo/marginals/"+runId+"/correctedDistriCompare.txt";
+            run(new String [] {dir, runCase});
+        }
 
-        Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+    }
+
+    public static void run (String[] args) {
+
+        String dir = args[0];
+        String runId = args[1];
+
+        String eventsFile = dir + runId + "/output/ITERS/it.300/" +runId +".300.events.xml.gz";
+        String configFile = dir + runId + "/output/"+runId+".output_config.xml";
+        String outputFile = dir + runId + "/output/ITERS/it.300/" + runId +".300.multiMode_distanceDistributionCounts_absolute.txt";
+
+        Config config = ConfigUtils.loadConfig(configFile);
+        config.network().setInputFile( runId+".output_network.xml.gz");
+        config.plans().setInputPersonAttributeFile(null);
+        config.plans().setInputFile(runId+".output_plans.xml.gz");
+        config.counts().setInputFile(null);
+        config.vehicles().setVehiclesFile(null);
+
+        Scenario scenario = ScenarioUtils.loadScenario(config);
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
         DistanceDistribution distri = NEMOUtils.getDistanceDistribution(scenario.getConfig().counts().getCountsScaleFactor());
 
         BeelineDistanceCollector collector = new BeelineDistanceCollector(scenario.getNetwork(), scenario.getConfig().plansCalcRoute(), distri, eventsManager);
-//        collector.setAgentFilter( new RuhrAgentsFilter(scenario.getPopulation()) );
+        collector.setAgentFilter( new RuhrAgentsFilter(scenario.getPopulation(), NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE ));
 
         new MatsimEventsReader(eventsManager).readFile(eventsFile);
 

@@ -40,6 +40,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -103,11 +104,11 @@ public class NemoModeLocationChoiceCalibrator {
 
         config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 
-//        if (args.length == 0) {
-//            config.controler()
-//                  .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-//            config.plans().setInputFile("run200.0.plans.xml.gz");
-//        }
+        if (args.length == 0) {
+            config.controler()
+                  .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+            config.plans().setInputFile("run200.0.plans.xml.gz");
+        }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
