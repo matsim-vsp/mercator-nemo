@@ -127,12 +127,12 @@ public class PrepareConfig {
 
         outConfig.strategy().setFractionOfIterationsToDisableInnovation(0.8);
         StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings();
-        reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
+        reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
         reRoute.setWeight(0.15);
         outConfig.strategy().addStrategySettings(reRoute);
 
         StrategyConfigGroup.StrategySettings modeChoice = new StrategyConfigGroup.StrategySettings();
-        modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name());
+        modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString());
         modeChoice.setWeight(0.15);
         outConfig.strategy().addStrategySettings(modeChoice);
         outConfig.subtourModeChoice().setModes(new String[]{TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.ride});
