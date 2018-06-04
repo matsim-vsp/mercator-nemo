@@ -147,7 +147,7 @@ public class NemoModeLocationChoiceCalibrator {
 
         // marginals cadyts
         final String shapeFile_final = shapeFile;
-        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor());
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
             controler.addOverridingModule(new AbstractModule() {

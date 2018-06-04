@@ -40,7 +40,7 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
 
     public static void main(String[] args) {
 
-        String inputPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
+        String inputPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
 
         Population population = NEMOUtils.loadScenarioFromPlans(inputPlansFile).getPopulation();
 

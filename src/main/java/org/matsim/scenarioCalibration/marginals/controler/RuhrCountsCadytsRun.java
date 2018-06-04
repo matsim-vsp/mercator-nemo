@@ -96,7 +96,7 @@ public class RuhrCountsCadytsRun {
         controler.addOverridingModule(new CadytsCarModule());
 
         final String shapeFile_final = shapeFile;
-        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(countScaleFactor);
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(countScaleFactor, scenario.getConfig().plansCalcRoute());
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

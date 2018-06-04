@@ -46,7 +46,7 @@ public class MarginalsOfflineAnalyser {
 
     public static void main(String[] args) {
         String dir = "../../repos/runs-svn/nemo/marginals/";
-        String runCases [] = {/*"allCars_3","run263",*/"run264"/*, "run266"*/};
+        String runCases [] = {"run262","run263","run264", "run265", "run266"};
 //        String runCases [] = {"run000", "run249","run250","run251","run252","run253","run254","run255","run256","run257","run258","run259"};
         for (String runCase : runCases ){
 
@@ -75,7 +75,7 @@ public class MarginalsOfflineAnalyser {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
-        DistanceDistribution distri = NEMOUtils.getDistanceDistribution(scenario.getConfig().counts().getCountsScaleFactor());
+        DistanceDistribution distri = NEMOUtils.getDistanceDistribution(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
 
         BeelineDistanceCollector collector = new BeelineDistanceCollector(scenario.getNetwork(), scenario.getConfig().plansCalcRoute(), distri, eventsManager);
         collector.setAgentFilter( new RuhrAgentsFilter(scenario.getPopulation(), NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE ));

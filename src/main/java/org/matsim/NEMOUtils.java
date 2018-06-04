@@ -19,8 +19,10 @@
 
 package org.matsim;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
@@ -77,13 +79,15 @@ public final class NEMOUtils {
         return ScenarioUtils.loadScenario(config);
     }
 
-    public static DistanceDistribution getDistanceDistribution(double carCountScaleFactor){
+    public static DistanceDistribution getDistanceDistribution(double carCountScaleFactor, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup){
         DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
 
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car",1.3); //+pt
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("bike",1.3);
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("walk",1.1);
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("ride",1.3);
+        Map<String, PlansCalcRouteConfigGroup.ModeRoutingParams> modeRoutingParams = plansCalcRouteConfigGroup.getModeRoutingParams();
+
+        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car", modeRoutingParams.containsKey("car") ? modeRoutingParams.get("car").getBeelineDistanceFactor() : 1.3 ); //+pt
+        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("bike",modeRoutingParams.containsKey("bike") ? modeRoutingParams.get("bike").getBeelineDistanceFactor() : 1.3);
+        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("walk",modeRoutingParams.containsKey("walk") ? modeRoutingParams.get("walk").getBeelineDistanceFactor() : 1.3);
+        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("ride",modeRoutingParams.containsKey("ride") ? modeRoutingParams.get("ride").getBeelineDistanceFactor() : 1.3);
 
         inputDistanceDistribution.setModeToScalingFactor("car", carCountScaleFactor );
         inputDistanceDistribution.setModeToScalingFactor("bike", 100.0);
