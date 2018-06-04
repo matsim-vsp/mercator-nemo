@@ -78,8 +78,8 @@ public class RuhrCountsCadytsRun {
         Config config = ConfigUtils.loadConfig(configFile);
         config.controler().setRunId(runID);
         config.controler().setOutputDirectory(outDir);
-        double flowCapFactor = NEMOUtils.round(1 * NEMOUtils.SAMPLE_SIZE / NEMOUtils.RUHR_CAR_SHARE,2); //0.021
-        config.qsim().setFlowCapFactor(  flowCapFactor);
+        double flowCapFactor = 1 * NEMOUtils.SAMPLE_SIZE / NEMOUtils.RUHR_CAR_SHARE; //0.021
+        config.qsim().setFlowCapFactor(  NEMOUtils.round( flowCapFactor, 3) );
         config.qsim().setStorageCapFactor(storageCapFactor);
 
         double countScaleFactor = NEMOUtils.round(1/flowCapFactor,2);
