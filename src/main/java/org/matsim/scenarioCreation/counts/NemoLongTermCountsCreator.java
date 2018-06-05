@@ -522,8 +522,16 @@ public class NemoLongTermCountsCreator {
 									Double sumDir1 = 0.;
 									Double sumDir2 = 0.;
 									for(String header : headers){
-										sumDir1 += trafficVolumesperVehicleType.get(header).getFirst();
-										sumDir2 += trafficVolumesperVehicleType.get(header).getSecond();
+										if(! trafficVolumesperVehicleType.get(header).getFirst().equals(Double.NaN) && !sumDir1.equals(Double.NaN)) {
+											sumDir1 += trafficVolumesperVehicleType.get(header).getFirst();
+										} else {
+											sumDir1 = Double.NaN;
+										}
+										if(! trafficVolumesperVehicleType.get(header).getSecond().equals(Double.NaN)  && !sumDir2.equals(Double.NaN)) {
+											sumDir2 += trafficVolumesperVehicleType.get(header).getSecond();
+										} else {
+											sumDir2 = Double.NaN;
+										}
 									}
 									
 									//get the HourlyCountData object and set volumes
@@ -532,8 +540,12 @@ public class NemoLongTermCountsCreator {
 										data = new HourlyCountData(countName, null); //ID = countID_countName_streetID
 									}
 									
-									data.computeAndSetVolume(true, hour, sumDir1);
-									data.computeAndSetVolume(false, hour, sumDir2);
+									if(!sumDir1.equals(Double.NaN)) {
+										data.computeAndSetVolume(true, hour, sumDir1);
+									}
+									if(!sumDir2.equals(Double.NaN)) {
+										data.computeAndSetVolume(false, hour, sumDir2);
+									}
 									this.countingStationsData.get(combination).put(countID,data);
 								}
 								
@@ -573,10 +585,12 @@ public class NemoLongTermCountsCreator {
 		double trafficVolume = 0.;
 		for(int lane = 1; lane <= nrOfLanes; lane ++){
 			String valueOfLaneString = rowData[baseColumn + (lane-1) * jumpLength];
-			Double valueOfLane = 0.;
+			double valueOfLane = 0;
 			try{
 				if(valueOfLaneString.endsWith("-")){
 					valueOfLane = Double.parseDouble(valueOfLaneString.substring(0, valueOfLaneString.length() - 1)); 
+				}else {
+					return Double.NaN;			//once data set for one lane is invalid, it is invalid for the whole direction
 				}
 				
 			} catch(NumberFormatException nfe){
