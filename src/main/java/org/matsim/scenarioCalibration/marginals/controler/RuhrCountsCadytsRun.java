@@ -62,7 +62,7 @@ public class RuhrCountsCadytsRun {
         String runID = "allCars_3";
 
         double cadytsWt = 15;
-        double storageCapFactor = 0.3;
+        double storageCapFactor = 0.03;
         String shapeFile = NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE;
 
         double flowCapFactor = 0.021;

@@ -29,14 +29,12 @@ import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -118,21 +116,21 @@ public class NemoModeLocationChoiceCalibrator {
                 .values()
                 .forEach(l -> l.setAllowedModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.ride))));
 
-        //go through all the plans and set the score  (uniform=10 times beta, relative = beta * typDur) to stayHome plans
-        PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
-        scenario.getPopulation()
-                .getPersons()
-                .values()
-                .stream()
-                .flatMap(p -> p.getPlans().stream())
-                .filter(pl -> pl.getPlanElements().size() == 1 )
-                .forEach(pl -> {
-                    Activity activity = ((Activity)pl.getPlanElements().get(0));
-                    pl.setScore( planCalcScoreConfigGroup.getActivityParams(activity.getType()).getTypicalDuration() * planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.);
-//                    pl.setScore(10 * scenario.getConfig()
-//                                             .planCalcScore()
-//                                             .getPerforming_utils_hr());
-                });
+//        //go through all the plans and set the score  (uniform=10 times beta, relative = beta * typDur) to stayHome plans
+//        PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
+//        scenario.getPopulation()
+//                .getPersons()
+//                .values()
+//                .stream()
+//                .flatMap(p -> p.getPlans().stream())
+//                .filter(pl -> pl.getPlanElements().size() == 1 )
+//                .forEach(pl -> {
+//                    Activity activity = ((Activity)pl.getPlanElements().get(0));
+//                    pl.setScore( planCalcScoreConfigGroup.getActivityParams(activity.getType()).getTypicalDuration() * planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.);
+////                    pl.setScore(10 * scenario.getConfig()
+////                                             .planCalcScore()
+////                                             .getPerforming_utils_hr());
+//                });
 
         Controler controler = new Controler(scenario);
 
@@ -172,11 +170,12 @@ public class NemoModeLocationChoiceCalibrator {
         }
 
         // counts cadyts
-        controler.addOverridingModule(new CadytsCarModule());
-        final double cadytsCountsScoringWeight = cadytsCountsWt * config.planCalcScore().getBrainExpBeta();
+        if (cadytsCountsWt!=0.)  controler.addOverridingModule(new CadytsCarModule());
 
-        if (cadytsMarginalsWt != 0.) {
-            final double cadytsMarginalsScoringWeight = cadytsMarginalsWt * config.planCalcScore().getBrainExpBeta();
+        final double cadytsCountsScoringWeight = cadytsCountsWt * config.planCalcScore().getBrainExpBeta();
+        final double cadytsMarginalsScoringWeight = cadytsMarginalsWt * config.planCalcScore().getBrainExpBeta();
+
+        if (cadytsCountsWt!=0. && cadytsMarginalsScoringWeight !=0.){ // we dont want to inject cadyts context if one of the two cadyts is off
             controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
                 @Inject
                 private CadytsContext cadytsContext;
@@ -199,20 +198,19 @@ public class NemoModeLocationChoiceCalibrator {
                             config,
                             cadytsContext);
                     scoringFunctionCounts.setWeightOfCadytsCorrection(cadytsCountsScoringWeight);
+                    sumScoringFunction.addScoringFunction(scoringFunctionCounts);
+
 
                     final CadytsScoring<ModalDistanceBinIdentifier> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
-                                config,
-                                marginalCadytsContext);
+                            config,
+                            marginalCadytsContext);
 
                     scoringFunctionMarginals.setWeightOfCadytsCorrection(cadytsMarginalsScoringWeight);
                     sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
-
-                    sumScoringFunction.addScoringFunction(scoringFunctionCounts);
-
                     return sumScoringFunction;
                 }
             });
-        } else {
+        } else  if ( cadytsCountsWt!=0. ){ // we dont want to inject cadyts context if one of the two cadyts is off
             controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
                 @Inject
                 private CadytsContext cadytsContext;
@@ -233,9 +231,33 @@ public class NemoModeLocationChoiceCalibrator {
                             config,
                             cadytsContext);
                     scoringFunctionCounts.setWeightOfCadytsCorrection(cadytsCountsScoringWeight);
-
                     sumScoringFunction.addScoringFunction(scoringFunctionCounts);
+                    return sumScoringFunction;
+                }
+            });
+        } else if ( cadytsMarginalsScoringWeight !=0.){ // we dont want to inject cadyts context if one of the two cadyts is off
+            controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+                @Inject
+                ScoringParametersForPerson parameters;
 
+                @Inject private ModalDistanceCadytsContext marginalCadytsContext;
+
+                @Override
+                public ScoringFunction createNewScoringFunction(Person person) {
+                    SumScoringFunction sumScoringFunction = new SumScoringFunction();
+
+                    final ScoringParameters params = parameters.getScoringParameters(person);
+                    sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
+                            controler.getScenario().getNetwork()));
+                    sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+                    sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+                    final CadytsScoring<ModalDistanceBinIdentifier> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
+                            config,
+                            marginalCadytsContext);
+
+                    scoringFunctionMarginals.setWeightOfCadytsCorrection(cadytsMarginalsScoringWeight);
+                    sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
                     return sumScoringFunction;
                 }
             });
@@ -254,6 +276,4 @@ public class NemoModeLocationChoiceCalibrator {
         });
         controler.run();
     }
-
-
 }
