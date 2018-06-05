@@ -46,13 +46,12 @@ public class MarginalsOfflineAnalyser {
 
     public static void main(String[] args) {
         String dir = "../../repos/runs-svn/nemo/marginals/";
-        String runCases [] = {"run262","run263","run264", "run265", "run266"};
+        String runCases [] = {"run1260","run261","run262","run263","run264", "run265", "run266"};
 //        String runCases [] = {"run000", "run249","run250","run251","run252","run253","run254","run255","run256","run257","run258","run259"};
         for (String runCase : runCases ){
 
             run(new String [] {dir, runCase});
         }
-
     }
 
     public static void run (String[] args) {

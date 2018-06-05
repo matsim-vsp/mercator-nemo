@@ -75,8 +75,8 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
         }
 
         // some pre-evaluated stats for the same file.
-        System.out.println("Maximum number of 0-1km trips while considering all plans of a person (beeline distance factor = 1.0) is 37943");
-        System.out.println("Maximum number of 0-1km trips while considering all plans of a person (beeline distance factor = 1.3) is 29722");
+//        System.out.println("Maximum number of 0-1km trips while considering all plans of a person (beeline distance factor = 1.0) is 37943");
+//        System.out.println("Maximum number of 0-1km trips while considering all plans of a person (beeline distance factor = 1.3) is 29722");
 
         System.out.println("Maximum number of trips which are > "+lowerLimit+ "km and <= "+upperLimit+" km while considering all plans of a person (beeline distance factor = "+beelineDistanceFactor+") is "+ shortTripsCounter);
 
