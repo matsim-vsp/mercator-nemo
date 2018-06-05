@@ -28,25 +28,23 @@ import playground.vsp.parametricRuns.PrepareParametricRuns;
 public class ParametricRunsNEMOMarginals {
 
     public static void main(String[] args) {
-        int runCounter= 1260;
+        int runCounter= 267;
 
         String baseOutDir = "/net/ils4/agarwal/nemo/data/marginals/";
-        String matsimDir = "r_823a955c798f0883989dbb0d06aabaad89e90e72_nemo_29May";
+        String matsimDir = "r_c713a936cbbd305e8a0c0ef7d1e1ee13d640a646_nemo_05June18";
 
         StringBuilder buffer = new StringBuilder();
         PrepareParametricRuns parametricRuns = new PrepareParametricRuns("~/.ssh/known_hosts","~/.ssh/id_rsa_tub_math","agarwal");
 
         Integer [] lastIts = {300};
-        double [] cadytsCountsWts = {0, 15};
-        double [] cadytsMarginalsWts = {0, 5, 10, 15};
+        double [] cadytsCountsWts = { 15, 0};
+        double [] cadytsMarginalsWts = {25, 15, 10, 5, 0};
 
         buffer.append("jobName\tconfigFile\toutputDir\tjobName\tlastIteration\tcadytsCountsWt\tcadytsMarginalsWt"+ PrepareParametricRuns.newLine);
 
         for (int lastIt : lastIts) {
             for (double countsCadytsWt : cadytsCountsWts ) {
                 for(double cadytsMarginalsWt :cadytsMarginalsWts){
-
-                        if (countsCadytsWt ==0.0 && cadytsMarginalsWt == 0.0) continue;;
 
                         String configFile = "/net/ils4/agarwal/nemo/data/marginals/input/preparedConfig.xml";
                         String jobName = "run"+String.valueOf(runCounter++);
