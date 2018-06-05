@@ -76,8 +76,8 @@ public class RuhrCountsCadytsRun {
             storageCapFactor = Double.valueOf(args[4]);
             shapeFile = args[5];
 
-            flowCapFactor = Double.valueOf(args[5]);
-            countScaleFactor = Double.valueOf(args[6]);
+            flowCapFactor = Double.valueOf(args[6]);
+            countScaleFactor = Double.valueOf(args[7]);
 
         }
 
