@@ -524,7 +524,7 @@ public class NemoLongTermCountsCreator {
 									for(String header : headers){
 										if(! trafficVolumesperVehicleType.get(header).getFirst().equals(Double.NaN) && !sumDir1.equals(Double.NaN)) {
 											sumDir1 += trafficVolumesperVehicleType.get(header).getFirst();
-										} else {
+										} else { // this means, exclude data which has low reliability (even for one of the mode in the combination)
 											sumDir1 = Double.NaN;
 										}
 										if(! trafficVolumesperVehicleType.get(header).getSecond().equals(Double.NaN)  && !sumDir2.equals(Double.NaN)) {

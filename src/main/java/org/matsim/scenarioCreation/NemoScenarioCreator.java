@@ -69,7 +69,7 @@ import org.matsim.scenarioCreation.network.NemoNetworkCreator;
 	
 	private static String OUTPUT_DIR_NETWORK = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-03_vspDefault_OSM_net/";
 	private static String OUTPUT_PREFIX_NETWORK = "";
-	private static String OUTPUT_COUNTS_DIR = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-03_vspDefault_OSM_net/";
+	private static String OUTPUT_COUNTS_DIR = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/";
 	
 	//	dates are included in aggregation									year, month, dayOfMonth
 	private final static LocalDate firstDayOfDataAggregation = LocalDate.of(2014, 1, 1);
