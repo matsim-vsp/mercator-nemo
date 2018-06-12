@@ -29,7 +29,9 @@ import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -48,7 +50,9 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.scenarioCalibration.marginals.NEMOPlanRemoval;
 import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
 import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
@@ -73,13 +77,15 @@ public class NemoModeLocationChoiceCalibrator {
 
         String outputDir = "../../repos/runs-svn/nemo/marginals/output/testCalib/";
 
-        String runId = "run207";
+        String runId = "testCalib";
 
         int lastIt = 200; // apparently 200 iterations are fine.
         double cadytsCountsWt = 15.0;
         double cadytsMarginalsWt = 0.0;
 
         String shapeFile = NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE;
+
+        boolean keepInitialPlans = true;
 
         if (args.length > 0) {
             configFile = args[0];
@@ -89,6 +95,7 @@ public class NemoModeLocationChoiceCalibrator {
             cadytsCountsWt = Double.valueOf(args[4]);
             cadytsMarginalsWt = Double.valueOf(args[5]);
             shapeFile = args[6];
+            keepInitialPlans = Boolean.valueOf(args[7]);
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -98,7 +105,7 @@ public class NemoModeLocationChoiceCalibrator {
         config.controler().setLastIteration(lastIt);
 
         config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
-        config.strategy().setMaxAgentPlanMemorySize(12);
+        config.strategy().setMaxAgentPlanMemorySize(15);
 
         config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 
@@ -116,23 +123,45 @@ public class NemoModeLocationChoiceCalibrator {
                 .values()
                 .forEach(l -> l.setAllowedModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.ride))));
 
-//        //go through all the plans and set the score  (uniform=10 times beta, relative = beta * typDur) to stayHome plans
-//        PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
-//        scenario.getPopulation()
-//                .getPersons()
-//                .values()
-//                .stream()
-//                .flatMap(p -> p.getPlans().stream())
-//                .filter(pl -> pl.getPlanElements().size() == 1 )
-//                .forEach(pl -> {
-//                    Activity activity = ((Activity)pl.getPlanElements().get(0));
-//                    pl.setScore( planCalcScoreConfigGroup.getActivityParams(activity.getType()).getTypicalDuration() * planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.);
-////                    pl.setScore(10 * scenario.getConfig()
-////                                             .planCalcScore()
-////                                             .getPerforming_utils_hr());
-//                });
+
+        // add stay home plan if it does not exists
+        for (Person person : scenario.getPopulation().getPersons().values()) {
+            if (person.getPlans().stream().anyMatch(pl -> ((Plan) pl).getPlanElements().size()==1)) {
+                // do nothing
+            } else {
+                Plan stayHome = scenario.getPopulation().getFactory().createPlan();
+                Activity existAct = (Activity) person.getPlans().get(0).getPlanElements().get(0);
+                Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("home_86400.0", existAct.getCoord());
+                activity.setLinkId(existAct.getLinkId());
+                stayHome.addActivity(activity);
+                AttributesUtils.copyAttributesFromTo(existAct, activity);
+                person.addPlan(stayHome);
+            }
+        }
+
+        if (keepInitialPlans) {
+            scenario.getConfig().strategy().setPlanSelectorForRemoval(NEMOPlanRemoval.nemo_plan_remover);
+
+            for (Person person : scenario.getPopulation().getPersons().values()){
+                for (int index =0; index < person.getPlans().size(); index++) {
+                    Plan plan = person.getPlans().get(index);
+                    plan.getAttributes().putAttribute( NEMOPlanRemoval.plan_attribute_name, NEMOPlanRemoval.plan_attribute_prefix+index);
+                }
+            }
+        }
 
         Controler controler = new Controler(scenario);
+
+        if (keepInitialPlans) {
+            controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    if (getConfig().strategy().getPlanSelectorForRemoval().equals(NEMOPlanRemoval.nemo_plan_remover)) {
+                        bindPlanSelectorForRemoval().to(NEMOPlanRemoval.class);
+                    }
+                }
+            });
+        }
 
         // use car-travel time calculator for ride mode to teleport them yet affected by congestion.
         controler.addOverridingModule(new AbstractModule() {
