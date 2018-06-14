@@ -139,20 +139,10 @@ public class NemoModeLocationChoiceCalibrator {
             }
         }
 
-        if (keepInitialPlans) {
-            scenario.getConfig().strategy().setPlanSelectorForRemoval(NEMOPlanRemoval.nemo_plan_remover);
-
-            for (Person person : scenario.getPopulation().getPersons().values()){
-                for (int index =0; index < person.getPlans().size(); index++) {
-                    Plan plan = person.getPlans().get(index);
-                    plan.getAttributes().putAttribute( NEMOPlanRemoval.plan_attribute_name, NEMOPlanRemoval.plan_attribute_prefix+index);
-                }
-            }
-        }
-
         Controler controler = new Controler(scenario);
 
         if (keepInitialPlans) {
+            controler.getConfig().strategy().setPlanSelectorForRemoval(NEMOPlanRemoval.nemo_plan_remover);
             controler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
