@@ -73,7 +73,7 @@ public class NemoModeLocationChoiceCalibrator {
 
     public static void main(String[] args) {
 
-        String configFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-03-01_RuhrCalibration_withMarginals/preparedConfig.xml";
+        String configFile = "../../repos/shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/preparedConfig.xml";
 
         String outputDir = "../../repos/runs-svn/nemo/marginals/output/testCalib/";
 
@@ -112,7 +112,7 @@ public class NemoModeLocationChoiceCalibrator {
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-            config.plans().setInputFile("sampled_run200.0.plans.xml");
+//            config.plans().setInputFile("sampled_run200.0.plans.xml");
         }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
