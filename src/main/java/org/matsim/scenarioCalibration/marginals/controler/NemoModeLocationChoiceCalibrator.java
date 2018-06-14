@@ -80,7 +80,7 @@ public class NemoModeLocationChoiceCalibrator {
         String runId = "testCalib";
 
         int lastIt = 200; // apparently 200 iterations are fine.
-        double cadytsCountsWt = 15.0;
+        double cadytsCountsWt =0.0;
         double cadytsMarginalsWt = 0.0;
 
         String shapeFile = NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE;
@@ -112,7 +112,7 @@ public class NemoModeLocationChoiceCalibrator {
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-            config.plans().setInputFile("run200.0.plans.xml.gz");
+            config.plans().setInputFile("sampled_run200.0.plans.xml");
         }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
