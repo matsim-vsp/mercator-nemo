@@ -50,7 +50,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.scenarioCalibration.marginals.NEMOPlanRemoval;
+import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
@@ -142,12 +142,12 @@ public class NemoModeLocationChoiceCalibrator {
         Controler controler = new Controler(scenario);
 
         if (keepInitialPlans) {
-            controler.getConfig().strategy().setPlanSelectorForRemoval(NEMOPlanRemoval.nemo_plan_remover);
+            controler.getConfig().strategy().setPlanSelectorForRemoval(InitialPlanKeeperPlanRemoval.initial_plans_keeper_plan_remover);
             controler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    if (getConfig().strategy().getPlanSelectorForRemoval().equals(NEMOPlanRemoval.nemo_plan_remover)) {
-                        bindPlanSelectorForRemoval().to(NEMOPlanRemoval.class);
+                    if (getConfig().strategy().getPlanSelectorForRemoval().equals(InitialPlanKeeperPlanRemoval.initial_plans_keeper_plan_remover)) {
+                        bindPlanSelectorForRemoval().to(InitialPlanKeeperPlanRemoval.class);
                     }
                 }
             });
