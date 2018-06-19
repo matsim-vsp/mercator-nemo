@@ -26,7 +26,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /**
  * Created by amit on 04.04.18.
@@ -42,13 +46,16 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
 
         String inputPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
 
-        Population population = NEMOUtils.loadScenarioFromPlans(inputPlansFile).getPopulation();
+        String outPopulationFile = "../runs-svn/nemo/marginals/input/plans_1pct_filteredForRuhr_maxShortTrips.xml.gz";
+        Population outPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 
+        Population population = NEMOUtils.loadScenarioFromPlans(inputPlansFile).getPopulation();
         // go through with all plans and take plan which has most number of short trips (0-1km)
         int shortTripsCounter = 0;
 
         for (Person person: population.getPersons().values()){
             int maxShortTripsForPerson = 0;
+            Plan outPlan = null ;
 
             for (Plan plan : person.getPlans()){
                 int numberOfShortTrips = 0;
@@ -69,8 +76,20 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
                 }
                 if (maxShortTripsForPerson < numberOfShortTrips) {
                     maxShortTripsForPerson = numberOfShortTrips;
+                    outPlan = plan;
                 }
             }
+
+            Person outPerson = population.getFactory().createPerson(person.getId());
+            AttributesUtils.copyAttributesFromTo(person, outPerson);
+
+            if (outPlan!=null) {
+                outPerson.addPlan(outPlan);
+                outPopulation.addPerson(outPerson);
+            } else{
+                outPopulation.addPerson(person); // if there are no trips with 0-1 km..take all plans
+            }
+
             shortTripsCounter += maxShortTripsForPerson;
         }
 
@@ -80,8 +99,8 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
 
         System.out.println("Maximum number of trips which are > "+lowerLimit+ "km and <= "+upperLimit+" km while considering all plans of a person (beeline distance factor = "+beelineDistanceFactor+") is "+ shortTripsCounter);
 
+        new PopulationWriter(outPopulation).write(outPopulationFile);
 
     }
-
 
 }
