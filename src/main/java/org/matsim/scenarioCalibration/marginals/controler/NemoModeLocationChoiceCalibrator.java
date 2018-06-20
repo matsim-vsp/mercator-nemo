@@ -37,6 +37,7 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -50,7 +51,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
@@ -64,6 +64,7 @@ import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
 import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
+import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 
 /**
  * Created by amit on 01.03.18.
@@ -79,7 +80,7 @@ public class NemoModeLocationChoiceCalibrator {
 
         String runId = "testCalib";
 
-        int lastIt = 200; // apparently 200 iterations are fine.
+        int lastIt = 1;
         double cadytsCountsWt =0.0;
         double cadytsMarginalsWt = 0.0;
 
@@ -112,7 +113,8 @@ public class NemoModeLocationChoiceCalibrator {
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-//            config.plans().setInputFile("sampled_run200.0.plans.xml");
+            config.plans().setInputFile("/Users/amit/Documents/repos/runs-svn/nemo/marginals/run269_b_ch1_maxShortTrips/output/ITERS/it.0/run269_b_ch1_maxShortTrips.0.plans.xml.gz");
+            config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile);
         }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
