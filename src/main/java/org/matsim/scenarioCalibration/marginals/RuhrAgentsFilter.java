@@ -26,12 +26,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.facilities.ActivityFacilities;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.vsp.cadyts.marginals.AgentFilter;
 
@@ -50,22 +52,26 @@ public class RuhrAgentsFilter implements AgentFilter {
     private final Map<Id<Person>,Boolean> personIdMap  = new HashMap<>();
 
     @Inject
-    public RuhrAgentsFilter(Population population, @Named(RuhrAgentsFilter.ruhr_boundary_shape) String shapeFile) {
+    public RuhrAgentsFilter(Scenario scenario, @Named(RuhrAgentsFilter.ruhr_boundary_shape) String shapeFile) {
         this.features = ShapeFileReader.getAllFeatures(shapeFile);
-        for (Person person : population.getPersons().values()) {
+        ActivityFacilities activityFacilities = scenario.getActivityFacilities();
+        for (Person person : scenario.getPopulation().getPersons().values()) {
             Activity activity = (Activity) person.getSelectedPlan().getPlanElements().get(0);
             if (! activity.getType().startsWith("home")) {
                 LOG.warn("First activity is not type home. Excluding such agents...");
                 this.personIdMap.put(person.getId(), false);
             }
-
-            this.personIdMap.put(person.getId(), isActivityInside(activity));
+            if (activityFacilities.getFacilities().isEmpty()) {
+                this.personIdMap.put(person.getId(), isActivityInside(activity.getCoord()));
+            } else {
+                this.personIdMap.put(person.getId(), isActivityInside( activityFacilities.getFacilities().get(activity.getFacilityId()).getCoord() ));
+            }
         }
     }
 
-    private boolean isActivityInside(Activity activity){
+    private boolean isActivityInside(Coord coord){
         for (SimpleFeature feature : features) {
-            if ( ((Geometry)feature.getDefaultGeometry()).contains(MGC.coord2Point(activity.getCoord()))  ) {
+            if ( ((Geometry)feature.getDefaultGeometry()).contains(MGC.coord2Point(coord))  ) {
                 return true;
             }
         }
@@ -74,18 +80,7 @@ public class RuhrAgentsFilter implements AgentFilter {
 
     @Override
     public boolean includeAgent(Id<Person> id) {
-//        Activity activity = (Activity) population.getPersons().get(id).getSelectedPlan().getPlanElements().get(0);
-//        if (! activity.getType().startsWith("home")) {
-//            LOG.warn("First activity is not type home. Excluding such agents...");
-//            return false;
-//        }
-//        for (SimpleFeature feature : features) {
-//            if ( ((Geometry)feature.getDefaultGeometry()).contains(MGC.coord2Point(activity.getCoord()))  ) {
-//                return true;
-//            }
-//        }
-//        return false;
-        // check for every agent again and again is expensive...
+        // check for every agent gain and again is very very expensive and unnecessary
         return this.personIdMap.get(id);
     }
 }

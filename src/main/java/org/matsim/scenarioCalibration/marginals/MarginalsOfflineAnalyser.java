@@ -21,17 +21,17 @@ package org.matsim.scenarioCalibration.marginals;
 
 import java.io.BufferedWriter;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.FacilitiesFromPopulation;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
@@ -46,11 +46,12 @@ public class MarginalsOfflineAnalyser {
 
     public static void main(String[] args) {
         String dir = "../../repos/runs-svn/nemo/marginals/";
-        String runCases [] = {"run1260","run261","run262","run263","run264", "run265", "run266"};
+        String runCases [] = {"run269_b_ch1_maxShortTrips"};
 //        String runCases [] = {"run000", "run249","run250","run251","run252","run253","run254","run255","run256","run257","run258","run259"};
         for (String runCase : runCases ){
 
-            run(new String [] {dir, runCase});
+            run(new String [] {dir, runCase, "0"});
+            run(new String [] {dir, runCase, "300"});
         }
     }
 
@@ -58,10 +59,11 @@ public class MarginalsOfflineAnalyser {
 
         String dir = args[0];
         String runId = args[1];
+        String iterationNr = args[2];
 
-        String eventsFile = dir + runId + "/output/ITERS/it.300/" +runId +".300.events.xml.gz";
+        String eventsFile = dir + runId + "/output/ITERS/it."+iterationNr+"/" +runId +"."+iterationNr+".events.xml.gz";
         String configFile = dir + runId + "/output/"+runId+".output_config.xml";
-        String outputFile = dir + runId + "/output/ITERS/it.300/" + runId +".300.multiMode_distanceDistributionCounts_absolute.txt";
+        String outputFile = dir + runId + "/output/ITERS/it."+iterationNr+"/" + runId +"."+iterationNr+".multiMode_distanceDistributionCounts_absolute_offline.txt";
 
         Config config = ConfigUtils.loadConfig(configFile);
         config.network().setInputFile( runId+".output_network.xml.gz");
@@ -72,12 +74,17 @@ public class MarginalsOfflineAnalyser {
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
+        FacilitiesConfigGroup facilitiesConfigGroup = scenario.getConfig().facilities();
+        FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(scenario.getActivityFacilities(), facilitiesConfigGroup);
+        facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(facilitiesConfigGroup.isAssigningLinksToFacilitiesIfMissing(), scenario.getNetwork());
+        facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
+        facilitiesFromPopulation.run(scenario.getPopulation());
+
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
         DistanceDistribution distri = NEMOUtils.getDistanceDistribution(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
 
-        BeelineDistanceCollector collector = new BeelineDistanceCollector(scenario.getNetwork(), scenario.getConfig().plansCalcRoute(), distri, eventsManager);
-        collector.setAgentFilter( new RuhrAgentsFilter(scenario.getPopulation(), NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE ));
+        BeelineDistanceCollector collector = new BeelineDistanceCollector(scenario, distri, eventsManager, new RuhrAgentsFilter(scenario, NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE ));
 
         new MatsimEventsReader(eventsManager).readFile(eventsFile);
 
@@ -93,7 +100,7 @@ public class MarginalsOfflineAnalyser {
                     "simulationCount");
             writer.newLine();
 
-            for (Entry<ModalDistanceBinIdentifier, DistanceBin> entry : getSortedMap(averages).entrySet()) {
+            for (Entry<ModalDistanceBinIdentifier, DistanceBin> entry : DistanceDistributionUtils.getSortedMap(averages).entrySet()) {
                 writer.write(
                         entry.getKey().getMode() + "\t"
                                 + entry.getKey().getDistanceRange().getLowerLimit() + "\t"
@@ -108,14 +115,5 @@ public class MarginalsOfflineAnalyser {
         } catch (Exception e) {
             throw new RuntimeException("Data is not written. Reason :" + e);
         }
-    }
-
-    //technically, following can be applied directly in DistanceDistribution, however, ordering is imp here only.
-    private static  SortedMap<ModalDistanceBinIdentifier, DistanceBin> getSortedMap(DistanceDistribution distanceDistribution) {
-        SortedMap<ModalDistanceBinIdentifier, DistanceBin> sortedMap = new TreeMap<>();
-        distanceDistribution.getModalBinToDistanceBin()
-                            .forEach((key, value) -> sortedMap.put(distanceDistribution.getModalBins().get(key),
-                                    value));
-        return sortedMap;
     }
 }
