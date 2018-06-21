@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -87,6 +88,7 @@ public class NemoModeLocationChoiceCalibrator {
         String shapeFile = NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE;
 
         boolean keepInitialPlans = true;
+        boolean removeStayHomePlanForMaxShortDistTrips = true;
 
         if (args.length > 0) {
             configFile = args[0];
@@ -97,6 +99,8 @@ public class NemoModeLocationChoiceCalibrator {
             cadytsMarginalsWt = Double.valueOf(args[5]);
             shapeFile = args[6];
             keepInitialPlans = Boolean.valueOf(args[7]);
+
+            if (args.length>8) removeStayHomePlanForMaxShortDistTrips = Boolean.valueOf(args[8]);
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -139,6 +143,19 @@ public class NemoModeLocationChoiceCalibrator {
                 AttributesUtils.copyAttributesFromTo(existAct, activity);
                 person.addPlan(stayHome);
             }
+
+            // following is used for the cases when some agents has only one plan which has maximum number of short distance trips.
+            if (! removeStayHomePlanForMaxShortDistTrips) continue;
+
+            if (person.getPlans().size()==2) {
+                Plan planForRemoval =null;
+                for (Plan plan : person.getPlans()) {
+                    if ( plan.getPlanElements().size()==1) {
+                        planForRemoval = plan;
+                    }
+                }
+                person.removePlan(planForRemoval);
+            }
         }
 
         Controler controler = new Controler(scenario);
@@ -179,12 +196,22 @@ public class NemoModeLocationChoiceCalibrator {
 
         } else { //get the analysis at least
             controler.addOverridingModule(new AbstractModule() {
+                @Inject
+                private EventsManager eventsManager;
+
                 @Override
                 public void install() {
+                    AgentFilter agentFilter = new RuhrAgentsFilter(scenario, shapeFile_final);
+
                     this.bind(DistanceDistribution.class).toInstance(inputDistanceDistribution);
-                    this.bind(BeelineDistanceCollector.class);
+                    this.bind(BeelineDistanceCollector.class)
+                        .toInstance(new BeelineDistanceCollector(scenario,
+                                inputDistanceDistribution,
+                                eventsManager,
+                                agentFilter));
+
                     this.addControlerListenerBinding().to(ModalDistanceDistributionControlerListener.class);
-                    bind(AgentFilter.class).to(RuhrAgentsFilter.class);
+                    bind(AgentFilter.class).toInstance(agentFilter);
                     bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(shapeFile_final);
                 }
             });
