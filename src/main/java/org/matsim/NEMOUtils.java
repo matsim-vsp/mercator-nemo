@@ -79,7 +79,7 @@ public final class NEMOUtils {
         return ScenarioUtils.loadScenario(config);
     }
 
-    public static DistanceDistribution getDistanceDistribution(double carCountScaleFactor, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup){
+    public static DistanceDistribution getDistanceDistribution(double carCountScaleFactor, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, boolean mergeShortDistanceBins){
         DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
 
         Map<String, PlansCalcRouteConfigGroup.ModeRoutingParams> modeRoutingParams = plansCalcRouteConfigGroup.getModeRoutingParams();
@@ -94,15 +94,26 @@ public final class NEMOUtils {
         inputDistanceDistribution.setModeToScalingFactor("walk", 100.0);
         inputDistanceDistribution.setModeToScalingFactor("ride", 100.0 );
 
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0,1000.),349515.0); //car+PT
-        inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(0.0,1000.),88247.0);
-        inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0,1000.),1660012.0);
-        inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0,1000.),120346.0);
+        if (mergeShortDistanceBins) {
 
-        inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(1000.0,3000.),1681862.0);
-        inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(1000.0,3000.),233988.0);
-        inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(1000.0,3000.),969147.0);
-        inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(1000.0,3000.),522180.0);
+            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0,3000.),1681862.0+349515.0);
+            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(0.0,3000.),233988.0+88247.0);
+            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0,3000.),969147.0+1660012.0);
+            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0,3000.),522180.0+120346.0);
+
+        } else {
+
+            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0,1000.),349515.0); //car+PT
+            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(0.0,1000.),88247.0);
+            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0,1000.),1660012.0);
+            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0,1000.),120346.0);
+
+            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(1000.0,3000.),1681862.0);
+            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(1000.0,3000.),233988.0);
+            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(1000.0,3000.),969147.0);
+            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(1000.0,3000.),522180.0);
+
+        }
 
         inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(3000.0,5000.),1559081.0);
         inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(3000.0,5000.),151014.0);

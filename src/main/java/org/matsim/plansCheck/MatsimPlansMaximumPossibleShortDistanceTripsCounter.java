@@ -53,6 +53,7 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
         String facilityFile = "../runs-svn/nemo/marginals/output/testCalib/testCalib.output_facilities.xml.gz";
 
         Population outPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+        boolean writeOutputPopulation = false;
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         scenario.getConfig().plans().setInputFile(inputPlansFile);
@@ -117,7 +118,7 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
 
         System.out.println("Maximum number of trips which are > "+lowerLimit+ "km and <= "+upperLimit+" km while considering all plans of a person (beeline distance factor = "+beelineDistanceFactor+") is "+ shortTripsCounter);
 
-        new PopulationWriter(outPopulation).write(outPopulationFile);
+        if (writeOutputPopulation) new PopulationWriter(outPopulation).write(outPopulationFile);
 
     }
 

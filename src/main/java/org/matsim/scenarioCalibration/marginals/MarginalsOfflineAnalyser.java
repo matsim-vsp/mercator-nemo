@@ -50,8 +50,8 @@ public class MarginalsOfflineAnalyser {
 //        String runCases [] = {"run000", "run249","run250","run251","run252","run253","run254","run255","run256","run257","run258","run259"};
         for (String runCase : runCases ){
 
-            run(new String [] {dir, runCase, "0"});
-            run(new String [] {dir, runCase, "300"});
+            run(new String [] {dir, runCase, "0", "false"});
+            run(new String [] {dir, runCase, "300", "false"});
         }
     }
 
@@ -60,6 +60,7 @@ public class MarginalsOfflineAnalyser {
         String dir = args[0];
         String runId = args[1];
         String iterationNr = args[2];
+        boolean mergeShortDistanceBins = Boolean.valueOf(args[3]);
 
         String eventsFile = dir + runId + "/output/ITERS/it."+iterationNr+"/" +runId +"."+iterationNr+".events.xml.gz";
         String configFile = dir + runId + "/output/"+runId+".output_config.xml";
@@ -82,7 +83,7 @@ public class MarginalsOfflineAnalyser {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
-        DistanceDistribution distri = NEMOUtils.getDistanceDistribution(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
+        DistanceDistribution distri = NEMOUtils.getDistanceDistribution(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute(), mergeShortDistanceBins);
 
         BeelineDistanceCollector collector = new BeelineDistanceCollector(scenario, distri, eventsManager, new RuhrAgentsFilter(scenario, NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE ));
 

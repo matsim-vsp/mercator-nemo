@@ -63,6 +63,8 @@ public class ReRunningWithStayHomePlan {
         boolean useUtilPerf4ScoreStayHomePlan = false;
         int preparatoryIterations = 50;
 
+        boolean mergeShortDistanceBins = false;
+
 		if (args.length>0) {
 
             parentDir = args[0];
@@ -76,6 +78,8 @@ public class ReRunningWithStayHomePlan {
 
             useUtilPerf4ScoreStayHomePlan = Boolean.valueOf(args[6]); // if false, args[3] doesn't matter.
             preparatoryIterations = Integer.valueOf(args[7]);
+
+            if (args.length>8) mergeShortDistanceBins = Boolean.valueOf(args[8]);
 
         } else {
             parentDir = "../../repos/runs-svn/nemo/marginals/";
@@ -137,7 +141,7 @@ public class ReRunningWithStayHomePlan {
             }
         });
         
-        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute(), mergeShortDistanceBins);
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
 

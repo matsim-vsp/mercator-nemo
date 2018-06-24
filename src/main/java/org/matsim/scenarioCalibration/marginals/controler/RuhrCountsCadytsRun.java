@@ -68,6 +68,8 @@ public class RuhrCountsCadytsRun {
         double flowCapFactor = 0.021;
         double countScaleFactor = 47.1;
 
+        boolean mergeShortDistanceBins = false;
+
         if(args.length>0){
             configFile = args[0] ;
             outDir = args[1];
@@ -79,6 +81,7 @@ public class RuhrCountsCadytsRun {
             flowCapFactor = Double.valueOf(args[6]);
             countScaleFactor = Double.valueOf(args[7]);
 
+            if (args.length>8) mergeShortDistanceBins = Boolean.valueOf(args[8]);
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -102,7 +105,7 @@ public class RuhrCountsCadytsRun {
         controler.addOverridingModule(new CadytsCarModule());
 
         final String shapeFile_final = shapeFile;
-        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(countScaleFactor, scenario.getConfig().plansCalcRoute());
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(countScaleFactor, scenario.getConfig().plansCalcRoute(),mergeShortDistanceBins);
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

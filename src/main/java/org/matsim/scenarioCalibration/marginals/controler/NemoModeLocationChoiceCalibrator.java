@@ -90,6 +90,8 @@ public class NemoModeLocationChoiceCalibrator {
         boolean keepInitialPlans = true;
         boolean removeStayHomePlanForMaxShortDistTrips = true;
 
+        boolean mergeShortDistanceBins = false;
+
         if (args.length > 0) {
             configFile = args[0];
             outputDir = args[1];
@@ -101,6 +103,7 @@ public class NemoModeLocationChoiceCalibrator {
             keepInitialPlans = Boolean.valueOf(args[7]);
 
             if (args.length>8) removeStayHomePlanForMaxShortDistTrips = Boolean.valueOf(args[8]);
+            if (args.length>9) mergeShortDistanceBins = Boolean.valueOf(args[9]);
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -183,7 +186,10 @@ public class NemoModeLocationChoiceCalibrator {
 
         // marginals cadyts
         final String shapeFile_final = shapeFile;
-        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts()
+                                                                                                 .getCountsScaleFactor(),
+                scenario.getConfig().plansCalcRoute(),
+                mergeShortDistanceBins);
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
             controler.addOverridingModule(new AbstractModule() {
