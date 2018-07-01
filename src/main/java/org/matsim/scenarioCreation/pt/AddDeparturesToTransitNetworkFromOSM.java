@@ -82,7 +82,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 	public void run() {
 		
 		// adjust these directories
-		final String projectDirectory = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/";
+		final String projectDirectory = "D:/Arbeit/mercator-nemo/";
 		final String inputScheduleFile = projectDirectory + "data/pt/ptNetworkScheduleFileFromOSM.xml"; 
 		final String directory = projectDirectory + "data/pt/extendedScheduleFromOSM/";
 		
@@ -217,7 +217,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					} else if (lineNew.getName().contains("RB") || lineNew.getName().contains("RE")) {
 						avgFreeSpeed = 13.888889; // 50 km/h
 						log.info("RB / RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("IC") || lineNew.getName().contains("Thalys")) {
+					} else if (lineNew.getName().contains("IC") || lineNew.getName().contains("Thalys") || lineNew.getName().contains("FLX20")) {
 						avgFreeSpeed = 27.777778; // 100 km/h
 						log.info("IC / ICE / Thalys --> line: " + lineNew.getName());
 					} else {
@@ -253,176 +253,20 @@ public class AddDeparturesToTransitNetworkFromOSM {
 				TransitRoute routeNew = scenario.getTransitSchedule().getFactory().createTransitRoute(routeNewId , networkRoute, stops, TransportMode.car);
 				routeNew.setDescription(route.getId().toString().replaceAll("[^a-zA-Z0-9]", "-"));
 				
-				if (lineNew.getName().contains("S1")) {
-					
-					log.info("S1 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 5. * 3600) {	
-							headway = 20 * 60.;
-						}
-						
-						if (t >= 7. * 3600) {
-							headway = 10 * 60.;
-						}
-						
-						if (t >= 8. * 3600) {
-							headway = 20 * 60.;
-						}
-						
-						if (t >= 19. * 3600) {
-							headway = 30 * 60.;
-						}
-							
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}	
-					
-				} else if (lineNew.getName().contains("S2")) {
-						
-					log.info("S2 --> line: " + lineNew.getName());
-						
-					int depCounter = 0;
-					double headway = 40 * 60.;
-					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 2. * 3600) {	
-							headway = 120 * 60.;
-						}
-						
-						if (t >= 4. * 3600) {
-							headway = 40 * 60.;
-						}
-						
-						if (t >= 6. * 3600) {
-							headway = 20 * 60.;
-						}
-						
-						if (t >= 20. * 3600) {
-							headway = 30 * 60.;
-						}
-							
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}	
-						
-				} else if (lineNew.getName().contains("S3")) {
-					log.info("S3 --> line: " + lineNew.getName());
-					
+				if (lineNew.getName().contains("S9")) {
+					log.info("S9 --> line: " + lineNew.getName());
+				
 					int depCounter = 0;
 					double headway = 20 * 60.;
-					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 18. * 3600) {
-							headway = 30 * 60.;
-						}
-							
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}	
-					
-				} else if (lineNew.getName().contains("S4")) {
-					log.info("S4 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 1 * 3600.;
-					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 1. * 3600) {	
-							headway = 3 * 3600.;
-						}
-						
-						if (t >= 4. * 3600) {
-							headway = 20 * 60.;
-						}
-						
+					for (double t = 4 * 3600.; t <= 3600 * 23.; t = t + headway) {
+
 						if (t >= 19. * 3600) {
 							headway = 30 * 60.;
 						}
 						
-						if (t >= 23. * 3600) {
-							headway = 60 * 60.;
-						}
-							
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}
-					
-				} else if (lineNew.getName().contains("S5")) {
-					log.info("S5 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 1 * 3600.;
-					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 1. * 3600) {	
-							headway = 3 * 3600.;
-						}
-						
-						if (t >= 4. * 3600) {
-							headway = 30 * 60.;
-						}
-						
-						if (t >= 23. * 3600) {
-							headway = 60 * 60.;
-						}
-						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}	
-					
-				} else if (lineNew.getName().contains("S6")) {
-					log.info("S6 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 1 * 3600.;
-					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 1. * 3600) {	
-							headway = 3 * 3600.;
-						}
-						
-						if (t >= 4. * 3600) {
-							headway = 20 * 60.;
-						}
-						
-						if (t >= 20. * 3600) {
-							headway = 30 * 60.;
-						}
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}	
-					
-				} else if (lineNew.getName().contains("S7")) {
-					log.info("S7 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 1 * 3600.;
-					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 1. * 3600) {	
-							headway = 3 * 3600.;
-						}
-						
-						if (t >= 4. * 3600) {
-							headway = 20 * 60.;
-						}
-						
-						if (t >= 20. * 3600) {
-							headway = 30 * 60.;
-						}
-						
-						if (t >= 23. * 3600) {
-							headway = 60 * 60.;
-						}
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}
 					
 				} else if (lineNew.getName().contains("S8")) {
 					log.info("S8 --> line: " + lineNew.getName());
@@ -451,58 +295,32 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("S9")) {
-					log.info("S9 --> line: " + lineNew.getName());
+				} else if (lineNew.getName().contains("S7")) {
+					log.info("S7 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
-					double headway = 20 * 60.;
-					for (double t = 4 * 3600.; t <= 3600 * 23.; t = t + headway) {
+					double headway = 1 * 3600.;
+					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
 						
-						if (t >= 19. * 3600) {	
-							headway = 30 * 60.;
+						if (t >= 1. * 3600) {	
+							headway = 3 * 3600.;
 						}
 						
 						if (t >= 4. * 3600) {
 							headway = 20 * 60.;
 						}
 						
-						if (t >= 19. * 3600) {
+						if (t >= 20. * 3600) {
 							headway = 30 * 60.;
 						}
 						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}	
-					
-				} else if (lineNew.getName().contains("S11")) {
-					log.info("S11 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 20 * 60.;
-					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 19. * 3600) {	
-							headway = 30 * 60.;
+						if (t >= 23. * 3600) {
+							headway = 60 * 60.;
 						}
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}
-					
-				} else if (lineNew.getName().contains("S28")) {
-					log.info("S28 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 20 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 20. * 3600) {	
-							headway = 30 * 60.;
-						}
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}	
 					
 				} else if (lineNew.getName().contains("S68")) {
 					log.info("S68 --> line: " + lineNew.getName());
@@ -523,213 +341,261 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB27")) {
-					log.info("RB27 --> line: " + lineNew.getName());
+				} else if (lineNew.getName().contains("S6")) {
+					log.info("S6 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 19.; t = t + headway) {
+					double headway = 1 * 3600.;
+					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
+						
+						if (t >= 1. * 3600) {	
+							headway = 3 * 3600.;
+						}
+						
+						if (t >= 4. * 3600) {
+							headway = 20 * 60.;
+						}
+						
+						if (t >= 20. * 3600) {
+							headway = 30 * 60.;
+						}
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
-					}
+					}	
 					
-				} else if (lineNew.getName().contains("RB31")) {
-					log.info("RB31 --> line: " + lineNew.getName());
+				} else if (lineNew.getName().contains("S5")) {
+					log.info("S5 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
-					double headway = 30 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 23.; t = t + headway) {
+					double headway = 1 * 3600.;
+					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
 						
-						if (t >= 20. * 3600) {	
+						if (t >= 1. * 3600) {	
+							headway = 3 * 3600.;
+						}
+						
+						if (t >= 4. * 3600) {
+							headway = 30 * 60.;
+						}
+						
+						if (t >= 23. * 3600) {
 							headway = 60 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}	
+					
+				} else if (lineNew.getName().contains("S4")) {
+					log.info("S4 --> line: " + lineNew.getName());
+				
+					int depCounter = 0;
+					double headway = 1 * 3600.;
+					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
+					
+						if (t >= 1. * 3600) {	
+						headway = 3 * 3600.;
+						}
+					
+						if (t >= 4. * 3600) {
+						headway = 20 * 60.;
+						}
+					
+						if (t >= 19. * 3600) {
+						headway = 30 * 60.;
+						}
+					
+						if (t >= 23. * 3600) {
+						headway = 60 * 60.;
 						}
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB32")) {
-					log.info("RB32 --> line: " + lineNew.getName());
-					
+				} else if (lineNew.getName().contains("S3")) {
+					log.info("S3 --> line: " + lineNew.getName());
+				
 					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 22.; t = t + headway) {
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}
-					
-				} else if (lineNew.getName().contains("RB33")) {
-					log.info("RB33 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 60 * 60.;
+					double headway = 20 * 60.;
 					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}
 					
-				} else if (lineNew.getName().contains("RB34")) {
-					log.info("RB34 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 6 * 3600.; t <= 3600 * 21.; t = t + headway) {
+						if (t >= 18. * 3600) {
+						headway = 30 * 60.;
+						}
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}	
-
-				} else if (lineNew.getName().contains("RB35")) {
-					log.info("RB35 --> line: " + lineNew.getName());
 					
+				} else if (lineNew.getName().contains("S28")) {
+					log.info("S28 --> line: " + lineNew.getName());
+				
 					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 6 * 3600.; t <= 3600 * 20.; t = t + headway) {
-						
+					double headway = 20 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 24.; t = t + headway) {
+					
+						if (t >= 20. * 3600) {	
+						headway = 30 * 60.;
+						}
+					
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB36")) {
-					log.info("RB36 --> line: " + lineNew.getName());
+				} else if (lineNew.getName().contains("S2")) {
+				
+					log.info("S2 --> line: " + lineNew.getName());
+						
+					int depCounter = 0;
+					double headway = 40 * 60.;
+					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
 					
+						if (t >= 2. * 3600) {	
+							headway = 120 * 60.;
+						}
+						
+						if (t >= 4. * 3600) {
+							headway = 30 * 60.;
+						}
+						
+						if (t >= 6. * 3600) {
+							headway = 20 * 60.;
+						}
+						
+						if (t >= 20. * 3600) {
+							headway = 30 * 60.;
+						}
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}	
+				
+				} else if (lineNew.getName().contains("S11")) {
+					log.info("S11 --> line: " + lineNew.getName());
+				
+					int depCounter = 0;
+					double headway = 20 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
+					
+						if (t >= 19. * 3600) {	
+							headway = 30 * 60.;
+						}
+					
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+
+				} else if (lineNew.getName().contains("S1")) {
+					
+					log.info("S1 --> line: " + lineNew.getName());
+				
 					int depCounter = 0;
 					double headway = 60 * 60.;
-					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
+					for (double t = 0; t <= 3600 * 24.; t = t + headway) {
+						
+						if (t >= 5. * 3600) {	
+							headway = 20 * 60.;
+						}
+					
+						if (t >= 7. * 3600) {
+							headway = 10 * 60.;
+						}
+						
+						if (t >= 8. * 3600) {
+							headway = 20 * 60.;
+						}
+					
+						if (t >= 19. * 3600) {
+							headway = 30 * 60.;
+						}
+						
+						if (t >= 23. * 3600) {
+							headway = 60 * 60.;
+						}
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+					
+				} else if (lineNew.getName().contains("RB91")) {
+					log.info("RB91 --> line: " + lineNew.getName());
+				
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 24.; t = t + headway) {
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}
 				
-				} else if (lineNew.getName().contains("RB37")) {
-					log.info("RB37 --> line: " + lineNew.getName());
-					
+				} else if (lineNew.getName().contains("RB89")) {
+					log.info("RE89 --> line " + lineNew.getName());
+						
 					int depCounter = 0;
 					double headway = 30 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 23.; t = t + headway) {
+					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
 						
-						if (t >= 8. * 3600) {	
+						if (t >= 21. * 3600) {
 							headway = 60 * 60.;
 						}
 						
-						if (t >= 13. * 3600) {	
-							headway = 30 * 60.;
-						}
-						
-						if (t >= 15. * 3600) {	
-							headway = 60 * 60.;
-						}
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RB39")) {
-					log.info("RB39 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 30 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 20. * 3600) {	
-							headway = 60 * 60.;
-						}
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}
-					
-				} else if (lineNew.getName().contains("RB40")) {
-					log.info("RB40 --> line: " + lineNew.getName());
+				} else if (lineNew.getName().contains("RB59")) {
+					log.info("RB59 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
 					double headway = 60 * 60.;
 					for (double t = 0.; t <= 3600 * 24.; t = t + headway) {
-						
+					
 						if (t >= 1. * 3600) {	
 							headway = 4 * 3600.;
 						}
-						
-						if (t >= 5. * 3600) {	
-							headway = 60 * 60.;
-						}
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}	
-
-				} else if (lineNew.getName().contains("RB43")) {
-					log.info("RB43 --> line: " + lineNew.getName());
 					
-					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 4 * 3600.; t <= 3600 * 21.; t = t + headway) {
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}	
-					
-				} else if (lineNew.getName().contains("RB44")) {
-					log.info("RB44 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 23.; t = t + headway) {
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}
-					
-				} else if (lineNew.getName().contains("RB45")) {
-					log.info("RB45 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 6 * 3600.; t <= 3600 * 21.; t = t + headway) {
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}
-					
-				} else if (lineNew.getName().contains("RB46")) {
-					log.info("RB46 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 60 * 60.;
-					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
-						
 						if (t >= 5. * 3600) {	
 							headway = 30 * 60.;
 						}
-						
-						if (t >= 21. * 3600) {	
-							headway = 60 * 60.;
-						}
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
-					}
 					
-				} else if (lineNew.getName().contains("RB48")) {
-					log.info("RB48 --> line: " + lineNew.getName());
-					
-					int depCounter = 0;
-					double headway = 30 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 23.; t = t + headway) {
-						
 						if (t >= 20. * 3600) {	
 							headway = 60 * 60.;
 						}
-						
+					
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB50")) {
-					log.info("RB50 --> line: " + lineNew.getName());
+				} else if (lineNew.getName().contains("RB54") || lineNew.getName().contains("RB69")) {
+					log.info("RB 54,69 --> line " + lineNew.getName());
+						
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 21.; t = t + headway) {
+					
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+				
+				} else if (lineNew.getName().contains("RB53")) {
+					log.info("RB53 --> line: " + lineNew.getName());
+				
+					int depCounter = 0;
+					double headway = 30 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 23.; t = t + headway) {
+					
+						if (t >= 20. * 3600) {	
+							headway = 60 * 60.;
+						}
+					
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+					
+				} else if (lineNew.getName().contains("RB52")) {
+					log.info("RB52 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
 					double headway = 60 * 60.;
@@ -753,9 +619,176 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}	
-
-				} else if (lineNew.getName().contains("RB52")) {
-					log.info("RB52 --> line: " + lineNew.getName());
+			
+				} else if (lineNew.getName().contains("RB50")) {
+					log.info("RB50 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
+					
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+					
+				} else if (lineNew.getName().contains("RB48")) {
+					log.info("RB48 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 30 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 23.; t = t + headway) {
+						
+						if (t >= 20. * 3600) {	
+							headway = 60 * 60.;
+						}
+					
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}	
+					
+				} else if (lineNew.getName().contains("RB46")) {
+					log.info("RB46 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
+						
+						if (t >= 5. * 3600) {	
+							headway = 30 * 60.;
+						}
+						
+						if (t >= 21. * 3600) {	
+							headway = 60 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}	
+					
+				} else if (lineNew.getName().contains("RB45")) {
+					log.info("RB45 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 21.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+					
+				} else if (lineNew.getName().contains("RB44")) {
+					log.info("RB44 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 23.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}		
+				} else if (lineNew.getName().contains("RB43")) {
+					log.info("RB43 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 22.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}	
+						
+				} else if (lineNew.getName().contains("RB40")) {
+					log.info("RB40 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 0.; t <= 3600 * 24.; t = t + headway) {
+						
+						if (t >= 1. * 3600) {	
+							headway = 4 * 3600.;
+						}
+						
+						if (t >= 5. * 3600) {	
+							headway = 60 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}		
+					
+				} else if (lineNew.getName().contains("RB39")) {
+					log.info("RB39 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 20 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 24.; t = t + headway) {
+						
+						if (t >= 20. * 3600) {	
+							headway = 60 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}	
+					
+				} else if (lineNew.getName().contains("RB37")) {
+					log.info("RB37 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 30 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 23.; t = t + headway) {
+						
+						if (t >= 8. * 3600) {	
+							headway = 60 * 60.;
+						}
+						
+						if (t >= 13. * 3600) {	
+							headway = 30 * 60.;
+						}
+						
+						if (t >= 15. * 3600) {	
+							headway = 60 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+					
+				} else if (lineNew.getName().contains("RB36")) {
+					log.info("RB36 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 30 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}		
+	
+				} else if (lineNew.getName().contains("RB35")) {
+					log.info("RB35 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 20.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}	
+					
+				} else if (lineNew.getName().contains("RB34")) {
+					log.info("RB34 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 21.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+					
+				} else if (lineNew.getName().contains("RB33")) {
+					log.info("RB33 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
 					double headway = 60 * 60.;
@@ -763,10 +796,21 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
-					}
+					}	
 					
-				} else if (lineNew.getName().contains("RB53")) {
-					log.info("RB53 --> line: " + lineNew.getName());
+				} else if (lineNew.getName().contains("RB32")) {
+					log.info("RB32 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 22.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}	
+					
+				} else if (lineNew.getName().contains("RB31")) {
+					log.info("RB31 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
 					double headway = 30 * 60.;
@@ -779,78 +823,438 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}
-					
-				} else if (lineNew.getName().contains("RB59")) {
-					log.info("RB59 --> line: " + lineNew.getName());
-					
+						
+				} else if (lineNew.getName().contains("RB27")) {
+					log.info("RB27 --> line: " + lineNew.getName());
+						
 					int depCounter = 0;
 					double headway = 60 * 60.;
-					for (double t = 0 * 3600.; t <= 3600 * 24.; t = t + headway) {
+					for (double t = 5 * 3600.; t <= 3600 * 19.; t = t + headway) {
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+					
+				} else if (lineNew.getName().contains("RB25")) {
+					log.info("RB25 --> line " + lineNew.getName());
 						
-						if (t >= 1. * 3600) {	
-							headway = 4 * 3600.;
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 23.; t = t + headway) {
+						
+						if (t >= 5. * 3600) {
+							headway = 20 * 60.;
 						}
 						
-						if (t >= 5. * 3600) {	
+						if (t >= 10. * 3600) {
 							headway = 30 * 60.;
 						}
 						
-						if (t >= 20. * 3600) {	
+						if (t >= 21. * 3600) {
 							headway = 60 * 60.;
 						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter
+						++;
+					}
+					
+				} else if (lineNew.getName().contains("RE57")) {
+					log.info("RE257 --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 90 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 23.; t = t + headway) {
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB91")) {
-					log.info("RB59 --> line: " + lineNew.getName());
+				} else if (lineNew.getName().contains("RE5")) {
+					log.info("RE5 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
 					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 21.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}		
+					
+				} else if (lineNew.getName().contains("RE42")) {
+					log.info("RE42 --> line " + lineNew.getName());
+						
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 23.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE2")){
+					log.info("RE2 --> line " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 0.; t <= 3600 * 24.; t = t + headway) {
+						
+						if (t >= 1. * 3600) {
+							headway = 3 * 3600.;
+						}
+						
+						if (t >= 4. * 3600) {
+							headway = 60 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE19")) {
+					log.info("RE19 --> line " + lineNew.getName());
+						
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 24; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE17")) {
+					log.info("RE17 --> line " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 22; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE16")) {
+					log.info("RE16 --> line " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 20; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE14")) {
+					log.info("RE14 --> line " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 5 * 3600; t <= 3600 * 23; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE13")) {
+					log.info("RE13 --> line " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 21.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE11")) {
+					log.info("RE11 --> line " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 22.; t = t + headway) {
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE10")) {
+					log.info("RE10 --> line " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 30 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 23.; t = t + headway) {
+							
+						if ( t >= 19. * 3600) {
+							headway = 60 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("RE1") || lineNew.getName().contains("RE3") || lineNew.getName().contains("RE4") || lineNew.getName().contains("RE6")
+							|| lineNew.getName().contains("RE7") || lineNew.getName().contains("RE8")) {
+						log.info("RE 1,3,4,6,7,8 --> line: " + lineNew.getName());
+						
+						int depCounter = 0;
+						double headway = 60 * 60.;
+						for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
+							
+							routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+							depCounter++;	
+							
+						}
+						
+				} else if (lineNew.getName().contains("ICE78")) {
+					log.info("ICE-78 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 120 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 19.; t = t + headway) {
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}	
+						
+				} else if (lineNew.getName().contains("ICE-43")) {
+					log.info("ICE-43 --> line " + lineNew.getName());
+						
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 20.; t = t + headway) {
+							
+						if (t >= 9. * 3600) {
+							headway = 120 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("ICE-42")) {
+					log.info("ICE-42 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 120 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 21.; t = t + headway) {
+						
+						if (t >= 19. * 3600) {
+							headway = 60 * 60.;
+						}
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("ICE-41")) {
+					log.info("ICE-41 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 2 * 3600.; t <= 3600 * 21.; t = t + headway) {
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("ICE-10")) {
+					log.info("ICE-10 --> line " + lineNew.getName());
+						
+					int depCounter = 0;
+					double headway = 30 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 20.; t = t + headway) {
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("ICE-1")) {
+					log.info("ICE-1 --> line " + lineNew.getName());
+								
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 6.; t = t + headway) {
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("IC-55")) {
+					log.info("IC-55 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 120 * 60.;
 					for (double t = 5 * 3600.; t <= 3600 * 24.; t = t + headway) {
-						
-						if (t >= 1. * 3600) {	
-							headway = 4 * 3600.;
+							
+						if (t >= 17. * 3600) {
+							headway = 420 * 60.;
 						}
 						
-						if (t >= 5. * 3600) {	
-							headway = 30 * 60.;
-						}
-						
-						if (t >= 20. * 3600) {	
+						if (t >= 23. * 3600) {
 							headway = 60 * 60.;
 						}
-						
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
 					}
-				
-				} else if (lineNew.getName().contains("RE1") || lineNew.getName().contains("RE3") || lineNew.getName().contains("RE6")
-						|| lineNew.getName().contains("RE7") || lineNew.getName().contains("RE8")) {
-					log.info("RE 1,3,6,7,8 --> line: " + lineNew.getName());
 					
+				} else if (lineNew.getName().contains("IC-50-MDV")) {
+					log.info("IC-50-MDV --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 120 * 60.;
+					for (double t = 9 * 3600.; t <= 3600 * 15.; t = t + headway) {
+							
+						if (t >= 11. * 3600) {
+							headway = 240 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+					
+				} else if (lineNew.getName().contains("IC-37")) {
+					log.info("IC-37 --> line " + lineNew.getName());
+								
 					int depCounter = 0;
 					double headway = 60 * 60.;
-					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
-						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
-						depCounter++;						
+					for (double t = 12 * 3600.; t <= 3600 * 12.; t = t + headway) {
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("IC-35")) {
+					log.info("IC-35 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 1 * 3600.; t <= 3600 * 15.; t = t + headway) {
+							
+						if (t >= 4. * 3600) {
+							headway = 120 * 60.;
+						}
+							
+						if (t >= 6. * 3600) {
+							headway = 60 * 60.;
+						}
+								
+						if (t >= 7. * 3600) {
+							headway = 180 * 60.;
+						}
+							
+						if (t >= 10. * 3600) {
+							headway = 120 * 60.;
+						}
+													
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("IC-32")) {
+					log.info("IC-32 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 120 * 60.;
+					for (double t = 3 * 3600.; t <= 3600 * 19.; t = t + headway) {
+							
+						if (t >= 5. * 3600) {
+							headway = 60 * 60.;
+						}
+							
+						if (t >= 10. * 3600) {
+							headway = 120 * 60.;
+						}
+							
+						if (t >= 12. * 3600) {
+							headway = 60 * 60.;
+						}
+							
+						if (t >= 14. * 3600) {
+							headway = 180 * 60.;
+						}
+							
+						if (t >= 17. * 3600) {
+							headway = 60 * 60.;
+						}
+		
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("IC-31")) {
+					log.info("IC-31 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 120 * 60.;
+					for (double t = 5 * 3600.; t <= 3600 * 16.; t = t + headway) {
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("IC-30")) {
+					log.info("IC-30 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 120 * 60.;
+					for (double t = 2 * 3600.; t <= 3600 * 21.; t = t + headway) {
+							
+						if (t >= 6. * 3600) {
+							headway = 60 * 60.;
+						}
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+						
+				} else if (lineNew.getName().contains("Thalys")) {
+					log.info("THA80 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 120 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 18.; t = t + headway) {
+							
+						if (t >= 8. * 3600) {
+							headway = 240 * 60.;
+						}
+							
+						if (t >= 16. * 3600) {
+							headway = 120 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
 					}
 					
-				// TODO: continue with other transit lines
-				// TODO: use something else than 'contains' to differentiate between e.g. RE2 and RE27...
+//				FlixBus FLX20 from Hamburg to Cologne
+				} else if (lineNew.getName().contains("FLX20")) {
+					log.info("FLX20 --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 60 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 14.; t = t + headway) {
+							
+						if (t >= 7. * 3600) {
+							headway = 420 * 60.;
+						}
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
 					
 				} else {
 					log.warn("Unknown transit line category: " + lineNew.getName());
-					
+						
 					int depCounter = 0;
 					double headway = 60 * 60.;
-					for (double t = 0; t <= 3600 * 24.; t = t + headway) {								
+					for (double t = 0; t <= 3600 * 24.; t = t + headway) {				
+							
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}	
-				}	
-
+				}
+				
 				lineNew.addRoute(routeNew);
 				routeCounter++;
 			}
