@@ -27,11 +27,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesFromPopulation;
+import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /**
@@ -44,23 +47,41 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
     private static final double upperLimit = 1000.;
     private static final double beelineDistanceFactor = 1.3;
 
+    private static final boolean writeOutputPopulation = false;
+    private static final boolean createFacilities = true;
+
     public static void main(String[] args) {
 
 //        String inputPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
-        String inputPlansFile = "../runs-svn/nemo/marginals/output/testCalib/ITERS/it.0/testCalib.0.plans.xml.gz";
+        String inputPlansFile = "../runs-svn/nemo/marginals/input/plans_1pct_filteredForRuhr_maxShortTrips.xml.gz";
+        String inputNetwork = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/2018-05-03_NRW_coarse_filteredcleaned_network.xml.gz";
         String outPopulationFile = "../runs-svn/nemo/marginals/input/plans_1pct_filteredForRuhr_maxShortTrips.xml.gz";
 
-        String facilityFile = "../runs-svn/nemo/marginals/output/testCalib/testCalib.output_facilities.xml.gz";
+        String facilityFile = "../runs-svn/nemo/marginals/input/plans_1pct_filteredForRuhr_maxShortTrips_facilities.xml.gz";
 
         Population outPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-        boolean writeOutputPopulation = false;
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().plans().setInputFile(inputPlansFile);
-        scenario.getConfig().facilities().setInputFile(facilityFile);
-        scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+        Config config =ConfigUtils.createConfig();
 
-        ScenarioUtils.loadScenario(scenario);
+        config.plans().setInputFile(inputPlansFile);
+        config.network().setInputFile(inputNetwork);
+        config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+        config.facilities().setOneFacilityPerLink(false); // setting false meaning, one facility for each coord.
+
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+
+        if (createFacilities) {
+            FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(scenario.getActivityFacilities(), scenario.getConfig().facilities());
+            facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(scenario.getConfig().facilities().isAssigningLinksToFacilitiesIfMissing(), scenario.getNetwork());
+            facilitiesFromPopulation.assignOpeningTimes(scenario.getConfig().facilities().isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
+            facilitiesFromPopulation.run(scenario.getPopulation());
+
+            new FacilitiesWriter(scenario.getActivityFacilities()).write(facilityFile);
+
+        } else {
+            scenario.getConfig().facilities().setInputFile(facilityFile);
+            ScenarioUtils.loadScenario(scenario);
+        }
 
         Population population = scenario.getPopulation();
         ActivityFacilities activityFacilities = scenario.getActivityFacilities();
@@ -113,8 +134,11 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
         }
 
         // some pre-evaluated stats for the same file.
-//        System.out.println("Maximum number of 0-1km trips while considering all plans of a person (beeline distance factor = 1.0) is 37943");
-//        System.out.println("Maximum number of 0-1km trips while considering all plans of a person (beeline distance factor = 1.3) is 29722");
+//        System.out.println("Maximum number of 0-1km trips while considering all plans of a person (beeline distance factor = 1.3) is 29705"); // from --> 2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz
+        // System.out.println("Maximum number of 0-1km trips while considering all plans of a person (beeline distance factor = 1.3) is 29705"); // from --> plans_1pct_filteredForRuhr_maxShortTrips.xml.gz
+        // if using activityFacilities with (oneFacilityPerLink=false) --> 29705
+
+
 
         System.out.println("Maximum number of trips which are > "+lowerLimit+ "km and <= "+upperLimit+" km while considering all plans of a person (beeline distance factor = "+beelineDistanceFactor+") is "+ shortTripsCounter);
 
