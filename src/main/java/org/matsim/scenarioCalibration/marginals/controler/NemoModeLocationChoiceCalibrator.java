@@ -35,10 +35,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -59,10 +57,9 @@ import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventH
 import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
 import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTripTravelTimeHandler;
 import playground.vsp.cadyts.marginals.AgentFilter;
-import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
+import playground.vsp.cadyts.marginals.ModalDistanceAnalysisModule;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
-import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
 import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
@@ -82,15 +79,15 @@ public class NemoModeLocationChoiceCalibrator {
         String runId = "testCalib";
 
         int lastIt = 1;
-        double cadytsCountsWt =0.0;
-        double cadytsMarginalsWt = 0.0;
+        double cadytsCountsWt =15.0;
+        double cadytsMarginalsWt = 10.0;
 
         String shapeFile = NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE;
 
         boolean keepInitialPlans = true;
         boolean removeStayHomePlanForMaxShortDistTrips = true;
 
-        boolean mergeShortDistanceBins = false;
+        boolean mergeShortDistanceBins = true;
 
         if (args.length > 0) {
             configFile = args[0];
@@ -120,8 +117,7 @@ public class NemoModeLocationChoiceCalibrator {
         if (args.length == 0) {
             config.controler()
                   .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-            config.plans().setInputFile("/Users/amit/Documents/repos/runs-svn/nemo/marginals/run269_b_ch1_maxShortTrips/output/ITERS/it.0/run269_b_ch1_maxShortTrips.0.plans.xml.gz");
-            config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile);
+            config.plans().setInputFile("/Users/amit/Documents/repos/runs-svn/nemo/marginals/input/sampledPop.xml");
         }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -190,37 +186,19 @@ public class NemoModeLocationChoiceCalibrator {
                                                                                                  .getCountsScaleFactor(),
                 scenario.getConfig().plansCalcRoute(),
                 mergeShortDistanceBins);
+
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(AgentFilter.class).to(RuhrAgentsFilter.class);
+                bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(shapeFile_final);
+            }
+        });
+
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
-            controler.addOverridingModule(new AbstractModule() {
-                @Override
-                public void install() {
-                    bind(AgentFilter.class).to(RuhrAgentsFilter.class);
-                    bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(shapeFile_final);
-                }
-            });
-
         } else { //get the analysis at least
-            controler.addOverridingModule(new AbstractModule() {
-                @Inject
-                private EventsManager eventsManager;
-
-                @Override
-                public void install() {
-                    AgentFilter agentFilter = new RuhrAgentsFilter(scenario, shapeFile_final);
-
-                    this.bind(DistanceDistribution.class).toInstance(inputDistanceDistribution);
-                    this.bind(BeelineDistanceCollector.class)
-                        .toInstance(new BeelineDistanceCollector(scenario,
-                                inputDistanceDistribution,
-                                eventsManager,
-                                agentFilter));
-
-                    this.addControlerListenerBinding().to(ModalDistanceDistributionControlerListener.class);
-                    bind(AgentFilter.class).toInstance(agentFilter);
-                    bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(shapeFile_final);
-                }
-            });
+            controler.addOverridingModule(new ModalDistanceAnalysisModule(inputDistanceDistribution));
         }
 
         // counts cadyts
