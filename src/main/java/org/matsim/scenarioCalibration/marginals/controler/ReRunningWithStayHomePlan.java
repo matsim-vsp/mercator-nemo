@@ -141,7 +141,8 @@ public class ReRunningWithStayHomePlan {
             }
         });
         
-        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute(), mergeShortDistanceBins);
+        DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute(), mergeShortDistanceBins,
+                true);
         if (cadytsMarginalsWt !=0.){
             controler.addOverridingModule(new ModalDistanceCadytsModule(inputDistanceDistribution));
 

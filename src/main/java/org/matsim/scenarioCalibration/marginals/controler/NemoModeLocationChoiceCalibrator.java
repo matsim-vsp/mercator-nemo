@@ -88,6 +88,7 @@ public class NemoModeLocationChoiceCalibrator {
         boolean removeStayHomePlanForMaxShortDistTrips = true;
 
         boolean mergeShortDistanceBins = true;
+        boolean useEssenBochumReferenceData = false;
 
         if (args.length > 0) {
             configFile = args[0];
@@ -101,6 +102,7 @@ public class NemoModeLocationChoiceCalibrator {
 
             if (args.length>8) removeStayHomePlanForMaxShortDistTrips = Boolean.valueOf(args[8]);
             if (args.length>9) mergeShortDistanceBins = Boolean.valueOf(args[9]);
+            if (args.length>10) useEssenBochumReferenceData = Boolean.valueOf(args[10]);
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
@@ -113,6 +115,12 @@ public class NemoModeLocationChoiceCalibrator {
         config.strategy().setMaxAgentPlanMemorySize(15);
 
         config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+
+        if (useEssenBochumReferenceData) {
+            config.counts().setCountsScaleFactor(75.79);
+        } else {
+            config.counts().setCountsScaleFactor(74.386);
+        }
 
         if (args.length == 0) {
             config.controler()
@@ -185,7 +193,7 @@ public class NemoModeLocationChoiceCalibrator {
         DistanceDistribution inputDistanceDistribution = NEMOUtils.getDistanceDistribution(config.counts()
                                                                                                  .getCountsScaleFactor(),
                 scenario.getConfig().plansCalcRoute(),
-                mergeShortDistanceBins);
+                mergeShortDistanceBins, useEssenBochumReferenceData);
 
         controler.addOverridingModule(new AbstractModule() {
             @Override

@@ -77,13 +77,14 @@ public class MarginalsOfflineAnalyser {
 
         FacilitiesConfigGroup facilitiesConfigGroup = scenario.getConfig().facilities();
         FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(scenario.getActivityFacilities(), facilitiesConfigGroup);
-        facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(facilitiesConfigGroup.isAssigningLinksToFacilitiesIfMissing(), scenario.getNetwork());
+        facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(true, scenario.getNetwork());
         facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
         facilitiesFromPopulation.run(scenario.getPopulation());
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
-        DistanceDistribution distri = NEMOUtils.getDistanceDistribution(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute(), mergeShortDistanceBins);
+        DistanceDistribution distri = NEMOUtils.getDistanceDistribution(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute(), mergeShortDistanceBins,
+                true);
 
         BeelineDistanceCollector collector = new BeelineDistanceCollector(scenario, distri, eventsManager, new RuhrAgentsFilter(scenario, NEMOUtils.Ruhr_BOUNDARY_SHAPE_FILE ));
 
