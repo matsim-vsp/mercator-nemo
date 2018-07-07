@@ -66,13 +66,13 @@ public class MatsimPlansMaximumPossibleShortDistanceTripsCounter {
         config.plans().setInputFile(inputPlansFile);
         config.network().setInputFile(inputNetwork);
         config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
-        config.facilities().setOneFacilityPerLink(false); // setting false meaning, one facility for each coord.
+//        config.facilities().setOneFacilityPerLink(false); // setting false meaning, one facility for each coord.
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         if (createFacilities) {
             FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(scenario.getActivityFacilities(), scenario.getConfig().facilities());
-            facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(scenario.getConfig().facilities().isAssigningLinksToFacilitiesIfMissing(), scenario.getNetwork());
+            facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(true, scenario.getNetwork());
             facilitiesFromPopulation.assignOpeningTimes(scenario.getConfig().facilities().isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
             facilitiesFromPopulation.run(scenario.getPopulation());
 
