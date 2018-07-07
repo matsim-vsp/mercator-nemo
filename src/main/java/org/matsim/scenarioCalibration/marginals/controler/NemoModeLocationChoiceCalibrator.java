@@ -37,6 +37,7 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -115,6 +116,11 @@ public class NemoModeLocationChoiceCalibrator {
         config.strategy().setMaxAgentPlanMemorySize(15);
 
         config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+
+        config.facilities().setAddEmptyActivityOption(false);
+        config.facilities().setRemovingLinksAndCoordinates(false); //keeping coordinates
+        config.facilities().setAssigningOpeningTime(false);
+        config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile);
 
         if (useEssenBochumReferenceData) {
             config.counts().setCountsScaleFactor(75.79);
