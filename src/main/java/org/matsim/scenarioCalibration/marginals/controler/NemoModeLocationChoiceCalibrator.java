@@ -120,7 +120,7 @@ public class NemoModeLocationChoiceCalibrator {
         config.facilities().setAddEmptyActivityOption(false);
         config.facilities().setRemovingLinksAndCoordinates(false); //keeping coordinates
         config.facilities().setAssigningOpeningTime(false);
-        config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile);
+        config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile);
 
         if (useEssenBochumReferenceData) {
             config.counts().setCountsScaleFactor(75.79);
