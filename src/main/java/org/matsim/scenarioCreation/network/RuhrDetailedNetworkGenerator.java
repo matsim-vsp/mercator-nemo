@@ -43,10 +43,11 @@ import org.opengis.feature.simple.SimpleFeature;
 
 public class RuhrDetailedNetworkGenerator {
 
-    private static final boolean useMultiModalNetworkCleaner = true;
-    private static final boolean readOSMFileAndCreateNetwork = true;
-
     public static void main(String[] args) {
+
+        boolean useMultiModalNetworkCleaner = true;
+        boolean readOSMFileAndCreateNetwork = true;
+
     	String svnDir = "../shared-svn/";
         String osmfile = svnDir + "projects/nemo_mercator/data/matsim_input/zz_archive/network/06042018/NRW_completeTransportNet.osm.gz";
         List<String> inputCountNodeMappingFiles = Arrays.asList(
@@ -54,8 +55,16 @@ public class RuhrDetailedNetworkGenerator {
         		svnDir + "projects/nemo_mercator/data/matsim_input/zz_archive/counts/mapmatching/Nemo_kurzfristZaehlstellen_OSMNodeIDs_UTM33N-allStationsInclNotFound.csv");
         String epsg = NEMOUtils.NEMO_EPSG;
         String prefix = "detailedRuhr_Network_" + new SimpleDateFormat("ddMMyyyy").format(new Date());
-        String outDir = svnDir + "projects/nemo_mercator/data/matsim_input/2018-05-03_vspDefault_OSM_net/";
+        String outDir = svnDir + "projects/nemo_mercator/data/matsim_input/2018-05-2018-05-28_shorterIntraZonalDist/";
         String shapeFile = svnDir + "projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
+
+        if (args.length > 0) {
+            readOSMFileAndCreateNetwork = Boolean.valueOf(args[0]);
+            useMultiModalNetworkCleaner = Boolean.valueOf(args[1]);
+
+            outDir = args[2];
+        }
+
         if ( readOSMFileAndCreateNetwork ){
             NemoNetworkCreator nemoNetworkCreator = new NemoNetworkCreator(osmfile,
                     inputCountNodeMappingFiles,
