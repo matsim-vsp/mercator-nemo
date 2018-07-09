@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -59,6 +60,7 @@ import playground.vsp.andreas.osmBB.extended.TransitScheduleImpl;
 
 public class GeneratePtAndRunNEMO {
 
+
 	private static final Logger log = Logger.getLogger(GeneratePtAndRunNEMO.class);
 
 	public static void main(String[] args) {
@@ -77,7 +79,7 @@ public class GeneratePtAndRunNEMO {
 		// #######################################################
 		// do not adjust the following lines (or talk to me, ik)
 
-		final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
+		final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, NEMOUtils.NEMO_EPSG);
 		final LocalDate date = LocalDate.parse("2018-05-17");
 		final String initialNetworkFile = projectDirectory + "data/matsim_input/tertiaryNemo_10112017_EPSG_25832_filteredcleaned_network.xml.gz";
 		
@@ -115,7 +117,7 @@ public class GeneratePtAndRunNEMO {
 			new MatsimNetworkReader(scenario.getNetwork()).readFile(initialNetworkFile);
 			
 			//Create a network around the schedule
-			new CreatePseudoNetwork(scenario.getTransitSchedule(),scenario.getNetwork(),"pt_").createNetwork();
+			new CreatePseudoNetwork(scenario.getTransitSchedule(),scenario.getNetwork(),NEMOUtils.TRANSIT_NETWORK_PREFIX).createNetwork();
 			
 			//Create simple transit vehicles
 			new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();

@@ -33,6 +33,8 @@ import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 
 public final class NEMOUtils {
 
+    public static final String TRANSIT_NETWORK_PREFIX = "pt_";
+
     public static final String NEMO_EPSG = "EPSG:25832";
 
     //shape files

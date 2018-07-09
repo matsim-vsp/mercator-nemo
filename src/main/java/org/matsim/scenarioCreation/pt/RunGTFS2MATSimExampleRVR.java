@@ -23,7 +23,7 @@
 package org.matsim.scenarioCreation.pt;
 
 import java.time.LocalDate;
-
+import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.gtfs.RunGTFS2MATSim;
 import org.matsim.core.config.ConfigUtils;
@@ -45,7 +45,6 @@ import org.matsim.vehicles.VehicleWriterV1;
 
 public class RunGTFS2MATSimExampleRVR {
 
-	
 	public static void main(String[] args) {
 	
 		//this was tested for the latest VBB GTFS, available at 
@@ -53,7 +52,7 @@ public class RunGTFS2MATSimExampleRVR {
 		
 		//input data
 		String gtfsZipFile = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/data/pt/google_transit_vrr_2018_05_11_corrected.zip"; 
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, NEMOUtils.NEMO_EPSG);
 		LocalDate date = LocalDate.parse("2018-05-15");
 
 		//output files 
@@ -72,7 +71,7 @@ public class RunGTFS2MATSimExampleRVR {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/data/matsim_input/tertiaryNemo_10112017_EPSG_25832_filteredcleaned_network.xml.gz");
 		
 		//Create a network around the schedule
-		new CreatePseudoNetwork(scenario.getTransitSchedule(),scenario.getNetwork(),"pt_").createNetwork();
+		new CreatePseudoNetwork(scenario.getTransitSchedule(),scenario.getNetwork(), NEMOUtils.TRANSIT_NETWORK_PREFIX).createNetwork();
 		
 		//Create simple transit vehicles
 		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();
