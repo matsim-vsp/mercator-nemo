@@ -23,9 +23,9 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
@@ -52,10 +52,13 @@ public class BaseCaseControler {
         }
 
         Config config = ConfigUtils.loadConfig(configFile);
-        config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile);
 
         config.controler().setRunId(runId);
         config.controler().setOutputDirectory(outputDir);
+
+        if (args.length==0) {
+            config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 

@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Coord;
@@ -58,11 +60,15 @@ public class RuhrDetailedNetworkGenerator {
         String outDir = svnDir + "projects/nemo_mercator/data/matsim_input/2018-05-2018-05-28_shorterIntraZonalDist/";
         String shapeFile = svnDir + "projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
 
+        boolean addRideOnCarLinks = true;
+
         if (args.length > 0) {
             readOSMFileAndCreateNetwork = Boolean.valueOf(args[0]);
             useMultiModalNetworkCleaner = Boolean.valueOf(args[1]);
 
             outDir = args[2];
+
+            addRideOnCarLinks = Boolean.valueOf(args[3]);
         }
 
         if ( readOSMFileAndCreateNetwork ){
@@ -84,6 +90,15 @@ public class RuhrDetailedNetworkGenerator {
                 cleaner.run(Collections.singleton(TransportMode.bike));
                 cleaner.removeNodesWithoutLinks();
             }
+
+            if (addRideOnCarLinks ) {
+                nemoNetworkCreator.getNetwork().getLinks().values().stream().filter(l -> l.getAllowedModes().contains("car")).forEach(l->{
+                    Set<String> modes = new HashSet<>(l.getAllowedModes());
+                    modes.add("ride");
+                    l.setAllowedModes(modes);
+                });
+            }
+
             nemoNetworkCreator.writeNetwork();
         } else {
             if ( useMultiModalNetworkCleaner ){

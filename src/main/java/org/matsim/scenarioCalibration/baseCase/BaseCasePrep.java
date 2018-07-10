@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.scenarioCreation.network.RuhrDetailedNetworkGenerator;
 
 /**
  * Created by amit on 09.07.18.
@@ -35,10 +36,13 @@ public class BaseCasePrep {
 
     public static void main(String[] args) {
 
-        // 01_Ruhr Detailed network
-//        {
-//            RuhrDetailedNetworkGenerator.main(new String [] {"true","true", "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/" });
-//        }
+        // 01_Ruhr Detailed network (also add ride wherever car is allowed.)
+        {
+        RuhrDetailedNetworkGenerator.main(
+                new String[]{"true", "true",
+                        "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/"
+                ,"true"});
+        }
 
         // 02_selected plans only... clear routes, linkInfo
         // also remove initial_plans attribute
@@ -82,10 +86,14 @@ public class BaseCasePrep {
                 if (activity.getLinkId()==null) continue;
 
                 if (activity.getCoord()!=null) activity.setLinkId(null);
-                else if (activity.getFacilityId()!=null) activity.setLinkId(null);
                 else {
+                    if (activity.getFacilityId()!=null) {
+                        throw new RuntimeException("Activity has a facility id; " +planElement+". Get the coordinate from facility id.");
+                    }
                     throw new RuntimeException("Activity "+planElement+" has neither link nor facility id. This should not happen. Aborting...");
                 }
+
+                activity.setFacilityId(null);
 
             } else if (planElement instanceof Leg) {
                 ((Leg)planElement).setRoute(null);
