@@ -55,6 +55,7 @@ public class BaseCaseControler {
 
         config.controler().setRunId(runId);
         config.controler().setOutputDirectory(outputDir);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(true); // so that bicycle can be route from car link to bike links.
 
         if (args.length==0) {
             config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
