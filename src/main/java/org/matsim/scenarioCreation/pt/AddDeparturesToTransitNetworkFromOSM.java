@@ -82,7 +82,9 @@ public class AddDeparturesToTransitNetworkFromOSM {
 	public void run() {
 		
 		// adjust these directories
-		final String projectDirectory = "D:/Arbeit/mercator-nemo/";
+//		final String projectDirectory = "D:/Arbeit/mercator-nemo/";
+		final String projectDirectory = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/";
+		
 		final String inputScheduleFile = projectDirectory + "data/pt/ptNetworkScheduleFileFromOSM.xml"; 
 		final String directory = projectDirectory + "data/pt/extendedScheduleFromOSM/";
 		
@@ -211,151 +213,151 @@ public class AddDeparturesToTransitNetworkFromOSM {
 
 					double avgFreeSpeed = Double.NEGATIVE_INFINITY;
 					
-					if (lineNew.getName().contains("S3") || lineNew.getName().contains("S68")) {
+					if (lineNew.getName().equals("S3") || lineNew.getName().equals("S68")) {
 						avgFreeSpeed = 14.69907402;
 						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("S11")) {
+					} else if (lineNew.getName().equals("S11")) {
 						avgFreeSpeed = 18.74999993;
 						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("S9") || lineNew.getName().contains("S8") || lineNew.getName().contains("S6") || lineNew.getName().contains("S1")) {
+					} else if (lineNew.getName().equals("S9") || lineNew.getName().equals("S8") || lineNew.getName().equals("S6") || lineNew.getName().equals("S1")) {
 						avgFreeSpeed = 16.6666666; 
 						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("S5")) {
+					} else if (lineNew.getName().equals("S5")) {
 						avgFreeSpeed = 12.5;
 						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("S4") || lineNew.getName().contains("S28")) {
+					} else if (lineNew.getName().equals("S4") || lineNew.getName().equals("S28")) {
 						avgFreeSpeed = 11.66666662;
 						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("S7")) {
+					} else if (lineNew.getName().equals("S7")) {
 						avgFreeSpeed = 9.722222183;
 						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("S2")) {
+					} else if (lineNew.getName().equals("S2")) {
 						avgFreeSpeed = 8.3333333;
 						log.info("S-Bahn --> line: " + lineNew.getName());
 					
-					} else if (lineNew.getName().contains("RB35")) {
+					} else if (lineNew.getName().equals("RB35")) {
 						avgFreeSpeed = 17.97385635;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB52")) {
+					} else if (lineNew.getName().equals("RB52")) {
 						avgFreeSpeed = 10.41666675;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB39")) {
+					} else if (lineNew.getName().equals("RB39")) {
 						avgFreeSpeed = 11.1111112;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB54") || lineNew.getName().contains("RB44") || lineNew.getName().contains("RB43")) {
+					} else if (lineNew.getName().equals("RB54") || lineNew.getName().equals("RB44") || lineNew.getName().equals("RB43")) {
 						avgFreeSpeed = 11.98743396;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB53") || lineNew.getName().contains("RB46") || lineNew.getName().contains("RB37") || lineNew.getName().contains("RB36") || lineNew.getName().contains("RB33") || lineNew.getName().contains("RB32") || lineNew.getName().contains("RB25")) {
+					} else if (lineNew.getName().equals("RB53") || lineNew.getName().equals("RB46") || lineNew.getName().equals("RB37") || lineNew.getName().equals("RB36") || lineNew.getName().equals("RB33") || lineNew.getName().equals("RB32") || lineNew.getName().equals("RB25")) {
 						avgFreeSpeed = 13.888889;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB91") || lineNew.getName().contains("RB59")) {
+					} else if (lineNew.getName().equals("RB91") || lineNew.getName().equals("RB59")) {
 						avgFreeSpeed = 16.6666668;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB51")) {
+					} else if (lineNew.getName().equals("RB51")) {
 						avgFreeSpeed = 17.36111125;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB31")) {
+					} else if (lineNew.getName().equals("RB31")) {
 						avgFreeSpeed = 18.51851867;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB45") || lineNew.getName().contains("RB40")) {
+					} else if (lineNew.getName().equals("RB45") || lineNew.getName().equals("RB40")) {
 						avgFreeSpeed = 19.09722238;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB50") || lineNew.getName().contains("RB48") || lineNew.getName().contains("RB27")) {
+					} else if (lineNew.getName().equals("RB50") || lineNew.getName().equals("RB48") || lineNew.getName().equals("RB27")) {
 						avgFreeSpeed = 19.4444446;
 						log.info("RB --> line: " + lineNew.getName());	
-					} else if (lineNew.getName().contains("RB34")) {
+					} else if (lineNew.getName().equals("RB34")) {
 						avgFreeSpeed = 20.8333335;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB89")) {
+					} else if (lineNew.getName().equals("RB89")) {
 						avgFreeSpeed = 22.43589762;
 						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB69")) {
+					} else if (lineNew.getName().equals("RB69")) {
 						avgFreeSpeed = 24.30555575;
 						log.info("RB --> line: " + lineNew.getName());
 						
-					} else if (lineNew.getName().contains("RE14")) {
+					} else if (lineNew.getName().equals("RE14")) {
 						avgFreeSpeed = 16.20370383;
 						log.info("RE --> line: " + lineNew.getName());	
-					} else if (lineNew.getName().contains("RE10") || lineNew.getName().contains("RE8")) {
+					} else if (lineNew.getName().equals("RE10") || lineNew.getName().equals("RE8")) {
 						avgFreeSpeed = 19.09722238;
 						log.info("RE --> line: " + lineNew.getName());	
-					} else if (lineNew.getName().contains("RE13")) {
+					} else if (lineNew.getName().equals("RE13")) {
 						avgFreeSpeed = 19.4444446;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE16")) {
+					} else if (lineNew.getName().equals("RE16")) {
 						avgFreeSpeed = 19.67592608;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE42")) {
+					} else if (lineNew.getName().equals("RE42")) {
 						avgFreeSpeed = 20.37037053;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE57") || lineNew.getName().contains("RE3") || lineNew.getName().contains("RE6") || lineNew.getName().contains("RE7")) {
+					} else if (lineNew.getName().equals("RE57") || lineNew.getName().equals("RE3") || lineNew.getName().equals("RE6") || lineNew.getName().equals("RE7")) {
 						avgFreeSpeed = 20.8333335;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE17")) {
+					} else if (lineNew.getName().equals("RE17")) {
 						avgFreeSpeed = 21.70138906;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE4")) {
+					} else if (lineNew.getName().equals("RE4")) {
 						avgFreeSpeed = 22.2222224;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE19")) {
+					} else if (lineNew.getName().equals("RE19")) {
 						avgFreeSpeed = 22.72727291;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE2")) {
+					} else if (lineNew.getName().equals("RE2")) {
 						avgFreeSpeed = 23.6111113;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE5")) {
+					} else if (lineNew.getName().equals("RE5")) {
 						avgFreeSpeed = 25.92592613;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE11")) {
+					} else if (lineNew.getName().equals("RE11")) {
 						avgFreeSpeed = 27.08333355;
 						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RE1")) {
+					} else if (lineNew.getName().equals("RE1")) {
 						avgFreeSpeed = 26.14379106;
 						log.info("RE --> line: " + lineNew.getName());
 						
-					} else if (lineNew.getName().contains("ICE78")) {
+					} else if (lineNew.getName().equals("ICE78")) {
 						avgFreeSpeed = 26.62037058;
 						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("ICE-43")) {
+					} else if (lineNew.getName().equals("ICE-43")) {
 						avgFreeSpeed = 31.48148173;
 						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("ICE-42")) {
+					} else if (lineNew.getName().equals("ICE-42")) {
 						avgFreeSpeed = 48.35390985;
 						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("ICE-41")) {
+					} else if (lineNew.getName().equals("ICE-41")) {
 						avgFreeSpeed = 44.23868348;
 						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("ICE-10")) {
+					} else if (lineNew.getName().equals("ICE-10")) {
 						avgFreeSpeed = 44.6428575;
 						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("ICE-1")) {
+					} else if (lineNew.getName().equals("ICE-1")) {
 						avgFreeSpeed = 35.714286;
 						log.info("ICE --> line: " + lineNew.getName());
 						
-					} else if (lineNew.getName().contains("IC-50-MDV")) {
+					} else if (lineNew.getName().equals("IC-50-MDV")) {
 						avgFreeSpeed = 25.13227533;
 						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("IC-37") || lineNew.getName().contains("IC-32")) {
+					} else if (lineNew.getName().equals("IC-37") || lineNew.getName().equals("IC-32")) {
 						avgFreeSpeed = 27.777778;
 						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("IC-55")) {
+					} else if (lineNew.getName().equals("IC-55")) {
 						avgFreeSpeed = 30.30303055;
 						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("IC-30")) {
+					} else if (lineNew.getName().equals("EC-30-IC-30")) {
 						avgFreeSpeed = 32.60869591;
 						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("IC-35")) {
+					} else if (lineNew.getName().equals("IC-35")) {
 						avgFreeSpeed = 38.01169621;
 						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("IC-31")) {
+					} else if (lineNew.getName().equals("IC-31")) {
 						avgFreeSpeed = 43.20987689;
 						log.info("IC --> line: " + lineNew.getName());
 					
-					} else if (lineNew.getName().contains("Thalys")) {
+					} else if (lineNew.getName().equals("Thalys")) {
 						avgFreeSpeed = 22.8174605;
 						log.info("Thalys --> line: " + lineNew.getName());
 						
-					} else if (lineNew.getName().contains("FLX20")) {
+					} else if (lineNew.getName().equals("FLX20")) {
 						avgFreeSpeed = 22.54428359;
 						log.info("FLX20 --> line: " + lineNew.getName());
 						
@@ -392,7 +394,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 				TransitRoute routeNew = scenario.getTransitSchedule().getFactory().createTransitRoute(routeNewId , networkRoute, stops, TransportMode.car);
 				routeNew.setDescription(route.getId().toString().replaceAll("[^a-zA-Z0-9]", "-"));
 				
-				if (lineNew.getName().contains("S9")) {
+				if (lineNew.getName().equals("S9")) {
 					log.info("S9 --> line: " + lineNew.getName());
 				
 					int depCounter = 0;
@@ -407,7 +409,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("S8")) {
+				} else if (lineNew.getName().equals("S8")) {
 					log.info("S8 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -434,7 +436,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("S7")) {
+				} else if (lineNew.getName().equals("S7")) {
 					log.info("S7 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -461,7 +463,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("S68")) {
+				} else if (lineNew.getName().equals("S68")) {
 					log.info("S68 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -480,7 +482,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("S6")) {
+				} else if (lineNew.getName().equals("S6")) {
 					log.info("S6 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -503,7 +505,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("S5")) {
+				} else if (lineNew.getName().equals("S5")) {
 					log.info("S5 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -526,7 +528,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("S4")) {
+				} else if (lineNew.getName().equals("S4")) {
 					log.info("S4 --> line: " + lineNew.getName());
 				
 					int depCounter = 0;
@@ -553,7 +555,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("S3")) {
+				} else if (lineNew.getName().equals("S3")) {
 					log.info("S3 --> line: " + lineNew.getName());
 				
 					int depCounter = 0;
@@ -568,7 +570,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("S28")) {
+				} else if (lineNew.getName().equals("S28")) {
 					log.info("S28 --> line: " + lineNew.getName());
 				
 					int depCounter = 0;
@@ -583,7 +585,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("S2")) {
+				} else if (lineNew.getName().equals("S2")) {
 				
 					log.info("S2 --> line: " + lineNew.getName());
 						
@@ -611,7 +613,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 				
-				} else if (lineNew.getName().contains("S11")) {
+				} else if (lineNew.getName().equals("S11")) {
 					log.info("S11 --> line: " + lineNew.getName());
 				
 					int depCounter = 0;
@@ -626,7 +628,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 
-				} else if (lineNew.getName().contains("S1")) {
+				} else if (lineNew.getName().equals("S1")) {
 					
 					log.info("S1 --> line: " + lineNew.getName());
 				
@@ -658,7 +660,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB91")) {
+				} else if (lineNew.getName().equals("RB91")) {
 					log.info("RB91 --> line: " + lineNew.getName());
 				
 					int depCounter = 0;
@@ -669,7 +671,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 				
-				} else if (lineNew.getName().contains("RB89")) {
+				} else if (lineNew.getName().equals("RB89")) {
 					log.info("RE89 --> line " + lineNew.getName());
 						
 					int depCounter = 0;
@@ -684,7 +686,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RB59")) {
+				} else if (lineNew.getName().equals("RB59")) {
 					log.info("RB59 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -707,7 +709,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB54") || lineNew.getName().contains("RB69")) {
+				} else if (lineNew.getName().equals("RB54") || lineNew.getName().equals("RB69")) {
 					log.info("RB 54,69 --> line " + lineNew.getName());
 						
 					int depCounter = 0;
@@ -718,7 +720,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 				
-				} else if (lineNew.getName().contains("RB53")) {
+				} else if (lineNew.getName().equals("RB53")) {
 					log.info("RB53 --> line: " + lineNew.getName());
 				
 					int depCounter = 0;
@@ -733,7 +735,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB52")) {
+				} else if (lineNew.getName().equals("RB52")) {
 					log.info("RB52 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -744,7 +746,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB51")) {
+				} else if (lineNew.getName().equals("RB51")) {
 					log.info("RB51 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -759,7 +761,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 			
-				} else if (lineNew.getName().contains("RB50")) {
+				} else if (lineNew.getName().equals("RB50")) {
 					log.info("RB50 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -770,7 +772,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB48")) {
+				} else if (lineNew.getName().equals("RB48")) {
 					log.info("RB48 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -785,7 +787,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("RB46")) {
+				} else if (lineNew.getName().equals("RB46")) {
 					log.info("RB46 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -804,7 +806,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("RB45")) {
+				} else if (lineNew.getName().equals("RB45")) {
 					log.info("RB45 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -815,7 +817,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB44")) {
+				} else if (lineNew.getName().equals("RB44")) {
 					log.info("RB44 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -825,7 +827,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
 					}		
-				} else if (lineNew.getName().contains("RB43")) {
+				} else if (lineNew.getName().equals("RB43")) {
 					log.info("RB43 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -836,7 +838,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 						
-				} else if (lineNew.getName().contains("RB40")) {
+				} else if (lineNew.getName().equals("RB40")) {
 					log.info("RB40 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -855,7 +857,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}		
 					
-				} else if (lineNew.getName().contains("RB39")) {
+				} else if (lineNew.getName().equals("RB39")) {
 					log.info("RB39 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -870,7 +872,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("RB37")) {
+				} else if (lineNew.getName().equals("RB37")) {
 					log.info("RB37 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -893,7 +895,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB36")) {
+				} else if (lineNew.getName().equals("RB36")) {
 					log.info("RB36 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -904,7 +906,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}		
 	
-				} else if (lineNew.getName().contains("RB35")) {
+				} else if (lineNew.getName().equals("RB35")) {
 					log.info("RB35 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -915,7 +917,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("RB34")) {
+				} else if (lineNew.getName().equals("RB34")) {
 					log.info("RB34 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -926,7 +928,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB33")) {
+				} else if (lineNew.getName().equals("RB33")) {
 					log.info("RB33 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -937,7 +939,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("RB32")) {
+				} else if (lineNew.getName().equals("RB32")) {
 					log.info("RB32 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -948,7 +950,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}	
 					
-				} else if (lineNew.getName().contains("RB31")) {
+				} else if (lineNew.getName().equals("RB31")) {
 					log.info("RB31 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -963,7 +965,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 						
-				} else if (lineNew.getName().contains("RB27")) {
+				} else if (lineNew.getName().equals("RB27")) {
 					log.info("RB27 --> line: " + lineNew.getName());
 						
 					int depCounter = 0;
@@ -974,7 +976,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RB25")) {
+				} else if (lineNew.getName().equals("RB25")) {
 					log.info("RB25 --> line " + lineNew.getName());
 						
 					int depCounter = 0;
@@ -999,7 +1001,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					}
 					
 //				route split for line RE57
-				} else if (lineNew.getName().contains("RE57") && route.getId().toString().contains("Brilon")) {
+				} else if (lineNew.getName().equals("RE57") && route.getId().toString().contains("Brilon")) {
 					log.info("RE57B --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1029,7 +1031,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RE57")) {
+				} else if (lineNew.getName().equals("RE57")) {
 					log.info("RE57W --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1040,7 +1042,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;						
 					}
 					
-				} else if (lineNew.getName().contains("RE5")) {
+				} else if (lineNew.getName().equals("RE5")) {
 					log.info("RE5 --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1051,7 +1053,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}		
 					
-				} else if (lineNew.getName().contains("RE42")) {
+				} else if (lineNew.getName().equals("RE42")) {
 					log.info("RE42 --> line " + lineNew.getName());
 						
 					int depCounter = 0;
@@ -1062,7 +1064,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE2")){
+				} else if (lineNew.getName().equals("RE2")){
 					log.info("RE2 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1081,7 +1083,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE19")) {
+				} else if (lineNew.getName().equals("RE19")) {
 					log.info("RE19 --> line " + lineNew.getName());
 						
 					int depCounter = 0;
@@ -1092,7 +1094,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE17")) {
+				} else if (lineNew.getName().equals("RE17")) {
 					log.info("RE17 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1103,7 +1105,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE16")) {
+				} else if (lineNew.getName().equals("RE16")) {
 					log.info("RE16 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1114,7 +1116,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE14")) {
+				} else if (lineNew.getName().equals("RE14")) {
 					log.info("RE14 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1125,7 +1127,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE13")) {
+				} else if (lineNew.getName().equals("RE13")) {
 					log.info("RE13 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1136,7 +1138,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE11")) {
+				} else if (lineNew.getName().equals("RE11")) {
 					log.info("RE11 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1147,7 +1149,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE10")) {
+				} else if (lineNew.getName().equals("RE10")) {
 					log.info("RE10 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1162,8 +1164,8 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("RE1") || lineNew.getName().contains("RE3") || lineNew.getName().contains("RE4") || lineNew.getName().contains("RE6")
-							|| lineNew.getName().contains("RE7") || lineNew.getName().contains("RE8")) {
+				} else if (lineNew.getName().equals("RE1") || lineNew.getName().equals("RE3") || lineNew.getName().equals("RE4") || lineNew.getName().equals("RE6")
+							|| lineNew.getName().equals("RE7") || lineNew.getName().equals("RE8")) {
 						log.info("RE 1,3,4,6,7,8 --> line: " + lineNew.getName());
 						
 						int depCounter = 0;
@@ -1175,7 +1177,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 							
 						}
 						
-				} else if (lineNew.getName().contains("ICE78")) {
+				} else if (lineNew.getName().equals("ICE78")) {
 					log.info("ICE-78 --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1186,7 +1188,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}	
 						
-				} else if (lineNew.getName().contains("ICE-43")) {
+				} else if (lineNew.getName().equals("ICE-43")) {
 					log.info("ICE-43 --> line " + lineNew.getName());
 						
 					int depCounter = 0;
@@ -1201,7 +1203,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("ICE-42")) {
+				} else if (lineNew.getName().equals("ICE-42")) {
 					log.info("ICE-42 --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1216,7 +1218,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("ICE-41")) {
+				} else if (lineNew.getName().equals("ICE-41")) {
 					log.info("ICE-41 --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1227,7 +1229,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("ICE-10")) {
+				} else if (lineNew.getName().equals("ICE-10")) {
 					log.info("ICE-10 --> line " + lineNew.getName());
 						
 					int depCounter = 0;
@@ -1238,7 +1240,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("ICE-1")) {
+				} else if (lineNew.getName().equals("ICE-1")) {
 					log.info("ICE-1 --> line " + lineNew.getName());
 								
 					int depCounter = 0;
@@ -1249,7 +1251,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("IC-55")) {
+				} else if (lineNew.getName().equals("IC-55")) {
 					log.info("IC-55 --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1260,7 +1262,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("IC-50-MDV")) {
+				} else if (lineNew.getName().equals("IC-50-MDV")) {
 					log.info("IC-50-MDV --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1275,7 +1277,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("IC-37")) {
+				} else if (lineNew.getName().equals("IC-37")) {
 					log.info("IC-37 --> line " + lineNew.getName());
 								
 					int depCounter = 0;
@@ -1286,7 +1288,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("IC-35")) {
+				} else if (lineNew.getName().equals("IC-35")) {
 					log.info("IC-35 --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1314,7 +1316,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					}
 					
 //				route split for line IC-32
-				} else if (lineNew.getName().contains("IC-32") && route.getId().toString().contains("Aachen")) {
+				} else if (lineNew.getName().equals("IC-32") && route.getId().toString().contains("Aachen")) {
 					log.info("IC-32a --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1329,7 +1331,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 							
-				} else if (lineNew.getName().contains("IC-32")) {
+				} else if (lineNew.getName().equals("IC-32")) {
 					log.info("IC-32 --> line " + lineNew.getName());
 				
 					int depCounter = 0;
@@ -1360,7 +1362,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("IC-31")) {
+				} else if (lineNew.getName().equals("IC-31")) {
 					log.info("IC-31 --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1372,7 +1374,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					}
 					
 //				route split for line IC-30
-				} else if (lineNew.getName().contains("EC-30") && route.getId().toString().contains("Zürich")) {
+				} else if (lineNew.getName().equals("EC-30-IC-30") && route.getId().toString().contains("Zürich")) {
 					log.info("EC-30 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1383,7 +1385,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("IC-30")) {
+				} else if (lineNew.getName().equals("EC-30-IC-30")) {
 					log.info("IC-30 --> line " + lineNew.getName());
 					
 					int depCounter = 0;
@@ -1398,7 +1400,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 						
-				} else if (lineNew.getName().contains("Thalys")) {
+				} else if (lineNew.getName().equals("Thalys")) {
 					log.info("Thalys --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1418,7 +1420,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					}
 					
 //				FlixBus FLX20 from Hamburg to Cologne
-				} else if (lineNew.getName().contains("FLX20")) {
+				} else if (lineNew.getName().equals("FLX20")) {
 					log.info("FLX20 --> line " + lineNew.getName());
 							
 					int depCounter = 0;
@@ -1433,7 +1435,8 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						depCounter++;
 					}
 					
-				} else if (lineNew.getName().contains("6283865") || lineNew.getName().contains("6290015")) {
+				} else if (lineNew.getName().equals("6283865") || lineNew.getName().equals("6290015")) {
+					log.warn("Skipping " + lineNew.getName().toString());
 					
 				} else {
 					log.warn("Unknown transit line category: " + lineNew.getName());
