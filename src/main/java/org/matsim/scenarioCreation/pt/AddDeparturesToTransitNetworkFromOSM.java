@@ -153,11 +153,11 @@ public class AddDeparturesToTransitNetworkFromOSM {
 			Id<TransitLine> lineId = Id.create("line"  + lineCounter, TransitLine.class);
 			TransitLine lineNew = scenario.getTransitSchedule().getFactory().createTransitLine(lineId);
 			lineNew.setName(line.getId().toString().replaceAll("[^a-zA-Z0-9]", "-"));
-			
+		
 			int routeCounter = 0;
 			for (TransitRoute route : line.getRoutes().values()) {
 				log.info("		> route: " + route.getId());
-
+				
 				Id<TransitRoute> routeNewId = Id.create("route" + routeCounter, TransitRoute.class);
 
 				List<Id<Link>> linkIds = new ArrayList<>();
@@ -211,18 +211,157 @@ public class AddDeparturesToTransitNetworkFromOSM {
 
 					double avgFreeSpeed = Double.NEGATIVE_INFINITY;
 					
-					if (lineNew.getName().contains("S")) {
-						avgFreeSpeed = 8.3333333; // 30 km/h
+					if (lineNew.getName().contains("S3") || lineNew.getName().contains("S68")) {
+						avgFreeSpeed = 14.69907402;
 						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("RB") || lineNew.getName().contains("RE")) {
-						avgFreeSpeed = 13.888889; // 50 km/h
-						log.info("RB / RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().contains("IC") || lineNew.getName().contains("Thalys") || lineNew.getName().contains("FLX20")) {
-						avgFreeSpeed = 27.777778; // 100 km/h
-						log.info("IC / ICE / Thalys --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("S11")) {
+						avgFreeSpeed = 18.74999993;
+						log.info("S-Bahn --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("S9") || lineNew.getName().contains("S8") || lineNew.getName().contains("S6") || lineNew.getName().contains("S1")) {
+						avgFreeSpeed = 16.6666666; 
+						log.info("S-Bahn --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("S5")) {
+						avgFreeSpeed = 12.5;
+						log.info("S-Bahn --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("S4") || lineNew.getName().contains("S28")) {
+						avgFreeSpeed = 11.66666662;
+						log.info("S-Bahn --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("S7")) {
+						avgFreeSpeed = 9.722222183;
+						log.info("S-Bahn --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("S2")) {
+						avgFreeSpeed = 8.3333333;
+						log.info("S-Bahn --> line: " + lineNew.getName());
+					
+					} else if (lineNew.getName().contains("RB35")) {
+						avgFreeSpeed = 17.97385635;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB52")) {
+						avgFreeSpeed = 10.41666675;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB39")) {
+						avgFreeSpeed = 11.1111112;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB54") || lineNew.getName().contains("RB44") || lineNew.getName().contains("RB43")) {
+						avgFreeSpeed = 11.98743396;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB53") || lineNew.getName().contains("RB46") || lineNew.getName().contains("RB37") || lineNew.getName().contains("RB36") || lineNew.getName().contains("RB33") || lineNew.getName().contains("RB32") || lineNew.getName().contains("RB25")) {
+						avgFreeSpeed = 13.888889;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB91") || lineNew.getName().contains("RB59")) {
+						avgFreeSpeed = 16.6666668;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB51")) {
+						avgFreeSpeed = 17.36111125;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB31")) {
+						avgFreeSpeed = 18.51851867;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB45") || lineNew.getName().contains("RB40")) {
+						avgFreeSpeed = 19.09722238;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB50") || lineNew.getName().contains("RB48") || lineNew.getName().contains("RB27")) {
+						avgFreeSpeed = 19.4444446;
+						log.info("RB --> line: " + lineNew.getName());	
+					} else if (lineNew.getName().contains("RB34")) {
+						avgFreeSpeed = 20.8333335;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB89")) {
+						avgFreeSpeed = 22.43589762;
+						log.info("RB --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RB69")) {
+						avgFreeSpeed = 24.30555575;
+						log.info("RB --> line: " + lineNew.getName());
+						
+					} else if (lineNew.getName().contains("RE14")) {
+						avgFreeSpeed = 16.20370383;
+						log.info("RE --> line: " + lineNew.getName());	
+					} else if (lineNew.getName().contains("RE10") || lineNew.getName().contains("RE8")) {
+						avgFreeSpeed = 19.09722238;
+						log.info("RE --> line: " + lineNew.getName());	
+					} else if (lineNew.getName().contains("RE13")) {
+						avgFreeSpeed = 19.4444446;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE16")) {
+						avgFreeSpeed = 19.67592608;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE42")) {
+						avgFreeSpeed = 20.37037053;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE57") || lineNew.getName().contains("RE3") || lineNew.getName().contains("RE6") || lineNew.getName().contains("RE7")) {
+						avgFreeSpeed = 20.8333335;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE17")) {
+						avgFreeSpeed = 21.70138906;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE4")) {
+						avgFreeSpeed = 22.2222224;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE19")) {
+						avgFreeSpeed = 22.72727291;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE2")) {
+						avgFreeSpeed = 23.6111113;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE5")) {
+						avgFreeSpeed = 25.92592613;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE11")) {
+						avgFreeSpeed = 27.08333355;
+						log.info("RE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("RE1")) {
+						avgFreeSpeed = 26.14379106;
+						log.info("RE --> line: " + lineNew.getName());
+						
+					} else if (lineNew.getName().contains("ICE78")) {
+						avgFreeSpeed = 26.62037058;
+						log.info("ICE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("ICE-43")) {
+						avgFreeSpeed = 31.48148173;
+						log.info("ICE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("ICE-42")) {
+						avgFreeSpeed = 48.35390985;
+						log.info("ICE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("ICE-41")) {
+						avgFreeSpeed = 44.23868348;
+						log.info("ICE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("ICE-10")) {
+						avgFreeSpeed = 44.6428575;
+						log.info("ICE --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("ICE-1")) {
+						avgFreeSpeed = 35.714286;
+						log.info("ICE --> line: " + lineNew.getName());
+						
+					} else if (lineNew.getName().contains("IC-50-MDV")) {
+						avgFreeSpeed = 25.13227533;
+						log.info("IC --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("IC-37") || lineNew.getName().contains("IC-32")) {
+						avgFreeSpeed = 27.777778;
+						log.info("IC --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("IC-55")) {
+						avgFreeSpeed = 30.30303055;
+						log.info("IC --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("IC-30")) {
+						avgFreeSpeed = 32.60869591;
+						log.info("IC --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("IC-35")) {
+						avgFreeSpeed = 38.01169621;
+						log.info("IC --> line: " + lineNew.getName());
+					} else if (lineNew.getName().contains("IC-31")) {
+						avgFreeSpeed = 43.20987689;
+						log.info("IC --> line: " + lineNew.getName());
+					
+					} else if (lineNew.getName().contains("Thalys")) {
+						avgFreeSpeed = 22.8174605;
+						log.info("Thalys --> line: " + lineNew.getName());
+						
+					} else if (lineNew.getName().contains("FLX20")) {
+						avgFreeSpeed = 22.54428359;
+						log.info("FLX20 --> line: " + lineNew.getName());
+						
 					} else {
-						avgFreeSpeed = 11.111111; // 40 km/h
-						log.warn("Unknown transit line category: " + lineNew.getName());
+						avgFreeSpeed = 11.111111;
+						log.warn("Unknown transit line category: " + lineNew.getName() + " Route: "+ route.getId());
 					}
 					link.setFreespeed(avgFreeSpeed);
 					
@@ -599,7 +738,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					
 					int depCounter = 0;
 					double headway = 60 * 60.;
-					for (double t = 4 * 3600.; t <= 3600 * 24.; t = t + headway) {
+					for (double t = 4 * 3600.; t <= 3600 * 23.; t = t + headway) {
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
@@ -859,12 +998,43 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						++;
 					}
 					
-				} else if (lineNew.getName().contains("RE57")) {
-					log.info("RE257 --> line: " + lineNew.getName());
+//				route split for line RE57
+				} else if (lineNew.getName().contains("RE57") && route.getId().toString().contains("Brilon")) {
+					log.info("RE57B --> line: " + lineNew.getName());
 					
 					int depCounter = 0;
-					double headway = 90 * 60.;
-					for (double t = 6 * 3600.; t <= 3600 * 23.; t = t + headway) {
+					double headway = 60 * 60.;
+					for (double t = 0 * 3600.; t <= 3600 * 24.; t = t + headway) {
+						
+						if (t >= 1. * 3600) {
+							headway = 480 * 60.;
+						}
+						
+						if (t >= 9. * 3600) {
+							headway = 120 * 60.;
+						}
+						
+						if (t >= 15. * 3600) {
+							headway = 60 * 60.;
+						}
+						
+						if (t >= 19. * 3600) {
+							headway = 120 * 60.;
+						}
+						if (t >= 21. * 3600) {
+							headway = 60 * 60.;
+						}
+						
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
+						depCounter++;						
+					}
+					
+				} else if (lineNew.getName().contains("RE57")) {
+					log.info("RE57W --> line: " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 120 * 60.;
+					for (double t = 6 * 3600.; t <= 3600 * 18.; t = t + headway) {
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));				
 						depCounter++;						
@@ -938,7 +1108,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					
 					int depCounter = 0;
 					double headway = 60 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 20; t = t + headway) {
+					for (double t = 5 * 3600.; t <= 3600 * 19; t = t + headway) {
 						
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
 						depCounter++;
@@ -1084,16 +1254,8 @@ public class AddDeparturesToTransitNetworkFromOSM {
 							
 					int depCounter = 0;
 					double headway = 120 * 60.;
-					for (double t = 5 * 3600.; t <= 3600 * 24.; t = t + headway) {
-							
-						if (t >= 17. * 3600) {
-							headway = 420 * 60.;
-						}
-						
-						if (t >= 23. * 3600) {
-							headway = 60 * 60.;
-						}
-							
+					for (double t = 3 * 3600.; t <= 3600 * 15.; t = t + headway) {
+														
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
 						depCounter++;
 					}
@@ -1150,10 +1312,26 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
 						depCounter++;
 					}
+					
+//				route split for line IC-32
+				} else if (lineNew.getName().contains("IC-32") && route.getId().toString().contains("Aachen")) {
+					log.info("IC-32a --> line " + lineNew.getName());
+							
+					int depCounter = 0;
+					double headway = 300 * 60.;
+					for (double t = 7 * 3600.; t <= 3600 * 14.; t = t + headway) {
 						
+						if (t >= 12 * 3600) {
+							headway = 120 * 60.;
+						}
+							
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
+							
 				} else if (lineNew.getName().contains("IC-32")) {
 					log.info("IC-32 --> line " + lineNew.getName());
-							
+				
 					int depCounter = 0;
 					double headway = 120 * 60.;
 					for (double t = 3 * 3600.; t <= 3600 * 19.; t = t + headway) {
@@ -1192,15 +1370,27 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
 						depCounter++;
 					}
+					
+//				route split for line IC-30
+				} else if (lineNew.getName().contains("EC-30") && route.getId().toString().contains("Zürich")) {
+					log.info("EC-30 --> line " + lineNew.getName());
+					
+					int depCounter = 0;
+					double headway = 180 * 60.;
+					for (double t = 4 * 3600.; t <= 3600 * 7.; t = t + headway) {
+					
+						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
+						depCounter++;
+					}
 						
 				} else if (lineNew.getName().contains("IC-30")) {
 					log.info("IC-30 --> line " + lineNew.getName());
-							
+					
 					int depCounter = 0;
 					double headway = 120 * 60.;
-					for (double t = 2 * 3600.; t <= 3600 * 21.; t = t + headway) {
+					for (double t = 4 * 3600.; t <= 3600 * 23.; t = t + headway) {
 							
-						if (t >= 6. * 3600) {
+						if (t >= 8. * 3600) {
 							headway = 60 * 60.;
 						}
 							
@@ -1209,7 +1399,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					}
 						
 				} else if (lineNew.getName().contains("Thalys")) {
-					log.info("THA80 --> line " + lineNew.getName());
+					log.info("Thalys --> line " + lineNew.getName());
 							
 					int depCounter = 0;
 					double headway = 120 * 60.;
@@ -1242,6 +1432,8 @@ public class AddDeparturesToTransitNetworkFromOSM {
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
 						depCounter++;
 					}
+					
+				} else if (lineNew.getName().contains("6283865") || lineNew.getName().contains("6290015")) {
 					
 				} else {
 					log.warn("Unknown transit line category: " + lineNew.getName());
