@@ -73,8 +73,8 @@ public class GeneratePtAndRunNEMO {
 		
 		// adjust these directories
 		final String projectDirectory = "../shared-svn/projects/nemo_mercator/";
-		final String gtfsZipFile = projectDirectory + "data/pt/google_transit_vrr_2018_05_11_corrected-v1.zip"; 
-		final String directory = projectDirectory + "data/pt/corrected-gtfs-file-v1b/";
+		final String gtfsZipFile = projectDirectory + "data/pt/google_transit_vrr_2018_05_11_corrected-v2.zip"; 
+		final String directory = projectDirectory + "data/pt/corrected-gtfs-file-v2_ik/";
 		
 		// #######################################################
 		// do not adjust the following lines (or talk to me, ik)
@@ -90,7 +90,7 @@ public class GeneratePtAndRunNEMO {
 		final String transitScheduleGTFS = directory + "transitSchedule_GTFS.xml.gz";
 		final String transitVehiclesGTFS = directory + "transitVehicles_GTFS.xml.gz";
 				
-		// the data to be used for the MATSim run
+		// the adjusted / cleaned data to be used for the MATSim run
 		final String networkGTFSadjusted = directory + networkFileNameAsPrefix+ "_GTFS_adjusted.xml.gz";
 		final String transitScheduleGTFSadjusted = directory + "transitSchedule_GTFS_adjusted.xml.gz";
 		final String outputDirectoryRun = directory + "pt-visualization/";
