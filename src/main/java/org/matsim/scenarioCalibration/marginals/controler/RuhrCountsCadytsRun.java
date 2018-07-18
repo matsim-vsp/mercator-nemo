@@ -53,6 +53,12 @@ import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
  * Created by amit on 01.05.18.
  */
 
+/*
+    it can also be run using NEmoModeLocationChoiceCalibrator however, change the parameters in the config file
+     (e.g. count scale factor, flow/stroage capacity factor, mode choice strategy).
+  */
+
+@Deprecated
 public class RuhrCountsCadytsRun {
 
     public static void main(String[] args) {

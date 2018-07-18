@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCalibration.modeChoice;
+package org.matsim.scenarioCalibration.marginals;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
