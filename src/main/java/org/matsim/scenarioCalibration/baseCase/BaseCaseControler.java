@@ -59,6 +59,7 @@ public class BaseCaseControler {
 
         //vspDefaults
         config.qsim().setUsingTravelTimeCheckInTeleportation(true);
+        config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
 
         if (args.length==0) {
             config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
