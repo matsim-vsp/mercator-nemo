@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +46,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -82,8 +82,8 @@ public class AddDeparturesToTransitNetworkFromOSM {
 	public void run() {
 		
 		// adjust these directories
-//		final String projectDirectory = "D:/Arbeit/mercator-nemo/";
-		final String projectDirectory = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/";
+		final String projectDirectory = "D:/Arbeit/mercator-nemo/";
+//		final String projectDirectory = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/";
 		
 		final String inputScheduleFile = projectDirectory + "data/pt/ptNetworkScheduleFileFromOSM.xml"; 
 		final String directory = projectDirectory + "data/pt/extendedScheduleFromOSM/";
@@ -129,7 +129,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 		
 		Map<Id<TransitStopFacility>, TransitStopFacility> transitStopFacilities = new HashMap<>();
 		
-		final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3857", "EPSG:31464");
+		final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3857", NEMOUtils.NEMO_EPSG);
 		
 		for (TransitStopFacility transitStopFacility : scenario0.getTransitSchedule().getFacilities().values()) {
 			TransitStopFacility transitStopFacilityNew = scenario.getTransitSchedule().getFactory().createTransitStopFacility(transitStopFacility.getId(), ct.transform(transitStopFacility.getCoord()), transitStopFacility.getIsBlockingLane());
@@ -1476,4 +1476,3 @@ public class AddDeparturesToTransitNetworkFromOSM {
 	}
 
 }
-
