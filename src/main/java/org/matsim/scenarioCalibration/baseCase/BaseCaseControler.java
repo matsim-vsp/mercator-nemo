@@ -23,6 +23,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -64,6 +65,39 @@ public class BaseCaseControler {
         if (args.length==0) {
             config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         }
+        
+        // see if the following produces the same as what is currently in the config file:
+//        for ( long ii = 600 ; ii <= 97200; ii+=600 ) {
+//			final ActivityParams params = new ActivityParams( "home_" + ii + ".0" ) ;
+//			params.setTypicalDuration( ii );
+//			config.planCalcScore().addActivityParams( params );
+//		}
+//		for ( long ii = 600 ; ii <= 97200; ii+=600 ) {
+//			final ActivityParams params = new ActivityParams( "work_" + ii + ".0" ) ;
+//			params.setTypicalDuration( ii );
+//			config.planCalcScore().addActivityParams( params );
+//		}
+//		for ( long ii = 600 ; ii <= 97200; ii+=600 ) {
+//			final ActivityParams params = new ActivityParams( "leisure_" + ii + ".0" ) ;
+//			params.setTypicalDuration( ii );
+//			config.planCalcScore().addActivityParams( params );
+//		}
+//		for ( long ii = 600 ; ii <= 97200; ii+=600 ) {
+//			final ActivityParams params = new ActivityParams( "shopping_" + ii + ".0" ) ;
+//			params.setTypicalDuration( ii );
+//			config.planCalcScore().addActivityParams( params );
+//		}
+//		for ( long ii = 600 ; ii <= 97200; ii+=600 ) {
+//			final ActivityParams params = new ActivityParams( "other_" + ii + ".0" ) ;
+//			params.setTypicalDuration( ii );
+//			config.planCalcScore().addActivityParams( params );
+//		}
+//		{
+//			final ActivityParams params = new ActivityParams( "freight" ) ;
+//			params.setTypicalDuration( 12.*3600. );
+//			config.planCalcScore().addActivityParams( params );
+//		}
+        
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
