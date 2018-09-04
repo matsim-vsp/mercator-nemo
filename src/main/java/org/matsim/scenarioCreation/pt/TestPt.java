@@ -49,7 +49,7 @@ public class TestPt {
 		Config config = ConfigUtils.createConfig();
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
-		config.controler().setOutputDirectory(projectDirectory + "data/pt/OSM_GTFS_merged_final/nemo-merged-gtfs-osm-pt-visualization/");
+		config.controler().setOutputDirectory(projectDirectory + "data/pt/OSM_GTFS_merged_final/nemo-merged-gtfs-osm-pt-visualization_test2/");
 		config.controler().setRunId("gtfs-osm");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
