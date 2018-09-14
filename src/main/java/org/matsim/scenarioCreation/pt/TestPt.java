@@ -23,9 +23,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 /**
 * @author ikaddoura
@@ -44,12 +47,14 @@ public class TestPt {
 
 	public void run() {
 		
-		final String projectDirectory = "../shared-svn/projects/nemo_mercator/";
+		final String projectDirectory = "C://Users//Gregor//Documents//VSP_Arbeit";
 
-		Config config = ConfigUtils.createConfig();
+		//Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.loadConfig("C://Users//Gregor//Documents//VSP_Arbeit//2018-05-28_shorterIntraZonalDist//preparedConfig_TestPt.xml");
+		//Config config = ConfigUtils.loadConfig("C://Users//Gregor//Documents//VSP_Arbeit//2018-05-28_shorterIntraZonalDist//config_take_activity-parametersOnly.xml");
 		
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
-		config.controler().setOutputDirectory(projectDirectory + "data/pt/OSM_GTFS_merged_final/nemo-merged-gtfs-osm-pt-visualization/");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory("C:/Users/Gregor/Documents/VSP_Arbeit/Nemo/OutputNemoTest");
 		config.controler().setRunId("gtfs-osm");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
@@ -57,16 +62,25 @@ public class TestPt {
 		config.qsim().setEndTime(30 * 3600.);
 		config.qsim().setStartTime(0.);
 		
-		config.plans().setInputFile(null);
-		config.network().setInputFile(projectDirectory + "data/pt/OSM_GTFS_merged_final/detailedRuhr_Network_10072018filtered_network_GTFS_OSM.xml.gz");
+		config.plans().setInputFile("C://Users//Gregor//Documents//VSP_Arbeit//Nemo//InputNemoTest//mytestpopulation_1.xml");
+		config.network().setInputFile("C:/Users/Gregor/Documents/VSP_Arbeit/Nemo/InputNemoTest/network_only_Pt_and_car.xml");
 		config.transit().setUseTransit(true);
-		config.transit().setTransitScheduleFile(projectDirectory + "data/pt/OSM_GTFS_merged_final/transitSchedule_GTFS_OSM.xml.gz");
-		config.transit().setVehiclesFile(projectDirectory + "data/pt/OSM_GTFS_merged_final/transitVehicles_GTFS_OSM.xml.gz");
+		config.transit().setTransitScheduleFile(projectDirectory + "/pt/OSM_GTFS_merged_final/transitSchedule_GTFS_OSM.xml.gz");
+		config.transit().setVehiclesFile(projectDirectory + "/pt/OSM_GTFS_merged_final/transitVehicles_GTFS_OSM.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
+
+		// use the sbb pt raptor router
+		controler.addOverridingModule( new AbstractModule() {
+		@Override
+		public void install() {
+		install( new SwissRailRaptorModule() );
+		}
+			} );
+
 		controler.run();
-	
+
 		log.info("Done.");
 		
 		
