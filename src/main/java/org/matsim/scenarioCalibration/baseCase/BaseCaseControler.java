@@ -41,9 +41,9 @@ public class BaseCaseControler {
 
     public static void main (String[] args) {
 
-        String configFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/preparedConfig_baseCase.xml";
+        String configFile = "C://Users//Gregor//Documents/VSP_Arbeit//Nemo//InputNemoTest//preparedConfig_baseCase.xml/";
         String runId = "test123";
-        String outputDir = "../runs-svn/nemo/marginals/output/testCalib/";
+        String outputDir = "C://Users//Gregor//Documents/VSP_Arbeit//Nemo//OutputNemoTest";
 
         if (args.length>0) {
             configFile = args[0];
@@ -56,6 +56,10 @@ public class BaseCaseControler {
         config.controler().setRunId(runId);
         config.controler().setOutputDirectory(outputDir);
         config.plansCalcRoute().setInsertingAccessEgressWalk(true); // so that bicycle can be route from car link to bike links.
+        config.network().setInputFile("C://Users//Gregor//Documents//VSP_Arbeit//Nemo//InputNemoTest//network_only_Pt_and_car.xml");
+        config.plans().setInputFile("C://Users//Gregor//Documents//VSP_Arbeit//Nemo//InputNemoTest//mytestpopulation.xml/");
+        config.transit().setTransitScheduleFile("C:/Users/Gregor/Documents/VSP_Arbeit//Nemo/InputNemoTest/transitSchedule_GTFS_adjusted.xml.gz");
+        config.transit().setVehiclesFile("C:/Users/Gregor/Documents/VSP_Arbeit/Nemo/InputNemoTest/transitVehicles_GTFS.xml.gz");
 
         //vspDefaults
         config.qsim().setUsingTravelTimeCheckInTeleportation(true);
