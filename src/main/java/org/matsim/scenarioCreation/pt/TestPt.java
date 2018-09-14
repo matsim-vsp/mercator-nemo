@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -46,15 +45,17 @@ public class TestPt {
 	}
 
 	public void run() {
-		
-		final String projectDirectory = "C://Users//Gregor//Documents//VSP_Arbeit";
+		// final String projectDirectory = "C://Users//Gregor//Documents//VSP_Arbeit";
+		final String projectDirectory = "../shared-svn/projects/nemo_mercator/";
 
 		//Config config = ConfigUtils.createConfig();
 		Config config = ConfigUtils.loadConfig("C://Users//Gregor//Documents//VSP_Arbeit//2018-05-28_shorterIntraZonalDist//preparedConfig_TestPt.xml");
 		//Config config = ConfigUtils.loadConfig("C://Users//Gregor//Documents//VSP_Arbeit//2018-05-28_shorterIntraZonalDist//config_take_activity-parametersOnly.xml");
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("C:/Users/Gregor/Documents/VSP_Arbeit/Nemo/OutputNemoTest");
+		//config.controler().setOutputDirectory("C:/Users/Gregor/Documents/VSP_Arbeit/Nemo/OutputNemoTest");
+		config.controler().setOutputDirectory(projectDirectory + "data/pt/OSM_GTFS_merged_final/nemo-merged-gtfs-osm-pt-visualization_test2/");
+		
 		config.controler().setRunId("gtfs-osm");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
