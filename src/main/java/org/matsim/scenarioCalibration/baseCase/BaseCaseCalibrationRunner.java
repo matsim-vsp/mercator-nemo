@@ -10,7 +10,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
+import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
 import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
+import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTripTravelTimeHandler;
 
 public class BaseCaseCalibrationRunner {
 
@@ -53,7 +55,9 @@ public class BaseCaseCalibrationRunner {
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
+                this.bind(ModalShareEventHandler.class);
                 this.addControlerListenerBinding().to(ModalShareControlerListener.class);
+                this.bind(ModalTripTravelTimeHandler.class);
                 this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
             }
         });
