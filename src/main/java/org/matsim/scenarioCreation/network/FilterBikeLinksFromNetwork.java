@@ -1,39 +1,42 @@
 package org.matsim.scenarioCreation.network;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class FilterBikeLinksFromNetwork {
 	public static void main(String[] args) {
+
+        Args arguments = new Args();
+        JCommander.newBuilder().addObject(arguments).build().parse(args);
+
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile("C://Users//Gregor//Documents//VSP_Arbeit//pt//OSM_GTFS_merged_final//detailedRuhr_Network_10072018filtered_network_GTFS_OSM.xml.gz");
-		Set<Link> linkwithoutcar = new HashSet<>();
-		
-		for (Link l: network.getLinks().values() ) {
-			if (l.getAllowedModes().contains("car") || l.getAllowedModes().contains("pt") || l.getAllowedModes().contains("ride")) {
-				// keep the link
-			} else {
-				linkwithoutcar.add(l);
-			}
-		}
-		
-		for (Link l: linkwithoutcar) {
-			network.removeLink(l.getId());
-		}
-		new NetworkWriter(network).write("C://Users//Gregor//Documents//VSP_Arbeit//Nemo//InputNemoTest//network_only_Pt_and_car.xml");
-	}
+
+        new MatsimNetworkReader(network).readFile(arguments.sharedSvnPath + "/projects/nemo_mercator/data/matsim_input/2018-10-01_baseCase/detailedRuhr_Network_10072018filtered_network_GTFS_OSM.xml.gz");
+
+        System.out.println("Start filtering Network");
+        List<Link> toRemove = network.getLinks().values().stream().filter((link) ->
+                (!link.getAllowedModes().contains("car") && !link.getAllowedModes().contains("pt") && !link.getAllowedModes().contains("ride")))
+                .collect(Collectors.toList());
+
+        System.out.println(toRemove.size() + " links to remove");
+        toRemove.forEach(link -> network.removeLink(link.getId()));
+        System.out.println("Start writing network.");
+        new NetworkWriter(network).write(arguments.sharedSvnPath + "/projects/nemo_mercator/data/matsim_input/2018-10-01_baseCase/network_ruhr_without_bike.xml.gz");
+
+        System.out.println("Done. Exiting Program");
+    }
+
+    private static class Args {
+
+        @Parameter(names = "-shared-svn")
+        private String sharedSvnPath;
+    }
 }
