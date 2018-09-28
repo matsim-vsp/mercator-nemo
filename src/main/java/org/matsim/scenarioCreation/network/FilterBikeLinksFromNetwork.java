@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FilterBikeLinksFromNetwork {
+
+    private static final String workingFolder = "/projects/nemo_mercator/data/matsim_input/2018-10-01_baseCase/";
+    private static final String inputFileName = "detailedRuhr_Network_10072018filtered_network_GTFS_OSM.xml.gz";
+    private static final String outputFileName = "network_ruhr_without_bike.xml.gz";
+
 	public static void main(String[] args) {
 
         Args arguments = new Args();
@@ -19,7 +24,7 @@ public class FilterBikeLinksFromNetwork {
 
 		Network network = NetworkUtils.createNetwork();
 
-        new MatsimNetworkReader(network).readFile(arguments.sharedSvnPath + "/projects/nemo_mercator/data/matsim_input/2018-10-01_baseCase/detailedRuhr_Network_10072018filtered_network_GTFS_OSM.xml.gz");
+        new MatsimNetworkReader(network).readFile(arguments.sharedSvnPath + workingFolder + inputFileName);
 
         System.out.println("Start filtering Network");
         List<Link> toRemove = network.getLinks().values().stream().filter((link) ->
@@ -29,7 +34,7 @@ public class FilterBikeLinksFromNetwork {
         System.out.println(toRemove.size() + " links to remove");
         toRemove.forEach(link -> network.removeLink(link.getId()));
         System.out.println("Start writing network.");
-        new NetworkWriter(network).write(arguments.sharedSvnPath + "/projects/nemo_mercator/data/matsim_input/2018-10-01_baseCase/network_ruhr_without_bike.xml.gz");
+        new NetworkWriter(network).write(arguments.sharedSvnPath + workingFolder + outputFileName);
 
         System.out.println("Done. Exiting Program");
     }
