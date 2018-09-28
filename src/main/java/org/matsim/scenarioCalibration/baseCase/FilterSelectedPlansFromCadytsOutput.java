@@ -7,6 +7,7 @@ import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 
 public class FilterSelectedPlansFromCadytsOutput {
 
@@ -23,6 +24,7 @@ public class FilterSelectedPlansFromCadytsOutput {
 
         inputPopulation.getPersons().values().forEach(person -> {
             Plan selectedPlan = clearLinkInfo(person.getSelectedPlan());
+            selectedPlan.getAttributes().removeAttribute(InitialPlanKeeperPlanRemoval.plan_attribute_name);
             Person outPerson = outputPopulation.getFactory().createPerson(person.getId());
             outPerson.addPlan(selectedPlan);
             outputPopulation.addPerson(outPerson);
