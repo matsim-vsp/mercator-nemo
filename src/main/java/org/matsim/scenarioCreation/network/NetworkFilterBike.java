@@ -17,7 +17,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class NetworkEditor {
+public class NetworkFilterBike {
 	public static void main(String[] args) {
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile("C://Users//Gregor//Documents//VSP_Arbeit//pt//OSM_GTFS_merged_final//detailedRuhr_Network_10072018filtered_network_GTFS_OSM.xml.gz");
