@@ -19,13 +19,19 @@
 
 package org.matsim;
 
-import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
+import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
+import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
+import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTripTravelTimeHandler;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
+
+import java.util.Map;
 
 /**
  * Created by amit on 29.01.18.
@@ -174,9 +180,19 @@ public final class NEMOUtils {
             inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(10000.0,1000000.),306624.0);
             return inputDistanceDistribution;
         }
-
-
-
     }
 
+    public static AbstractModule createModalShareAnalysis() {
+        return new AbstractModule() {
+            @SuppressWarnings("PointlessBinding")
+            @Override
+            public void install() {
+                this.bind(ModalShareEventHandler.class);
+                this.addControlerListenerBinding().to(ModalShareControlerListener.class);
+
+                this.bind(ModalTripTravelTimeHandler.class);
+                this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
+            }
+        };
+    }
 }

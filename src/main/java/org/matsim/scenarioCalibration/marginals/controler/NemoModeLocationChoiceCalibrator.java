@@ -19,10 +19,6 @@
 
 package org.matsim.scenarioCalibration.marginals.controler;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import javax.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.matsim.NEMOUtils;
@@ -46,17 +42,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
-import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
-import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
-import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
-import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTripTravelTimeHandler;
 import playground.vsp.cadyts.marginals.AgentFilter;
 import playground.vsp.cadyts.marginals.ModalDistanceAnalysisModule;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
@@ -64,6 +52,11 @@ import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
 import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Created by amit on 01.03.18.
@@ -145,7 +138,7 @@ public class NemoModeLocationChoiceCalibrator {
 
         // add stay home plan if it does not exists
         for (Person person : scenario.getPopulation().getPersons().values()) {
-            if (person.getPlans().stream().anyMatch(pl -> ((Plan) pl).getPlanElements().size()==1)) {
+            if (person.getPlans().stream().anyMatch(pl -> pl.getPlanElements().size() == 1)) {
                 // do nothing
             } else {
                 Plan stayHome = scenario.getPopulation().getFactory().createPlan();
@@ -310,16 +303,7 @@ public class NemoModeLocationChoiceCalibrator {
         }
 
         //analyses
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                this.bind(ModalShareEventHandler.class);
-                this.addControlerListenerBinding().to(ModalShareControlerListener.class);
-
-                this.bind(ModalTripTravelTimeHandler.class);
-                this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
-            }
-        });
+        controler.addOverridingModule(NEMOUtils.createModalShareAnalysis());
         controler.run();
     }
 }

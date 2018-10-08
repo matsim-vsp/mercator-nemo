@@ -47,6 +47,7 @@ public class FilterBikeLinksFromNetwork {
         Set<String> modes = new HashSet<>();
         modes.add("car");
         modes.add("ride");
+        modes.add("bike");
         return modes;
     }
 
