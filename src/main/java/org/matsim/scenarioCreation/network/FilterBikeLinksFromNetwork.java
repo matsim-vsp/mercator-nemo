@@ -2,6 +2,7 @@ package org.matsim.scenarioCreation.network;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -28,6 +29,18 @@ public class FilterBikeLinksFromNetwork {
 		Network network = NetworkUtils.createNetwork();
 
         new MatsimNetworkReader(network).readFile(arguments.sharedSvnPath + workingFolder + inputFileName);
+
+        System.out.println("Start changing pt network with mode 'car' to mode 'pt'");
+        Set<String> modes = new HashSet<>();
+        modes.add(TransportMode.pt);
+
+        network.getLinks().forEach((id, link) -> {
+
+            if (id.toString().contains("line")) {
+                System.out.println("Changing mode of link id: " + id.toString());
+                link.setAllowedModes(modes);
+            }
+        });
 
         System.out.println("Start filtering Network");
         List<Link> toRemove = network.getLinks().values().stream().filter((link) ->
