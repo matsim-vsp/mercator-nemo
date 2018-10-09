@@ -2,7 +2,6 @@ package org.matsim.scenarioCreation.network;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 public class FilterBikeLinksFromNetwork {
 
     private static final String workingFolder = "/projects/nemo_mercator/data/matsim_input/2018-10-01_baseCase/";
-    private static final String inputFileName = "detailedRuhr_Network_10072018filtered_network_GTFS_OSM.xml.gz";
+    private static final String inputNetworkFileName = "detailedRuhr_Network_10072018filtered_network_GTFS_OSM.xml.gz";
     private static final String outputFileName = "network_ruhr_without-bike_with-pt.xml.gz";
 
 	public static void main(String[] args) {
@@ -28,20 +27,18 @@ public class FilterBikeLinksFromNetwork {
 
 		Network network = NetworkUtils.createNetwork();
 
-        new MatsimNetworkReader(network).readFile(arguments.sharedSvnPath + workingFolder + inputFileName);
+        new MatsimNetworkReader(network).readFile(arguments.sharedSvnPath + workingFolder + inputNetworkFileName);
 
-        System.out.println("Start changing pt network with mode 'car' to mode 'pt'");
-        Set<String> modes = new HashSet<>();
-        modes.add(TransportMode.pt);
+        filterBikeOnlyLinks(network);
 
-        network.getLinks().forEach((id, link) -> {
+        new MultimodalNetworkCleaner(network).run(getModes());
+        System.out.println("Start writing network.");
+        new NetworkWriter(network).write(arguments.sharedSvnPath + workingFolder + outputFileName);
 
-            if (id.toString().contains("line")) {
-                System.out.println("Changing mode of link id: " + id.toString());
-                link.setAllowedModes(modes);
-            }
-        });
+        System.out.println("Done. Exiting Program");
+    }
 
+    private static void filterBikeOnlyLinks(Network network) {
         System.out.println("Start filtering Network");
         List<Link> toRemove = network.getLinks().values().stream().filter((link) ->
                 (!link.getAllowedModes().contains("car") && !link.getAllowedModes().contains("pt") && !link.getAllowedModes().contains("ride")))
@@ -49,12 +46,8 @@ public class FilterBikeLinksFromNetwork {
 
         System.out.println(toRemove.size() + " links to remove");
         toRemove.forEach(link -> network.removeLink(link.getId()));
-        new MultimodalNetworkCleaner(network).run(getModes());
-        System.out.println("Start writing network.");
-        new NetworkWriter(network).write(arguments.sharedSvnPath + workingFolder + outputFileName);
-
-        System.out.println("Done. Exiting Program");
     }
+
 
     private static Set<String> getModes() {
         Set<String> modes = new HashSet<>();

@@ -1,5 +1,6 @@
 package org.matsim.scenarioCalibration.baseCase;
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.matsim.NEMOUtils;
@@ -16,6 +17,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.Arrays;
 
+@SuppressWarnings("WeakerAccess")
 public class BaseCaseCalibrationRunner {
 
     private final String configPath;
@@ -54,13 +56,13 @@ public class BaseCaseCalibrationRunner {
         controler = new Controler(scenario);
 
         // use fast pt router
-      /*  controler.addOverridingModule(new AbstractModule() {
+        controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 install(new SwissRailRaptorModule());
             }
         });
-*/
+
         // use the (congested) car travel time for the teleported ride mode
         controler.addOverridingModule(new AbstractModule() {
             @Override
