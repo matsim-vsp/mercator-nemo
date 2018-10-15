@@ -82,8 +82,8 @@ public class AddDeparturesToTransitNetworkFromOSM {
 	public void run() {
 		
 		// adjust these directories
-		final String projectDirectory = "D:/Arbeit/mercator-nemo/";
-//		final String projectDirectory = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/";
+//		final String projectDirectory = "D:/Arbeit/mercator-nemo/";
+		final String projectDirectory = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/";
 		
 		final String inputScheduleFile = projectDirectory + "data/pt/ptNetworkScheduleFileFromOSM.xml"; 
 		final String directory = projectDirectory + "data/pt/extendedScheduleFromOSM/";
@@ -205,7 +205,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					}
 					
 					Set<String> modes = new HashSet<>();
-					modes.add(TransportMode.car);
+					modes.add(TransportMode.pt);
 					link.setAllowedModes(modes);
 					link.setCapacity(99999.);
 					double beelineDistance = NetworkUtils.getEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
