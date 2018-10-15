@@ -14,24 +14,30 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.vsp.cadyts.marginals.ModalDistanceAnalysisModule;
+import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 
 import java.util.Arrays;
 
 @SuppressWarnings("WeakerAccess")
 public class BaseCaseCalibrationRunner {
 
+    private static final String ruhrShapeFile = "./ruhrgebiet_boundary.shp";
+
     private final String configPath;
     private final String runId;
     private final String outputPath;
+    private final String inputPath;
     private Config config;
     private Scenario scenario;
     private Controler controler;
 
-    public BaseCaseCalibrationRunner(String configPath, String runId, String outputPath) {
+    public BaseCaseCalibrationRunner(String configPath, String runId, String outputPath, String sharedSvn) {
 
         this.configPath = configPath;
         this.runId = runId;
         this.outputPath = outputPath;
+        this.inputPath = sharedSvn;
     }
 
     public static void main(String[] args) {
@@ -39,7 +45,8 @@ public class BaseCaseCalibrationRunner {
         InputArguments arguments = new InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-        BaseCaseCalibrationRunner runner = new BaseCaseCalibrationRunner(arguments.configPath, arguments.runId, arguments.outputDir);
+        BaseCaseCalibrationRunner runner = new BaseCaseCalibrationRunner(arguments.configPath,
+                arguments.runId, arguments.outputDir, arguments.inputDir);
         runner.run();
     }
 
@@ -74,6 +81,22 @@ public class BaseCaseCalibrationRunner {
 
         // use special analysis for modalShare
         controler.addOverridingModule(NEMOUtils.createModalShareAnalysis());
+
+        // add amits special stuff
+        DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistribution(
+                config.counts().getCountsScaleFactor(),
+                scenario.getConfig().plansCalcRoute(),
+                true, false
+        );
+        controler.addOverridingModule(new ModalDistanceAnalysisModule(distanceDistribution));
+        /*controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(AgentFilter.class).to(RuhrAgentsFilter.class);
+                bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(inputPath + ruhrShapeFile);
+            }
+        });*/
+
 
         // add overridingModules from method parameters
         Arrays.stream(overridingModule).forEach(controler::addOverridingModule);
@@ -134,5 +157,8 @@ public class BaseCaseCalibrationRunner {
 
         @Parameter(names = "-outputDir", required = true)
         private String outputDir;
+
+        @Parameter(names = "-inputDir", required = true)
+        private String inputDir;
     }
 }
