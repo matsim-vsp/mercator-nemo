@@ -19,11 +19,6 @@
 
 package org.matsim.scenarioCalibration.marginals;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -36,6 +31,12 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.vsp.cadyts.marginals.AgentFilter;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by amit on 28.05.18.
@@ -81,6 +82,6 @@ public class RuhrAgentsFilter implements AgentFilter {
     @Override
     public boolean includeAgent(Id<Person> id) {
         // check for every agent gain and again is very very expensive and unnecessary
-        return this.personIdMap.get(id);
+        return this.personIdMap.containsKey(id);
     }
 }

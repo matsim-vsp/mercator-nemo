@@ -3,6 +3,8 @@ package org.matsim.scenarioCalibration.baseCase;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,6 +16,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
+import playground.vsp.cadyts.marginals.AgentFilter;
 import playground.vsp.cadyts.marginals.ModalDistanceAnalysisModule;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 
@@ -26,18 +30,18 @@ public class BaseCaseCalibrationRunner {
 
     private final String configPath;
     private final String runId;
-    private final String outputPath;
-    private final String inputPath;
+    private final String outputDir;
+    private final String inputDir;
     private Config config;
     private Scenario scenario;
     private Controler controler;
 
-    public BaseCaseCalibrationRunner(String configPath, String runId, String outputPath, String sharedSvn) {
+    public BaseCaseCalibrationRunner(String configPath, String runId, String outputDir, String inputDir) {
 
         this.configPath = configPath;
         this.runId = runId;
-        this.outputPath = outputPath;
-        this.inputPath = sharedSvn;
+        this.outputDir = outputDir;
+        this.inputDir = inputDir;
     }
 
     public static void main(String[] args) {
@@ -82,21 +86,20 @@ public class BaseCaseCalibrationRunner {
         // use special analysis for modalShare
         controler.addOverridingModule(NEMOUtils.createModalShareAnalysis());
 
-        // add amits special stuff
-        DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistribution(
+        // add Modal Distance analysis
+        DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistributionWithSeparatePt(
                 config.counts().getCountsScaleFactor(),
                 scenario.getConfig().plansCalcRoute(),
                 true, false
         );
         controler.addOverridingModule(new ModalDistanceAnalysisModule(distanceDistribution));
-        /*controler.addOverridingModule(new AbstractModule() {
+        controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bind(AgentFilter.class).to(RuhrAgentsFilter.class);
-                bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(inputPath + ruhrShapeFile);
+                bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(inputDir + ruhrShapeFile);
             }
-        });*/
-
+        });
 
         // add overridingModules from method parameters
         Arrays.stream(overridingModule).forEach(controler::addOverridingModule);
@@ -117,7 +120,7 @@ public class BaseCaseCalibrationRunner {
         OutputDirectoryLogging.catchLogEntries();
         config = ConfigUtils.loadConfig(configPath, customModules);
         config.controler().setRunId(runId);
-        config.controler().setOutputDirectory(outputPath);
+        config.controler().setOutputDirectory(outputDir);
         config.plansCalcRoute().setInsertingAccessEgressWalk(true);
         config.qsim().setUsingTravelTimeCheckInTeleportation(true);
         config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
