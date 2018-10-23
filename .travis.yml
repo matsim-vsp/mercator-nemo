@@ -4,11 +4,21 @@ addons:
   apt:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
-script:
-  - mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 env:
   global:
-    - MAVEN_OPTS="-Xmx2g"
-cache:
-  directories:
-  - $HOME/.m2
+  - MAVEN_OPTS="-Xmx2g"
+
+stages:
+- name: test
+- name: release
+  if branch = master
+
+jobs:
+  include:
+  - stage: test
+    script: mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+  - stage: release
+    script:
+    - now=$(date +"%Y_%m_%d_%T")
+    - curl -k --ftp-create-dirs -T target/nemo-0.0.1-SNAPSHOT-release.zip sftp://$MATH_CLUSTER_USER:$MATH_CLUSTER_PASSWORD@cluster.math.tu-berlin.de/net/ils3/nemo_mercartor/nemo-release_$now.zip
+
