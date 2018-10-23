@@ -9,4 +9,4 @@ mvn -Prelease -DskipTests=true
 NOW=$(date +"%Y_%m_%d_%T")
 
 echo "Copying release file to math cluster"
-scp scp -i $SSH_PRIVATE_KEY target/nemo-0.0.1-SNAPSHOT-release.zip $CLUSTER_USER@cluster.math.tu-berlin.de:/net/ils3/nemo_mercartor/nemo-release_$NOW.zip
+scp -i $SSH_PRIVATE_KEY target/nemo-0.0.1-SNAPSHOT-release.zip $CLUSTER_USER@cluster.math.tu-berlin.de:/net/ils3/nemo_mercartor/nemo-release_$NOW.zip
