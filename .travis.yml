@@ -11,7 +11,7 @@ env:
 stages:
   - name: test
   - name: release
-    if branch = master
+    if: branch = master
 
 jobs:
   include:
