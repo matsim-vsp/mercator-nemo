@@ -12,9 +12,6 @@ script: mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDt
 
 deploy:
   provider: script
-  script:
-    - mvn -Prelease -DskipTests=true
-    - now=$(date +"%Y_%m_%d_%T")
-    - curl -k --ftp-create-dirs -T target/nemo-0.0.1-SNAPSHOT-release.zip sftp://$MATH_CLUSTER_USER:$MATH_CLUSTER_PASSWORD@cluster.math.tu-berlin.de/net/ils3/nemo_mercartor/nemo-release_$now.zip
+  script: bash deploy.sh $MATH_CLUSTER_USER $MATH_CLUSTER_PASSWORD
   on:
      branch: master
