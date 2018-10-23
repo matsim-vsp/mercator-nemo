@@ -26,7 +26,7 @@ import java.util.Arrays;
 @SuppressWarnings("WeakerAccess")
 public class BaseCaseCalibrationRunner {
 
-    private static final String ruhrShapeFile = "./ruhrgebiet_boundary.shp";
+    private static final String ruhrShapeFile = "/ruhrgebiet_boundary.shp";
 
     private final String configPath;
     private final String runId;

@@ -82,6 +82,9 @@ public class RuhrAgentsFilter implements AgentFilter {
     @Override
     public boolean includeAgent(Id<Person> id) {
         // check for every agent gain and again is very very expensive and unnecessary
-        return this.personIdMap.containsKey(id);
+        if (this.personIdMap.containsKey(id)) {
+            return this.personIdMap.get(id);
+        }
+        return false;
     }
 }
