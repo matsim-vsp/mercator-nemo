@@ -12,6 +12,7 @@ script: mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDt
 
 deploy:
   provider: script
-  script: bash deploy.sh $MATH_CLUSTER_USER $MATH_CLUSTER_PASSWORD
+  skip_cleanup: true
+  script: bash deploy.sh $SSH_KEY $MATH_CLUSTER_USER
   on:
      branch: master
