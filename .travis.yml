@@ -9,7 +9,7 @@ env:
   global:
     - MAVEN_OPTS="-Xmx2g"
 
-script: mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+script: mvn -Prelease -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 
 deploy:
   provider: script
