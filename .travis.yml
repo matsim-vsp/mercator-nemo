@@ -18,6 +18,8 @@ script: mvn -Prelease -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocal
 deploy:
   provider: script
   skip_cleanup: true
-  script: aws s3 sync ./target/nemo-0.0.1-SNAPSHOT-release.zip s3://mercartor-nemo-build-files --delete
+  script:
+    # upload the release to aws s3
+    - aws s3 cp ./target/nemo-0.0.1-SNAPSHOT-release.zip s3://mercartor-nemo-build-files/nemo-recent-build.zip
   on:
      branch: master
