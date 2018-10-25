@@ -8,8 +8,8 @@ CLUSTER_USER=$2
 # mvn -Prelease -DskipTests=true
 NOW=$(date +"%Y_%m_%d_%T")
 
-echo "preparing ssh key"
-eval $(ssh-agent -s)
-ssh-add <(echo "$SSH_PRIVATE_KEY")
+#echo "preparing ssh key"
+#eval $(ssh-agent -s)
+#ssh-add <(echo "$SSH_PRIVATE_KEY")
 echo "Copying release file to math cluster"
-scp target/nemo-0.0.1-SNAPSHOT-release.zip ${CLUSTER_USER}@cluster.math.tu-berlin.de:/net/ils3/nemo_mercartor/nemo-release_$NOW.zip
+scp -i $(echo "$SSH_PRIVATE_KEY") target/nemo-0.0.1-SNAPSHOT-release.zip ${CLUSTER_USER}@cluster.math.tu-berlin.de:/net/ils3/nemo_mercartor/nemo-release_$NOW.zip
