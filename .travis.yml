@@ -15,6 +15,9 @@ env:
 
 script: mvn -Prelease -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 
+# install awscli command line tool to sync files to s3
+before_deploy: pip install --user awscli
+
 deploy:
   provider: script
   skip_cleanup: true
