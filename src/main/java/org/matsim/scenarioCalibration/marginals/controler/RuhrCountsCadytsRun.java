@@ -19,10 +19,8 @@
 
 package org.matsim.scenarioCalibration.marginals.controler;
 
-import javax.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -38,16 +36,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
+import org.matsim.util.NEMOUtils;
 import playground.vsp.cadyts.marginals.AgentFilter;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
+
+import javax.inject.Inject;
 
 /**
  * Created by amit on 01.05.18.

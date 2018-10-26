@@ -1,8 +1,5 @@
 package org.matsim.scenarioCalibration.marginals.controler;
 
-import java.io.File;
-import javax.inject.Inject;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -26,12 +23,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.scenarioCalibration.marginals.stayHomePlan.StayHomeScoreUpdater;
+import org.matsim.util.NEMOUtils;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareControlerListener;
 import playground.vsp.analysis.modules.modalAnalyses.modalShare.ModalShareEventHandler;
 import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTravelTimeControlerListener;
@@ -42,6 +36,9 @@ import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
 import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListener;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
+
+import javax.inject.Inject;
+import java.io.File;
 
 public class ReRunningWithStayHomePlan {
 	

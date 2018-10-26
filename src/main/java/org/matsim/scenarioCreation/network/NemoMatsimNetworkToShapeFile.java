@@ -19,10 +19,7 @@
 
 package org.matsim.scenarioCreation.network;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -31,8 +28,12 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.util.NEMOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by amit on 29.01.18.

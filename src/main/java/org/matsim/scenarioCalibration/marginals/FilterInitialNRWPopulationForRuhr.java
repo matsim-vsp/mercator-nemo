@@ -19,10 +19,6 @@
 
 package org.matsim.scenarioCalibration.marginals;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Collectors;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -30,7 +26,12 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.util.NEMOUtils;
 import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansConverter;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Take selected plans and persons who originate, terminate any trip to Ruhr boundary or pass through it.
@@ -81,14 +82,14 @@ public class FilterInitialNRWPopulationForRuhr {
             return person.getSelectedPlan()
                          .getPlanElements()
                          .stream().filter(Activity.class::isInstance)
-                         .map(pe -> ((Activity) pe).getAttributes().getAttribute(CemdapOutput2MatsimPlansConverter.activityZoneId_attributeKey))
+                    .map(pe -> pe.getAttributes().getAttribute(CemdapOutput2MatsimPlansConverter.activityZoneId_attributeKey))
                          .anyMatch(this.zoneIds::contains);
         } else {
             return person.getPlans()
                          .stream()
                          .flatMap(plan -> plan.getPlanElements().stream())
                          .filter(Activity.class::isInstance)
-                         .map(pe -> ((Activity) pe).getAttributes().getAttribute(CemdapOutput2MatsimPlansConverter.activityZoneId_attributeKey))
+                    .map(pe -> pe.getAttributes().getAttribute(CemdapOutput2MatsimPlansConverter.activityZoneId_attributeKey))
                          .anyMatch(this.zoneIds::contains);
         }
     }

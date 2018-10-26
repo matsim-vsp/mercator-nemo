@@ -3,10 +3,10 @@ package org.matsim.scenarioCalibration.baseCase;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.util.NEMOUtils;
 import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 
 public class FilterSelectedPlansFromCadytsOutput {

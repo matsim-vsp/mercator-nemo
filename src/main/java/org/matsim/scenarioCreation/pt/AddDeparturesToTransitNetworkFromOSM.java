@@ -19,16 +19,7 @@
 
 package org.matsim.scenarioCreation.pt;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,18 +38,15 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.util.NEMOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
 * @author ikaddoura
@@ -1436,7 +1424,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					}
 					
 				} else if (lineNew.getName().equals("6283865") || lineNew.getName().equals("6290015")) {
-					log.warn("Skipping " + lineNew.getName().toString());
+					log.warn("Skipping " + lineNew.getName());
 					
 				} else {
 					log.warn("Unknown transit line category: " + lineNew.getName());

@@ -19,9 +19,6 @@
 
 package org.matsim.scenarioCalibration.locationChoice;
 
-import java.io.File;
-import javax.inject.Inject;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -37,11 +34,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.*;
+import org.matsim.util.NEMOUtils;
+
+import javax.inject.Inject;
+import java.io.File;
 
 /**
  * Created by amit on 03.11.17.

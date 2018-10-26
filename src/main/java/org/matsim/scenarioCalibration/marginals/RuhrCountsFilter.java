@@ -19,12 +19,10 @@
 
 package org.matsim.scenarioCalibration.marginals;
 
-import java.util.Collection;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,7 +31,10 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.util.NEMOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.util.Collection;
 
 /**
  * Created by amit on 24.04.18.

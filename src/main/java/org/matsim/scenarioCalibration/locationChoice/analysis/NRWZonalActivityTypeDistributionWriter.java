@@ -19,20 +19,7 @@
 
 package org.matsim.scenarioCalibration.locationChoice.analysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.matsim.NEMOAreaFilter;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
@@ -42,6 +29,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.util.NEMOUtils;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by amit on 01.02.18.

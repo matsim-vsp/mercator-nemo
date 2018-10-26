@@ -19,8 +19,6 @@
 
 package org.matsim.scenarioCalibration.marginals;
 
-import java.util.Arrays;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -31,10 +29,13 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.util.NEMOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.Arrays;
 
 /**
  * Created by amit on 02.03.18.
@@ -127,12 +128,12 @@ public class PrepareConfig {
 
         outConfig.strategy().setFractionOfIterationsToDisableInnovation(0.8);
         StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings();
-        reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
+        reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute);
         reRoute.setWeight(0.15);
         outConfig.strategy().addStrategySettings(reRoute);
 
         StrategyConfigGroup.StrategySettings modeChoice = new StrategyConfigGroup.StrategySettings();
-        modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString());
+        modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice);
         modeChoice.setWeight(0.15);
         outConfig.strategy().addStrategySettings(modeChoice);
         outConfig.subtourModeChoice().setModes(new String[]{TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.ride});

@@ -19,17 +19,13 @@
 
 package org.matsim.scenarioCalibration.locationChoice.analysis;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import org.matsim.NEMOAreaFilter;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.util.NEMOUtils;
+
+import java.util.*;
 
 /**
  * Created by amit on 01.02.18.

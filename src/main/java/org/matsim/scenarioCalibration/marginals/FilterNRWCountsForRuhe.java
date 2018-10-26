@@ -19,10 +19,7 @@
 
 package org.matsim.scenarioCalibration.marginals;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
 import com.vividsolutions.jts.geom.Geometry;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,8 +28,12 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.util.NEMOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.vsp.corineLandcover.GeometryUtils;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Take counting stations which are inside Ruhr, rest will anyways underestimated for population of Ruhr area.

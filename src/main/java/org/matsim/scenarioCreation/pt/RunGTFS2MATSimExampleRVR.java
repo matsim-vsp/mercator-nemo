@@ -22,8 +22,6 @@
  */
 package org.matsim.scenarioCreation.pt;
 
-import java.time.LocalDate;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.gtfs.RunGTFS2MATSim;
 import org.matsim.core.config.ConfigUtils;
@@ -36,7 +34,10 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.util.NEMOUtils;
 import org.matsim.vehicles.VehicleWriterV1;
+
+import java.time.LocalDate;
 
 /**
  * @author  jbischoff

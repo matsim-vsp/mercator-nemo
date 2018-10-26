@@ -21,7 +21,6 @@ package org.matsim.scenarioCalibration.marginals.controler;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -44,6 +43,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
+import org.matsim.util.NEMOUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.cadyts.marginals.AgentFilter;
 import playground.vsp.cadyts.marginals.ModalDistanceAnalysisModule;

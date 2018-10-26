@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim;
+package org.matsim.util;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -93,52 +94,52 @@ public final class NEMOUtils {
         Map<String, PlansCalcRouteConfigGroup.ModeRoutingParams> modeRoutingParamsMap = plansCalcRouteConfigGroup.getModeRoutingParams();
 
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes(
-                NemoModeKeys.Car, getBeelineDistanceFactor(modeRoutingParamsMap, NemoModeKeys.Car, 1.3));
+                TransportMode.car, getBeelineDistanceFactor(modeRoutingParamsMap, TransportMode.car, 1.3));
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes(
-                NemoModeKeys.Pt, getBeelineDistanceFactor(modeRoutingParamsMap, NemoModeKeys.Pt, 1.3));
+                TransportMode.pt, getBeelineDistanceFactor(modeRoutingParamsMap, TransportMode.pt, 1.3));
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes(
-                NemoModeKeys.Bike, getBeelineDistanceFactor(modeRoutingParamsMap, NemoModeKeys.Bike, 1.3));
+                TransportMode.bike, getBeelineDistanceFactor(modeRoutingParamsMap, TransportMode.bike, 1.3));
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes(
-                NemoModeKeys.Walk, getBeelineDistanceFactor(modeRoutingParamsMap, NemoModeKeys.Walk, 1.3));
+                TransportMode.walk, getBeelineDistanceFactor(modeRoutingParamsMap, TransportMode.walk, 1.3));
         inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes(
-                NemoModeKeys.Ride, getBeelineDistanceFactor(modeRoutingParamsMap, NemoModeKeys.Ride, 1.3));
+                TransportMode.ride, getBeelineDistanceFactor(modeRoutingParamsMap, TransportMode.ride, 1.3));
 
-        inputDistanceDistribution.setModeToScalingFactor(NemoModeKeys.Car, carCountScaleFactor);
-        inputDistanceDistribution.setModeToScalingFactor(NemoModeKeys.Pt, 100.0);
-        inputDistanceDistribution.setModeToScalingFactor(NemoModeKeys.Bike, 100.0);
-        inputDistanceDistribution.setModeToScalingFactor(NemoModeKeys.Ride, 100.0);
-        inputDistanceDistribution.setModeToScalingFactor(NemoModeKeys.Walk, 100.0);
+        inputDistanceDistribution.setModeToScalingFactor(TransportMode.car, carCountScaleFactor);
+        inputDistanceDistribution.setModeToScalingFactor(TransportMode.pt, 100.0);
+        inputDistanceDistribution.setModeToScalingFactor(TransportMode.bike, 100.0);
+        inputDistanceDistribution.setModeToScalingFactor(TransportMode.ride, 100.0);
+        inputDistanceDistribution.setModeToScalingFactor(TransportMode.walk, 100.0);
 
         // we are always using essen-bochum reference data from shared-svn/projects/nemo_mercartor/doc/50_conceptual/trip_distances.xlsx
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Car, new DistanceBin.DistanceRange(0, 1000.), 320099);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Pt, new DistanceBin.DistanceRange(0, 1000), 29416);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Bike, new DistanceBin.DistanceRange(0.0, 1000.), 88247.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Walk, new DistanceBin.DistanceRange(0.0, 1000.), 1660012.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Ride, new DistanceBin.DistanceRange(0.0, 1000.), 120346.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(0, 1000.), 320099);
+        inputDistanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(0, 1000), 29416);
+        inputDistanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(0.0, 1000.), 88247.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(0.0, 1000.), 1660012.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(0.0, 1000.), 120346.0);
 
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Car, new DistanceBin.DistanceRange(1000.0, 3000.), 1292600);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Pt, new DistanceBin.DistanceRange(1000.0, 3000.), 389262);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Bike, new DistanceBin.DistanceRange(1000.0, 3000.), 233988.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Walk, new DistanceBin.DistanceRange(1000.0, 3000.), 969147.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Ride, new DistanceBin.DistanceRange(1000.0, 3000.), 522180.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(1000.0, 3000.), 1292600);
+        inputDistanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(1000.0, 3000.), 389262);
+        inputDistanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(1000.0, 3000.), 233988.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(1000.0, 3000.), 969147.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(1000.0, 3000.), 522180.0);
 
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Car, new DistanceBin.DistanceRange(3000.0, 5000.), 1112761);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Pt, new DistanceBin.DistanceRange(3000.0, 5000.), 446320);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Bike, new DistanceBin.DistanceRange(3000.0, 5000.), 151014.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Walk, new DistanceBin.DistanceRange(3000.0, 5000.), 176786.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Ride, new DistanceBin.DistanceRange(3000.0, 5000.), 369415.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(3000.0, 5000.), 1112761);
+        inputDistanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(3000.0, 5000.), 446320);
+        inputDistanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(3000.0, 5000.), 151014.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(3000.0, 5000.), 176786.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(3000.0, 5000.), 369415.0);
 
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Car, new DistanceBin.DistanceRange(5000.0, 10000.), 1540620);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Pt, new DistanceBin.DistanceRange(5000.0, 10000.), 584702);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Bike, new DistanceBin.DistanceRange(5000.0, 10000.), 63506.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Walk, new DistanceBin.DistanceRange(5000.0, 10000.), 36089.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Ride, new DistanceBin.DistanceRange(5000.0, 10000.), 508044.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(5000.0, 10000.), 1540620);
+        inputDistanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(5000.0, 10000.), 584702);
+        inputDistanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(5000.0, 10000.), 63506.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(5000.0, 10000.), 36089.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(5000.0, 10000.), 508044.0);
 
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Car, new DistanceBin.DistanceRange(10000.0, 1000000.), 2259539);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Pt, new DistanceBin.DistanceRange(10000.0, 1000000.), 634865);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Bike, new DistanceBin.DistanceRange(10000.0, 1000000.), 51604.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Walk, new DistanceBin.DistanceRange(10000.0, 1000000.), 0.0);
-        inputDistanceDistribution.addToDistribution(NemoModeKeys.Ride, new DistanceBin.DistanceRange(10000.0, 1000000.), 326112.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(10000.0, 1000000.), 2259539);
+        inputDistanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(10000.0, 1000000.), 634865);
+        inputDistanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(10000.0, 1000000.), 51604.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(10000.0, 1000000.), 0.0);
+        inputDistanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(10000.0, 1000000.), 326112.0);
 
         return inputDistanceDistribution;
     }

@@ -19,9 +19,6 @@
 
 package org.matsim.scenarioCalibration.marginals;
 
-import java.io.BufferedWriter;
-import java.util.Map.Entry;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -32,11 +29,15 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.FacilitiesFromPopulation;
+import org.matsim.util.NEMOUtils;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 import playground.vsp.cadyts.marginals.prep.DistanceDistributionUtils;
 import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
+
+import java.io.BufferedWriter;
+import java.util.Map.Entry;
 
 /**
  * Created by amit on 28.05.18.

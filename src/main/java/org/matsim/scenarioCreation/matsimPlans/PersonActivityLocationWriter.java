@@ -19,16 +19,13 @@
 
 package org.matsim.scenarioCreation.matsimPlans;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.util.NEMOUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
-import org.matsim.NEMOUtils;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Created by amit on 29.01.18.

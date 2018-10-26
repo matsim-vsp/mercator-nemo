@@ -21,16 +21,6 @@
  */
 package org.matsim.scenarioCreation;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -42,6 +32,12 @@ import org.matsim.scenarioCreation.counts.NemoLongTermCountsCreator;
 import org.matsim.scenarioCreation.counts.NemoShortTermCountsCreator;
 import org.matsim.scenarioCreation.counts.RawDataVehicleTypes;
 import org.matsim.scenarioCreation.network.NemoNetworkCreator;
+import org.matsim.util.NEMOUtils;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author tschlenther

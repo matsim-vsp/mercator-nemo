@@ -19,13 +19,7 @@
 
 package org.matsim.scenarioCreation.pt;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -41,18 +35,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.util.NEMOUtils;
 import org.matsim.vehicles.VehicleWriterV1;
-
 import playground.vsp.andreas.osmBB.extended.TransitScheduleImpl;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @author ikaddoura

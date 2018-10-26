@@ -16,21 +16,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.scenarioCreation.network;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.matsim.NEMOUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -48,6 +38,10 @@ import org.matsim.core.utils.io.OsmNetworkReader.OsmFilter;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.util.NEMOUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 /**
@@ -108,10 +102,7 @@ public class NemoNetworkCreator {
 				    "%d{dd MMM yyyy HH:mm:ss,SSS} %-4r [%t] %-5p %c %x - %m%n"));
 	     log.addAppender(fa);
 	}
-	
-	/**
-	 * @param args
-	 */
+
 	public static void main(String[] args) {
 		String osmfile = "data/input/counts/mapmatching/network/allWaysNRW.osm";
 		List<String> inputCountNodeMappingFiles = Arrays.asList("data/input/counts/mapmatching/OSMNodeIDs_Dauerzaehlstellen.csv", "data/input/counts/mapmatching/Nemo_kurzfristZaehlstellen_OSMNodeIDs_UTM33N-allStationsInclNotFound.csv");
