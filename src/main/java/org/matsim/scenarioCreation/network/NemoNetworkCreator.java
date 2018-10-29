@@ -149,7 +149,8 @@ public class NemoNetworkCreator {
 	
 			OsmNetworkReader networkReader;
 			if (this.includeBicyclePaths) {
-				networkReader = new BicycleOsmNetworkReaderV2(network, ct, null, true, "bike", 0.25, true);
+                networkReader = new BicycleOsmNetworkReaderV2(
+                        network, ct, null, true, "bike", 0.25, true);
 			} else {
 				networkReader = new OsmNetworkReader(network,ct, true, true);
 			}
