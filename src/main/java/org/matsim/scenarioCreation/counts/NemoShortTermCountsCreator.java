@@ -22,8 +22,19 @@
 package org.matsim.scenarioCreation.counts;
 
 
-import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.FileVisitResult.TERMINATE;
+import lombok.val;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.counts.Counts;
+import org.matsim.scenarioCreation.UnZipFile;
+import org.matsim.scenarioCreation.network.NetworkInput;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,21 +46,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.counts.Counts;
-import org.matsim.scenarioCreation.UnZipFile;
+import java.util.*;
+
+import static java.nio.file.FileVisitResult.CONTINUE;
+import static java.nio.file.FileVisitResult.TERMINATE;
 
 /**
  * @author tschlenther
@@ -57,32 +57,46 @@ import org.matsim.scenarioCreation.UnZipFile;
  */
 public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 
-	/**
-	 * @param network
-	 * @param pathToCountDataRootDirectory
-	 * @param pathToCountStationToOSMNodesMappingFile
-	 * @param outputPath
-	 */
-	public NemoShortTermCountsCreator(Map<String,Counts<Link>> countsPerColumnCombination, Network network, String pathToCountDataRootDirectory,
-									  String pathToCountStationToOSMNodesMappingFile, String outputPath, int firstYear, int lastYear) {
-		super(countsPerColumnCombination, network, pathToCountDataRootDirectory, pathToCountStationToOSMNodesMappingFile, outputPath);
+    protected NemoShortTermCountsCreator(Set<String> columnCombination,
+                                         Network network,
+                                         String countDataRootDirectory,
+                                         String countsMapping,
+                                         String logginFolder) {
 
-		super.setFirstDayOfAnalysis(LocalDate.of(firstYear,1,1));
-		super.setLastDayOfAnalysis(LocalDate.of(lastYear,12,31));
-	}
+        super(columnCombination, network, countDataRootDirectory, countsMapping, logginFolder);
+    }
+
+    public static void deleteFileOrFolder(final Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+                    throws IOException {
+                Files.delete(file);
+                return CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(final Path file, final IOException e) {
+                return handleException(e);
+            }
+
+            private FileVisitResult handleException(final IOException e) {
+                e.printStackTrace(); // replace with more robust error handling
+                return TERMINATE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(final Path dir, final IOException e)
+                    throws IOException {
+                if (e != null) return handleException(e);
+                Files.delete(dir);
+                return CONTINUE;
+            }
+        });
+    }
 
 	@Override
-	public void setFirstDayOfAnalysis(LocalDate day){
-		throw new RuntimeException("Please dont set it for short term counting stations.");
-	}
-
-	@Override
-	public void setLastDayOfAnalysis(LocalDate day){
-		throw new RuntimeException("Please dont set it for short term counting stations.");
-	}
-
-	@Override
-	public void run() {
+    public Map<String, Counts<Link>> run() {
 		super.init();
 		super.readData();
 		  
@@ -94,11 +108,11 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 		SimpleDateFormat format = new SimpleDateFormat("YY_MM_dd_HHmmss");
 		String now = format.format(Calendar.getInstance().getTime());
 		description += "\n created: " + now;
-		  
-	  	convert(description);
-		  
-		finish();
-		
+
+        val result = convert(description);
+
+        finish(result);
+        return result;
 	}
 	
 	@Override
@@ -128,7 +142,7 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 		    }
 		  } else {
 			  log.severe("something is wrong with the year directory .... please look here: " + rootDirOfYear.getAbsolutePath());
-			  this.finish();
+             throw new RuntimeException("the year direction has an error. loog at folder: " + rootDirOfYear.getAbsolutePath());
 		  }
 		
 	}
@@ -150,7 +164,7 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 				}
 			}else{
 				log.severe("something is wrong with the count directory .... please look here: " + countDir.getAbsolutePath());
-				this.finish();
+                throw new RuntimeException("Error while searching in the count directory. Check out: " + countDir.getAbsolutePath());
 			}
 		
 	}
@@ -267,30 +281,28 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 		}
 	}
 
-	public static void deleteFileOrFolder(final Path path) throws IOException {
-		  Files.walkFileTree(path, new SimpleFileVisitor<Path>(){
-		    @Override public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
-		      throws IOException {
-		      Files.delete(file);
-		      return CONTINUE;
-		    }
+    public static class Builder extends NemoLongTermCountsCreator.AbstractBuilder<NemoShortTermCountsCreator> {
 
-		    @Override public FileVisitResult visitFileFailed(final Path file, final IOException e) {
-		      return handleException(e);
-		    }
 
-		    private FileVisitResult handleException(final IOException e) {
-		      e.printStackTrace(); // replace with more robust error handling
-		      return TERMINATE;
-		    }
+        @Override
+        protected NemoShortTermCountsCreator newInstance() {
 
-		    @Override public FileVisitResult postVisitDirectory(final Path dir, final IOException e)
-		      throws IOException {
-		      if(e!=null)return handleException(e);
-		      Files.delete(dir);
-		      return CONTINUE;
-		    }
-		  });
-		};
-	
+            val input = new NetworkInput(svnDir);
+            val creator = new NemoShortTermCountsCreator(
+                    columnComination, network,
+                    input.getInputShorttermCountDataRootDir(), input.getInputShorttermCountMapping(), loggingFolder
+            );
+
+            creator.setFirstDayOfAnalysis(firstDayOfAnalysis != null ? firstDayOfAnalysis : LocalDate.of(2011, 1, 1));
+            creator.setLastDayOfAnalysis(lastDayOfAnalysis != null ? lastDayOfAnalysis : LocalDate.of(2015, 12, 31));
+            creator.setMonthRangeMin(monthRangeMin);
+            creator.setMonthRangeMax(monthRangeMax);
+            creator.setWeekRangeMin(weekRangeMin);
+            creator.setWeekRangeMax(weekRangeMax);
+            creator.setDatesToIgnore(datesToIgnore);
+            creator.addToStationsToOmit(Arrays.asList(stationIdsToOmit));
+            return creator;
+        }
+    }
+
 }

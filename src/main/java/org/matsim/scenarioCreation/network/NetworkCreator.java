@@ -3,6 +3,7 @@ package org.matsim.scenarioCreation.network;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.bicycle.network.BicycleOsmNetworkReaderV2;
@@ -27,7 +28,6 @@ class NetworkCreator {
     private static Logger logger = LoggerFactory.getLogger(NetworkCreator.class);
 
     private final NetworkInput input;
-    private final NetworkOutput output;
     private final boolean withByciclePaths;
     private OsmNetworkReader.OsmFilter osmFilter;
     private CoordinateTransformation transformation;
@@ -76,11 +76,10 @@ class NetworkCreator {
         return osmFilter;
     }
 
-    @SuppressWarnings("SuspiciousMethodCalls")
     private void validateParsedNetwork(Network network, Set<Long> nodeIdsToKeep) {
 
         nodeIdsToKeep.forEach(id -> {
-            if (!network.getNodes().containsKey(id))
+            if (!network.getNodes().containsKey(Id.createNodeId(id)))
                 logger.error("COULD NOT FIND NODE: " + id + " IN THE NETWORK");
         });
     }
@@ -127,7 +126,7 @@ class NetworkCreator {
         private boolean withByciclePaths = false;
         private CoordinateTransformation transformation;
 
-        public Builder setSvnDir(String svnDir) {
+        Builder setSvnDir(String svnDir) {
             this.svnDir = svnDir;
             return this;
         }
@@ -137,7 +136,7 @@ class NetworkCreator {
             return this;
         }
 
-        public Builder setNetworkCoordinateSystem(String networkCoordinateSystem) {
+        Builder setNetworkCoordinateSystem(String networkCoordinateSystem) {
             this.transformation =
                     TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, networkCoordinateSystem);
             return this;
@@ -151,7 +150,6 @@ class NetworkCreator {
         public NetworkCreator build() {
             return new NetworkCreator(
                     new NetworkInput(svnDir),
-                    new NetworkOutput(svnDir),
                     withByciclePaths,
                     osmFilter,
                     transformation
