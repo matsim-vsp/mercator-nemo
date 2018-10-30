@@ -21,17 +21,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class NetworkCreator {
+class NetworkCreator {
 
     private static final double BIKE_PCU = 0.25;
     private static Logger logger = LoggerFactory.getLogger(NetworkCreator.class);
+
     private final NetworkInput input;
     private final NetworkOutput output;
     private final boolean withByciclePaths;
     private OsmNetworkReader.OsmFilter osmFilter;
     private CoordinateTransformation transformation;
 
-    public Network createNetwork() {
+    Network createNetwork() {
 
         val network = createEmptyNetwork();
         val nodeIdsToKeep = readNodeIds(Arrays.asList(input.getInputLongtermCountNodesMapping(), input.getInputShorttermCountMapping()));
@@ -63,8 +64,6 @@ public class NetworkCreator {
             result = new OsmNetworkReader(network, transformation, true, true);
         }
         result.setKeepPaths(false);
-
-
         result.setNodeIDsToKeep(nodeIdsToKeep);
         result.addOsmFilter(getOsmFilterOrDefault());
         return result;
@@ -77,6 +76,7 @@ public class NetworkCreator {
         return osmFilter;
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     private void validateParsedNetwork(Network network, Set<Long> nodeIdsToKeep) {
 
         nodeIdsToKeep.forEach(id -> {
@@ -92,7 +92,7 @@ public class NetworkCreator {
     private Set<Long> readNodeIds(List<String> listOfCSVFiles) {
 
         val config = new TabularFileParserConfig();
-        config.setDelimiterTags(new String[]{":"});
+        config.setDelimiterTags(new String[]{";"});
         logger.info("start reading osm node ids of counts");
 
         return listOfCSVFiles.stream()
