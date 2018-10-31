@@ -152,7 +152,7 @@ private final static String INPUT_SHORTTERM_COUNT_MAPPING_CSV = "/projects/nemo_
         val longTermCountsCreator = new NemoLongTermCountsCreator.Builder()
                 .setSvnDir(arguments.svnDir)
                 .withNetwork(network)
-                .withColumnCombination(columnCombinations)
+                .withColumnCombinations(columnCombinations)
                 .useCountsBetween(firstDayOfDataAggregation, lastDayOfDataAggregation)
                 .withIgnoredDates(datesToIgnore)
                 .withStationIdsToOmit(5002l, 5025l)
@@ -186,7 +186,7 @@ private final static String INPUT_SHORTTERM_COUNT_MAPPING_CSV = "/projects/nemo_
         val shortTermCountsCreator = new NemoShortTermCountsCreator.Builder()
                 .setSvnDir(arguments.svnDir)
                 .withNetwork(network)
-                .withColumnCombination(columnCombinations)
+                .withColumnCombinations(columnCombinations)
                 .build();
         val shortTermCounts = shortTermCountsCreator.run();
 

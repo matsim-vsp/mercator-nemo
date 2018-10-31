@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Counts;
 import org.matsim.scenarioCreation.UnZipFile;
-import org.matsim.scenarioCreation.network.NetworkInput;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -287,9 +286,9 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
         @Override
         protected NemoShortTermCountsCreator newInstance() {
 
-            val input = new NetworkInput(svnDir);
+            val input = new CountsInput(svnDir);
             val creator = new NemoShortTermCountsCreator(
-                    columnComination, network,
+                    columnCombinations, network,
                     input.getInputShorttermCountDataRootDir(), input.getInputShorttermCountMapping(), loggingFolder
             );
 

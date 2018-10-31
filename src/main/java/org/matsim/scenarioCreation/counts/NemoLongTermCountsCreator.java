@@ -33,7 +33,6 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
-import org.matsim.scenarioCreation.network.NetworkInput;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -71,10 +70,7 @@ public class NemoLongTermCountsCreator {
 	
 	private static final boolean USE_DATA_WITH_LESS_THAN_9_VEHICLE_CLASSES = true;
 
-	Map<String,Map<String,HourlyCountData>> countingStationsData  = new HashMap<String,Map<String,HourlyCountData>>();
-	
-//	protected Map<String,HourlyCountData> kfzCountingStationsData = new HashMap<String,HourlyCountData>();
-//	protected Map<String,HourlyCountData> svCountingStationsData = new HashMap<String,HourlyCountData>();
+    Map<String, Map<String, HourlyCountData>> countingStationsData = new HashMap<>();
 	
 	private Map<String,String> countingStationNames = new HashMap<String,String>();
 	private Map<String,String> problemsPerCountingStation = new HashMap<String,String>();
@@ -160,7 +156,6 @@ public class NemoLongTermCountsCreator {
 						this.allNeededColumnHeaders.add("PkwÄ");
 					}
 				}
-
 			}
 		}
 
@@ -177,17 +172,10 @@ public class NemoLongTermCountsCreator {
         for (String combination : this.columnCombination) {
             val container = new Counts<Link>();
             container.setDescription(container.getDescription() + countsDescription);
-            //Counts container = this.countsPerColumnCombination.get(combination) ;
-            //if(container == null){
-            //	throw new RuntimeException("Counts container should not be empty at this point.");
-            //} else{
-            //	container.setDescription(container.getDescription() + countsDescription);
-            //}
 			container.setYear(this.lastDayOfAnalysis.getYear());
 
 			log.info("start conversion of data for " + combination + "...");
 			convertDataToMatSimCounts(container, this.countingStationsData.get(combination));
-            //this.countsPerColumnCombination.put(combination, container);
             countsPerColumnCombination.put(combination, container);
         }
         return countsPerColumnCombination;
@@ -225,7 +213,6 @@ public class NemoLongTermCountsCreator {
 				String name = countFile.getName();
 				this.countingStationNames.put(name.substring(0, name.lastIndexOf(".")) , monthDir.getName());
 				try {
-//					BufferedReader reader = new BufferedReader(new FileReader(countFile));
 					//need this for proper encoding
 					BufferedReader reader = new BufferedReader( new InputStreamReader(new FileInputStream(countFile), "windows-1256"));
 					String headerOne = reader.readLine();
@@ -265,7 +252,6 @@ public class NemoLongTermCountsCreator {
 					}
 
 					Map<String,Integer> baseColumnsOfVehicleTypes = new HashMap<String,Integer>();
-
 
 					//get column number for each header
 					String[] headerThreeArray = headerThree.split("\\s+");
@@ -362,7 +348,6 @@ public class NemoLongTermCountsCreator {
 									}
 									this.countingStationsData.get(combination).put(countID,data);
 								}
-
                             }
 						}
 					}
@@ -414,14 +399,12 @@ public class NemoLongTermCountsCreator {
                 String problem = "direction 1 of the counting station " + stationID + " was not localised in the given csv file";
                 log.severe(problem);
                 this.problemsPerCountingStation.put(stationID + "_R1", problem);
-//				linkIDDirectionOne = Id.createLinkId("directionNotSpecifiedInCSV_" + stationID + "_R1");
                 this.notLocatedCountingStations.add(stationID + "_R1");
             }
             if (linkIDDirectionTwo == null && !this.notLocatedCountingStations.contains(stationID + "_R2")) {
                 String problem = "direction 2 of the counting station " + stationID + " was not localised in the given csv file";
                 log.severe(problem);
                 this.problemsPerCountingStation.put(stationID + "_R2", problem);
-//				linkIDDirectionTwo = Id.createLinkId("directionNotSpecifiedInCSV_" + stationID + "_R2");
                 this.notLocatedCountingStations.add(stationID + "_R2");
             }
 
@@ -468,7 +451,6 @@ public class NemoLongTermCountsCreator {
 
                 this.problemsPerCountingStation.put(stationID, e.getMessage() + str);
             }
-
         }
     }
 
@@ -501,7 +483,6 @@ public class NemoLongTermCountsCreator {
                             log.severe(problem);
                             log.severe("this means something went wrong in network creation");
                             problemsPerCountingStation.put(row[0], problem);
-//							log.severe("setting a non-valid link id: " + "noFromNode"  + row[0]);
                             linkIDsOfCounts.put(row[0], Id.createLinkId("noFromNode_" + row[0]));
                             header = false;
                             notLocatedCountingStations.add(row[0]);
@@ -514,7 +495,6 @@ public class NemoLongTermCountsCreator {
                             log.severe(problem);
                             log.severe("this means something went wrong in network creation");
                             problemsPerCountingStation.put(row[0], problem);
-//							log.severe("setting a non-valid link id: " + "noToNode"  + row[0]);
                             linkIDsOfCounts.put(row[0], Id.createLinkId("noToNode_" + row[0]));
                             header = false;
                             notLocatedCountingStations.add(row[0]);
@@ -530,9 +510,6 @@ public class NemoLongTermCountsCreator {
                         }
                         if (countLinkID == null) {
                             String problem;
-//						problem = "could not find a link directly leading from node " + fromNode.getId() + " to node " + toNodeID;
-////						log.severe(problem);
-//						problemsPerCountingStation.put(row[0], problem);
 
                             countLinkID = linkFinder.getFirstLinkOnTheWayFromNodeToNode(fromNode, toNode);
                             if (countLinkID == null) {
@@ -579,21 +556,6 @@ public class NemoLongTermCountsCreator {
 			}
 
         log.info("number of problems that occured while creating matsim counts: " + this.problemsPerCountingStation.size());
-
-//			String allProblems = "";
-//			List<String> keySet = new ArrayList<String>();
-//			keySet.addAll(this.problemsPerCountingStation.keySet());
-//			if(!keySet.isEmpty()){
-//				Collections.sort(keySet);
-//				for(String station : keySet){
-//					allProblems += "\n" + station + ": \t" + this.problemsPerCountingStation.get(station);
-//				}
-//				log.info("list of these problems per station: \n" + allProblems);
-//				log.info("-----------------");
-//			}
-
-        //checking quality of countData
-
 
         for (String combination : this.columnCombination) {
 				log.info("checking data quality of counts for " + combination);
@@ -680,7 +642,6 @@ public class NemoLongTermCountsCreator {
 	        ch.setFormatter(formatter);
 	        log.addHandler(fh);
 	        log.addHandler(ch);
-
     }
 
     protected String fixEncoding(String string) {
@@ -754,40 +715,6 @@ public class NemoLongTermCountsCreator {
         this.lastDayOfAnalysis = day;
     }
 
-	//Since, there are two different counts creater, thus, use them to create and write counts file outside. Amit May'18
-//	public void writeOutput(String countFilesName){
-//
-//		String out = "NemoCounts_data_";
-//		for(String combination : this.countsPerColumnCombination.keySet()){
-//			CountsWriter writer = new CountsWriter(countsPerColumnCombination.get(combination));
-//			log.info("writing " + combination + " counts to " + this.outputPath + out + countFilesName + "_" + combination + ".xml");
-//			writer.write(this.outputPath + out + countFilesName + "_" + combination + ".xml");
-//			log.info("finished writing " + combination + " data");
-//		}
-//		log.info("....finished writing all output data...");
-//	}
-	
-//	public static void main(String[] args){
-//		final String INPUT_COUNT_NODES_MAPPING_CSV= "C:/Users/Work/svn/shared-svn/projects/nemo_mercator/40_Data/counts/OSMNodeIDs_Testlauf.csv";
-//		final String INPUT_COUNT_DATA_ROOT_DIR = "C:/Users/Work/svn/shared-svn/projects/nemo_mercator/40_Data/counts/LandesbetriebStrassenbauNRW_Verkehrszentrale";
-//		final String OUTPUT_COUNTS_DIR = "C:/Users/Work/VSP/Nemo/";
-//		
-//		String[] columns = new String[2];
-//		columns[0] = "KFZ";
-//		columns[1] = "SV";
-//		
-//		NemoCountsCreator countCreator = new NemoCountsCreator(columns, null, INPUT_COUNT_DATA_ROOT_DIR, INPUT_COUNT_NODES_MAPPING_CSV, OUTPUT_COUNTS_DIR);
-//		
-//		countCreator.setFirstDayOfAnalysis(LocalDate.of(2014, 1, 1));
-//		countCreator.setLastDayOfAnalysis(LocalDate.of(2014, 1, 2));
-//		countCreator.run();
-//	}
-	
-//-----------------------------------------------------------------  SETTERS  ----------------------------------------------------------------------------------------
-//	public void setOutputPath (String newOutputPath){
-//		this.outputPath = newOutputPath;
-//	}
-
     void setDatesToIgnore(List<LocalDate> datesToIgnore) {
 		this.datesToIgnore.clear();
 		this.datesToIgnore.addAll(datesToIgnore);
@@ -825,58 +752,110 @@ public class NemoLongTermCountsCreator {
         int weekRangeMin = 1;
         int weekRangeMax = 5;
         Network network;
-        Set<String> columnComination;
+        Set<String> columnCombinations;
 
+        /**
+         * @param svnDir Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder
+         * @return Current Builder instance
+         */
         public AbstractBuilder<T> setSvnDir(String svnDir) {
             this.svnDir = svnDir;
             return this;
         }
 
+        /**
+         * Several logging files are written during run method of NemoLongTermCountsCreator
+         * @param loggingFolder path to folder files are written to. Default is './counts_creation_logging'
+         * @return Current Builder instance
+         */
         public AbstractBuilder<T> setLoggingFolder(String loggingFolder) {
             this.loggingFolder = loggingFolder;
             return this;
         }
 
+        /**
+         * @param network network the counts are matched for
+         * @return Current Builder instance
+         */
         public AbstractBuilder<T> withNetwork(Network network) {
             this.network = network;
             return this;
         }
 
-        public AbstractBuilder<T> withColumnCombination(Set<String> columnCombination) {
-            this.columnComination = columnCombination;
+        /**
+         * the raw data contains different columns, which can be found in the RawDataVehicleTypes enum.
+         * Each column combination my contain several values of vehicle types separated by ';'
+         * Example:
+         *      'Pkw' will create a counts file for counts found in the 'Pkw' column
+         *      'Pkw;Rad' will create a counts file for the combined counts found in the 'Pkw' and 'Rad' column
+         * @param columnCombinations all column combinations a counts file should be generated for
+         * @return Current Builder instance
+         */
+        public AbstractBuilder<T> withColumnCombinations(Set<String> columnCombinations) {
+            this.columnCombinations = columnCombinations;
             return this;
         }
 
+        /**
+         * @param ignoredDates Dates which should be excluded from the counts creation
+         * @return Current Builder instance
+         */
         public AbstractBuilder<T> withIgnoredDates(List<LocalDate> ignoredDates) {
             this.datesToIgnore = ignoredDates;
             return this;
         }
 
+        /**
+         * @param id Station ids which should be excluded from the counts creation
+         * @return Current Builder instance
+         */
         public AbstractBuilder<T> withStationIdsToOmit(Long... id) {
             this.stationIdsToOmit = id;
             return this;
         }
 
+        /**
+         * If one is only interested in a particular date range of counts
+         * @param from earliest date to inlcude counts for. Default is 1.1.2014
+         * @param to latest date to include counts for. Default is 31.12.2016
+         * @return Current Builder instance
+         */
         public AbstractBuilder<T> useCountsBetween(LocalDate from, LocalDate to) {
             this.firstDayOfAnalysis = from;
             this.lastDayOfAnalysis = to;
             return this;
         }
 
+        /**
+         * If one is only interested in a certain month range of every year.
+         * @param fromMonth first month to include in numbers. 1 = January, 2 = February, etc.
+         * @param toMonth last moth to include in numbers. 1 = January, 2 = February, etc.
+         * @return Current Builder instance
+         */
         public AbstractBuilder<T> useMonthsOfEveryYear(int fromMonth, int toMonth) {
             this.monthRangeMin = fromMonth;
             this.monthRangeMax = toMonth;
             return this;
         }
 
+        /**
+         * If one is only interested in a certain range of days during the week.
+         * @param fromDay first day to include as numbers. 1 = Monday, 2 = Tuesday, etc.
+         * @param toDay last day to include as number. 1 = Monday, 2 = Tuesday, etc.
+         * @return Current Builder instance
+         */
         public AbstractBuilder<T> useWeekDaysOfEveryWeek(int fromDay, int toDay) {
             this.weekRangeMin = fromDay;
             this.weekRangeMax = toDay;
             return this;
         }
 
+        /**
+         * Create a new instance
+         * @return new instance of counts creator
+         */
         public T build() {
-            if (columnComination == null || network == null || svnDir == null)
+            if (columnCombinations == null || network == null || svnDir == null)
                 throw new RuntimeException("columnCombination, network and svnDir must be set!");
             return newInstance();
         }
@@ -888,9 +867,9 @@ public class NemoLongTermCountsCreator {
 
         protected NemoLongTermCountsCreator newInstance() {
 
-            val input = new NetworkInput(svnDir);
+            val input = new CountsInput(svnDir);
             val creator = new NemoLongTermCountsCreator(
-                    columnComination, network,
+                    columnCombinations, network,
                     input.getInputLongtermCountDataRootDir(),
                     input.getInputLongtermCountNodesMapping(),
                     loggingFolder
@@ -906,13 +885,4 @@ public class NemoLongTermCountsCreator {
             return creator;
         }
     }
-
-	public void setCountingStationNames(Map<String, String> countingStationNames) {
-		this.countingStationNames = countingStationNames;
-	}
-
-	public void setCountingStationsToOmit(List<Long> countingStationsToOmit) {
-		this.countingStationsToOmit.clear();
-		this.countingStationsToOmit.addAll(countingStationsToOmit);
-	}
 }

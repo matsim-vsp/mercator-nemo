@@ -14,64 +14,75 @@ import org.matsim.util.NEMOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
-public class CreateCoarseNetwork {
+public class CreateCoarseNetworkAndCarCounts {
 
-    private static final String OUTPUT_NETWORK = "/projects/nemo_mercator/data/matsim_input/network/nemo_network_coarse.xml.gz";
-    //	dates are included in aggregation									year, month, dayOfMonth
-    //private final static LocalDate firstDayOfDataAggregation = LocalDate.of(2014, 1, 1);
-    //private final static LocalDate lastDayOfDataAggregation = LocalDate.of(2016, 12, 31);
-    public static Logger logger = LoggerFactory.getLogger(CreateCoarseNetwork.class);
+    private static final String SUBDIR = "coarse";
+    public static Logger logger = LoggerFactory.getLogger(CreateCoarseNetworkAndCarCounts.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
+        // parse input variables
         val arguments = new InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
+        val outputParams = new NetworkOutput(arguments.svnDir);
+
+        //ensure all output directories are present
+        Files.createDirectories(outputParams.getOutputNetworkDir().resolve(SUBDIR));
+
+        // create the network from scratch with default setting of network creator
         val creator = new NetworkCreator.Builder()
                 .setNetworkCoordinateSystem(NEMOUtils.NEMO_EPSG)
                 .setSvnDir(arguments.svnDir)
                 .build();
 
         val network = creator.createNetwork();
-        logger.info("Writing network to: " + arguments.svnDir + OUTPUT_NETWORK);
-        new NetworkWriter(network).write(arguments.svnDir + OUTPUT_NETWORK);
+        logger.info("Writing network to: " + outputParams.getOutputNetworkDir().resolve(SUBDIR));
+        new NetworkWriter(network).write(outputParams.getOutputNetworkDir().resolve(SUBDIR).resolve("nemo_coarse_network.xml.gz").toString());
 
+        // create long term counts
         Set<String> columnCombinations = new HashSet<>(Collections.singletonList(RawDataVehicleTypes.Pkw.toString()));
         val longTermCountsCreator = new NemoLongTermCountsCreator.Builder()
                 .setSvnDir(arguments.svnDir)
                 .withNetwork(network)
-                .withColumnCombination(columnCombinations)
+                .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 50025L)
                 .build();
         val longTermCounts = longTermCountsCreator.run();
 
+        // create short term counts
         val shortTermCountsCreator = new NemoShortTermCountsCreator.Builder()
                 .setSvnDir(arguments.svnDir)
                 .withNetwork(network)
-                .withColumnCombination(columnCombinations)
+                .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 5025L)
                 .build();
         val shortTermCounts = shortTermCountsCreator.run();
 
-        writeCounts(new NetworkOutput(arguments.svnDir), columnCombinations, longTermCounts, shortTermCounts);
+        writeCounts(outputParams, columnCombinations, longTermCounts, shortTermCounts);
     }
 
     @SafeVarargs
     private static void writeCounts(NetworkOutput output, Set<String> columnCombinations, Map<String, Counts<Link>>... countsMaps) {
 
+        // create a separate counts file for each column combination
+        // each counts file contains all counts long term and short term count stations
         columnCombinations.forEach(combination -> {
             val writer = new CombinedCountsWriter<Link>();
             Arrays.stream(countsMaps).forEach(map -> writer.addCounts(map.get(combination)));
-            writer.write(output.getOutputCountsDir() + "Counts_coarseNetwork_" + combination + "xml");
+            writer.write(output.getOutputNetworkDir().resolve(SUBDIR).resolve("nemo_coarse_network_counts_" + combination + ".xml").toString());
         });
     }
 
 
     private static class InputArguments {
 
-        @Parameter(names = "-svnDir", required = true)
+        @Parameter(names = "-svnDir", required = true,
+                description = "Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder")
         private String svnDir;
     }
 }

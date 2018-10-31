@@ -15,6 +15,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.scenarioCreation.counts.CountsInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ class NetworkCreator {
     private static Logger logger = LoggerFactory.getLogger(NetworkCreator.class);
 
     private final NetworkInput input;
+    private final CountsInput countsInput;
     private final boolean withByciclePaths;
     private OsmNetworkReader.OsmFilter osmFilter;
     private CoordinateTransformation transformation;
@@ -35,7 +37,7 @@ class NetworkCreator {
     Network createNetwork() {
 
         val network = createEmptyNetwork();
-        val nodeIdsToKeep = readNodeIds(Arrays.asList(input.getInputLongtermCountNodesMapping(), input.getInputShorttermCountMapping()));
+        val nodeIdsToKeep = readNodeIds(Arrays.asList(countsInput.getInputLongtermCountNodesMapping(), countsInput.getInputShorttermCountMapping()));
         val networkReader = createNetworkReader(network, nodeIdsToKeep);
         networkReader.parse(input.getInputOsmFile());
 
@@ -126,30 +128,52 @@ class NetworkCreator {
         private boolean withByciclePaths = false;
         private CoordinateTransformation transformation;
 
+        /**
+         * @param svnDir Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder
+         * @return Current Builder instance
+         */
         Builder setSvnDir(String svnDir) {
             this.svnDir = svnDir;
             return this;
         }
 
+        /**
+         * Set osm filter other than org.matsim.scenarioCreation.network.NemoOsmFilter
+         * @param filter only links filtered by this filter will be contained in the network
+         * @return Current Builder instance
+         */
         public Builder setOsmFilter(OsmNetworkReader.OsmFilter filter) {
             this.osmFilter = filter;
             return this;
         }
 
+        /**
+         *
+         * @param networkCoordinateSystem set coordinate system transformation like e.g. EPSG:25832
+         * @return Current Builder instance
+         */
         Builder setNetworkCoordinateSystem(String networkCoordinateSystem) {
             this.transformation =
                     TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, networkCoordinateSystem);
             return this;
         }
 
+        /**
+         * With this set BicycleOsmNetworkReaderV2 is used to parse the network. The default is OsmNetworkReader
+         * @return Current Builder instance
+         */
         public Builder withByciclePaths() {
             this.withByciclePaths = true;
             return this;
         }
 
+        /**
+         * @return new instance of NetworkCreator
+         */
         public NetworkCreator build() {
             return new NetworkCreator(
                     new NetworkInput(svnDir),
+                    new CountsInput(svnDir),
                     withByciclePaths,
                     osmFilter,
                     transformation

@@ -2,20 +2,18 @@ package org.matsim.scenarioCreation.network;
 
 import lombok.AllArgsConstructor;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @AllArgsConstructor
 public class NetworkOutput {
 
-    private static final String OUTPUT_NETWORK_DIR = "/projets/nemo_mercartor/data/matsim_input/network";
-    private static final String OUTPUT_COUNTS_DIR = "/projects/nemo_mercartor/data/matsim_input/counts/car_counts.xml";
+    private static final String OUTPUT_NETWORK_DIR = "/projects/nemo_mercator/data/matsim_input/network";
 
     private String svnDir;
 
-    public String getOutputNetworkDir() {
-        return svnDir + OUTPUT_NETWORK_DIR;
-    }
-
-    String getOutputCountsDir() {
-        return svnDir + OUTPUT_COUNTS_DIR;
+    public Path getOutputNetworkDir() {
+        return Paths.get(svnDir, OUTPUT_NETWORK_DIR);
     }
 
 }
