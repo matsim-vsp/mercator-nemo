@@ -32,6 +32,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.counts.Volume;
 import org.matsim.scenarioCreation.network.NetworkInput;
 
 import java.io.*;
@@ -608,12 +609,15 @@ public class NemoLongTermCountsCreator {
                         uselessCounts.add(count.getCsLabel());
 						it.remove();
 					}
-					for(int i = 1; i < 25; i++){
-						if(count.getVolume(i).getValue() < 0){
-							nrOfCountsWithPartiallyMissingInformation ++;
-							break;
-						}
-					}
+                if (count.getVolumes().size() > 0) {
+                    for (val volume : (Collection<Volume>) count.getVolumes().values()) {
+                        if (volume.getValue() < 0) {
+                            nrOfCountsWithPartiallyMissingInformation++;
+                            break;
+                        }
+                    }
+
+                }
 				}
 
             log.info("nrOfCounts =" + countsPerColumnCombination.get(combination).getCounts().size() + "\n"
