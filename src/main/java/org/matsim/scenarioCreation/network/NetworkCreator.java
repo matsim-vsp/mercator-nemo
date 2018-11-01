@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.bicycle.network.BicycleOsmNetworkReaderV2;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -30,9 +31,11 @@ class NetworkCreator {
 
     private final NetworkInput input;
     private final CountsInput countsInput;
-    private final boolean withByciclePaths;
-    private OsmNetworkReader.OsmFilter osmFilter;
-    private CoordinateTransformation transformation;
+    private final boolean withBicyclePaths;
+    private final boolean withRideOnCarLinks;
+    private final OsmNetworkReader.OsmFilter osmFilter;
+    private final CoordinateTransformation transformation;
+    private final Set<String> cleaningModes;
 
     Network createNetwork() {
 
@@ -47,6 +50,10 @@ class NetworkCreator {
 
         logger.info("validate network after cleaning");
         validateParsedNetwork(network, nodeIdsToKeep);
+
+        if (withRideOnCarLinks) {
+            addRideOnCarLinks(network);
+        }
         return network;
     }
 
@@ -58,7 +65,7 @@ class NetworkCreator {
 
     private OsmNetworkReader createNetworkReader(Network network, Set<Long> nodeIdsToKeep) {
         OsmNetworkReader result;
-        if (this.withByciclePaths) {
+        if (this.withBicyclePaths) {
             result = new BicycleOsmNetworkReaderV2(
                     network, transformation, null, true,
                     TransportMode.bike, BIKE_PCU, true);
@@ -67,15 +74,8 @@ class NetworkCreator {
         }
         result.setKeepPaths(false);
         result.setNodeIDsToKeep(nodeIdsToKeep);
-        result.addOsmFilter(getOsmFilterOrDefault());
+        result.addOsmFilter(osmFilter);
         return result;
-    }
-
-    private OsmNetworkReader.OsmFilter getOsmFilterOrDefault() {
-        if (osmFilter == null) {
-            osmFilter = new NemoOsmFilter(input.getInputNetworkShapeFilter());
-        }
-        return osmFilter;
     }
 
     private void validateParsedNetwork(Network network, Set<Long> nodeIdsToKeep) {
@@ -87,7 +87,20 @@ class NetworkCreator {
     }
 
     private void cleanNetwork(Network network) {
-        new NetworkCleaner().run(network);
+        if (cleaningModes.isEmpty())
+            new NetworkCleaner().run(network);
+        else
+            new MultimodalNetworkCleaner(network).run(cleaningModes);
+    }
+
+    private void addRideOnCarLinks(Network network) {
+
+        network.getLinks().values().stream().filter(link -> link.getAllowedModes().contains(TransportMode.car))
+                .forEach(link -> {
+                    val modes = new HashSet<String>(link.getAllowedModes());
+                    modes.add(TransportMode.ride);
+                    link.setAllowedModes(modes);
+                });
     }
 
     private Set<Long> readNodeIds(List<String> listOfCSVFiles) {
@@ -125,8 +138,10 @@ class NetworkCreator {
 
         private String svnDir;
         private OsmNetworkReader.OsmFilter osmFilter;
-        private boolean withByciclePaths = false;
+        private boolean withBicyclePaths = false;
+        private boolean withRideOnCarLinks = false;
         private CoordinateTransformation transformation;
+        private Set<String> cleaningModes = new HashSet<>();
 
         /**
          * @param svnDir Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder
@@ -142,7 +157,7 @@ class NetworkCreator {
          * @param filter only links filtered by this filter will be contained in the network
          * @return Current Builder instance
          */
-        public Builder setOsmFilter(OsmNetworkReader.OsmFilter filter) {
+        public Builder withOsmFilter(OsmNetworkReader.OsmFilter filter) {
             this.osmFilter = filter;
             return this;
         }
@@ -163,7 +178,17 @@ class NetworkCreator {
          * @return Current Builder instance
          */
         public Builder withByciclePaths() {
-            this.withByciclePaths = true;
+            this.withBicyclePaths = true;
+            return this;
+        }
+
+        public Builder withRideOnCarLinks() {
+            this.withRideOnCarLinks = true;
+            return this;
+        }
+
+        public Builder withCleaningModes(String... modes) {
+            this.cleaningModes = new HashSet<>(Arrays.asList(modes));
             return this;
         }
 
@@ -171,12 +196,16 @@ class NetworkCreator {
          * @return new instance of NetworkCreator
          */
         public NetworkCreator build() {
+
+            val input = new NetworkInput(svnDir);
             return new NetworkCreator(
-                    new NetworkInput(svnDir),
+                    input,
                     new CountsInput(svnDir),
-                    withByciclePaths,
-                    osmFilter,
-                    transformation
+                    withBicyclePaths,
+                    withRideOnCarLinks,
+                    osmFilter != null ? osmFilter : new NemoOsmFilter(input.getInputNetworkShapeFilter()),
+                    transformation,
+                    cleaningModes
             );
         }
     }
