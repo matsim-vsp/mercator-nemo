@@ -29,16 +29,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class CreateFineNetworkWithPtAndCarCounts {
+public class CreateFineNetworkWithPtAndCarCountsWithoutBikeOnlyLinks {
 
-    private static final String SUBDIR = "fine_with-pt";
-    private static final String FILE_PREFIX = "nemo_fine_network_with-pt";
+    private static final String SUBDIR = "fine_with-pt_without-bike-only-links";
+    private static final String FILE_PREFIX = "nemo_fine_network_with-pt_without-bike-only-links";
     private static final Logger logger = LoggerFactory.getLogger(CreateFineNetworkWithPtAndCarCounts.class);
 
     public static void main(String[] args) throws IOException {
 
         // parse input variables
-        val arguments = new CreateFineNetworkWithPtAndCarCounts.InputArguments();
+        val arguments = new CreateFineNetworkWithPtAndCarCountsWithoutBikeOnlyLinks.InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
         val networkOutputParams = new NetworkOutput(arguments.svnDir);
@@ -72,7 +72,7 @@ public class CreateFineNetworkWithPtAndCarCounts {
                 .setNetworkCoordinateSystem(NEMOUtils.NEMO_EPSG)
                 .setSvnDir(arguments.svnDir)
                 .withByciclePaths()
-                .withOsmFilter(new FineNetworkFilter(networkInputParams.getInputNetworkShapeFilter()))
+                .withOsmFilter(new FineNetworkFilterWithoutBikeOnlyLinks(networkInputParams.getInputNetworkShapeFilter()))
                 .withCleaningModes(TransportMode.car, TransportMode.ride, TransportMode.bike)
                 .withRideOnCarLinks()
                 .build();
