@@ -127,7 +127,7 @@ public class CreateFineNetworkWithPtAndCarCounts {
             val writer = new CombinedCountsWriter<Link>();
             Arrays.stream(countsMaps).forEach(map -> writer.addCounts(map.get(combination)));
             logger.info("writing counts to folder: " + output.getOutputNetworkDir().resolve(SUBDIR).toString());
-            writer.write(output.getOutputNetworkDir().resolve(SUBDIR).resolve(FILE_PREFIX + "_" + combination + ".xml").toString());
+            writer.write(output.getOutputNetworkDir().resolve(SUBDIR).resolve(FILE_PREFIX + "_counts_" + combination + ".xml").toString());
         });
     }
 
