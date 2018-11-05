@@ -19,6 +19,7 @@
 
 package org.matsim.scenarioCreation.pt;
 
+import lombok.val;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -26,13 +27,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,72 +39,28 @@ import org.matsim.util.NEMOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleWriterV1;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
 * @author ikaddoura
 */
 
-public class AddDeparturesToTransitNetworkFromOSM {
-	
-	private final double trainBeelineDistanceFactor = 1.3;
-	
+public class CreateScenarioFromOsmFile {
+
+    //private Scenario scenario;
+    private static final Logger log = Logger.getLogger(CreateScenarioFromGtfs.class);
+
 	private Scenario scenario;
-	private static final Logger log = Logger.getLogger(GeneratePtAndRunNEMO.class);
 	private int vehicleCounter = 0;
 	private int lineCounter = 0;
 
-	public static void main(String[] args) {
-		
-		AddDeparturesToTransitNetworkFromOSM runner = new AddDeparturesToTransitNetworkFromOSM();
-		runner.run();
-	}
+    public Scenario run(String inputScheduleFile) {
 
-	public void run() {
-		
-		// adjust these directories
-//		final String projectDirectory = "D:/Arbeit/mercator-nemo/";
-		final String projectDirectory = "/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/";
-		
-		final String inputScheduleFile = projectDirectory + "data/pt/ptNetworkScheduleFileFromOSM.xml"; 
-		final String directory = projectDirectory + "data/pt/extendedScheduleFromOSM/";
-		
-		final String outputScheduleFile = directory + "OSMtransitSchedule.xml.gz";
-		final String outptTransitVehicleFile = directory + "OSMtransitVehicles.xml.gz";
-		final String outputNetworkFile = directory + "OSMtransitNetwork.xml.gz";
-		
-		OutputDirectoryLogging.catchLogEntries();
-		try {
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(directory);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
 		log.info("input transit schedule file: " + inputScheduleFile);
-		log.info("output schedule file: " + outputScheduleFile);
-		log.info("output vehicles file: " + outptTransitVehicleFile);
-				
-		Config config = ConfigUtils.createConfig();
-		
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(directory + "/osm-pt-visualization/");
-		config.controler().setRunId("osm-pt-v1");
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
-		
-//		List<String> networkModes = new ArrayList<>();
-//		networkModes.add("train");
-//		config.plansCalcRoute().setNetworkModes(networkModes);
-		
-		config.qsim().setEndTime(30. * 3600.);
-		config.qsim().setStartTime(0.);
-		
-		config.plans().setInputFile(null);
-		config.transit().setUseTransit(true);
-		
+
+
+        val config = ConfigUtils.createConfig();
 		Scenario scenario0 = ScenarioUtils.createScenario(config);
 		new TransitScheduleReader(scenario0).readFile(inputScheduleFile);
 		TransitSchedule schedule0 = scenario0.getTransitSchedule();
@@ -197,162 +149,234 @@ public class AddDeparturesToTransitNetworkFromOSM {
 					link.setAllowedModes(modes);
 					link.setCapacity(99999.);
 					double beelineDistance = NetworkUtils.getEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+                    double trainBeelineDistanceFactor = 1.3;
 					link.setLength(beelineDistance * trainBeelineDistanceFactor);
 
-					double avgFreeSpeed = Double.NEGATIVE_INFINITY;
-					
-					if (lineNew.getName().equals("S3") || lineNew.getName().equals("S68")) {
-						avgFreeSpeed = 14.69907402;
-						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("S11")) {
-						avgFreeSpeed = 18.74999993;
-						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("S9") || lineNew.getName().equals("S8") || lineNew.getName().equals("S6") || lineNew.getName().equals("S1")) {
-						avgFreeSpeed = 16.6666666; 
-						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("S5")) {
-						avgFreeSpeed = 12.5;
-						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("S4") || lineNew.getName().equals("S28")) {
-						avgFreeSpeed = 11.66666662;
-						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("S7")) {
-						avgFreeSpeed = 9.722222183;
-						log.info("S-Bahn --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("S2")) {
-						avgFreeSpeed = 8.3333333;
-						log.info("S-Bahn --> line: " + lineNew.getName());
-					
-					} else if (lineNew.getName().equals("RB35")) {
-						avgFreeSpeed = 17.97385635;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB52")) {
-						avgFreeSpeed = 10.41666675;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB39")) {
-						avgFreeSpeed = 11.1111112;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB54") || lineNew.getName().equals("RB44") || lineNew.getName().equals("RB43")) {
-						avgFreeSpeed = 11.98743396;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB53") || lineNew.getName().equals("RB46") || lineNew.getName().equals("RB37") || lineNew.getName().equals("RB36") || lineNew.getName().equals("RB33") || lineNew.getName().equals("RB32") || lineNew.getName().equals("RB25")) {
-						avgFreeSpeed = 13.888889;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB91") || lineNew.getName().equals("RB59")) {
-						avgFreeSpeed = 16.6666668;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB51")) {
-						avgFreeSpeed = 17.36111125;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB31")) {
-						avgFreeSpeed = 18.51851867;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB45") || lineNew.getName().equals("RB40")) {
-						avgFreeSpeed = 19.09722238;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB50") || lineNew.getName().equals("RB48") || lineNew.getName().equals("RB27")) {
-						avgFreeSpeed = 19.4444446;
-						log.info("RB --> line: " + lineNew.getName());	
-					} else if (lineNew.getName().equals("RB34")) {
-						avgFreeSpeed = 20.8333335;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB89")) {
-						avgFreeSpeed = 22.43589762;
-						log.info("RB --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RB69")) {
-						avgFreeSpeed = 24.30555575;
-						log.info("RB --> line: " + lineNew.getName());
-						
-					} else if (lineNew.getName().equals("RE14")) {
-						avgFreeSpeed = 16.20370383;
-						log.info("RE --> line: " + lineNew.getName());	
-					} else if (lineNew.getName().equals("RE10") || lineNew.getName().equals("RE8")) {
-						avgFreeSpeed = 19.09722238;
-						log.info("RE --> line: " + lineNew.getName());	
-					} else if (lineNew.getName().equals("RE13")) {
-						avgFreeSpeed = 19.4444446;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE16")) {
-						avgFreeSpeed = 19.67592608;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE42")) {
-						avgFreeSpeed = 20.37037053;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE57") || lineNew.getName().equals("RE3") || lineNew.getName().equals("RE6") || lineNew.getName().equals("RE7")) {
-						avgFreeSpeed = 20.8333335;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE17")) {
-						avgFreeSpeed = 21.70138906;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE4")) {
-						avgFreeSpeed = 22.2222224;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE19")) {
-						avgFreeSpeed = 22.72727291;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE2")) {
-						avgFreeSpeed = 23.6111113;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE5")) {
-						avgFreeSpeed = 25.92592613;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE11")) {
-						avgFreeSpeed = 27.08333355;
-						log.info("RE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("RE1")) {
-						avgFreeSpeed = 26.14379106;
-						log.info("RE --> line: " + lineNew.getName());
-						
-					} else if (lineNew.getName().equals("ICE78")) {
-						avgFreeSpeed = 26.62037058;
-						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("ICE-43")) {
-						avgFreeSpeed = 31.48148173;
-						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("ICE-42")) {
-						avgFreeSpeed = 48.35390985;
-						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("ICE-41")) {
-						avgFreeSpeed = 44.23868348;
-						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("ICE-10")) {
-						avgFreeSpeed = 44.6428575;
-						log.info("ICE --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("ICE-1")) {
-						avgFreeSpeed = 35.714286;
-						log.info("ICE --> line: " + lineNew.getName());
-						
-					} else if (lineNew.getName().equals("IC-50-MDV")) {
-						avgFreeSpeed = 25.13227533;
-						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("IC-37") || lineNew.getName().equals("IC-32")) {
-						avgFreeSpeed = 27.777778;
-						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("IC-55")) {
-						avgFreeSpeed = 30.30303055;
-						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("EC-30-IC-30")) {
-						avgFreeSpeed = 32.60869591;
-						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("IC-35")) {
-						avgFreeSpeed = 38.01169621;
-						log.info("IC --> line: " + lineNew.getName());
-					} else if (lineNew.getName().equals("IC-31")) {
-						avgFreeSpeed = 43.20987689;
-						log.info("IC --> line: " + lineNew.getName());
-					
-					} else if (lineNew.getName().equals("Thalys")) {
-						avgFreeSpeed = 22.8174605;
-						log.info("Thalys --> line: " + lineNew.getName());
-						
-					} else if (lineNew.getName().equals("FLX20")) {
-						avgFreeSpeed = 22.54428359;
-						log.info("FLX20 --> line: " + lineNew.getName());
-						
-					} else {
-						avgFreeSpeed = 11.111111;
-						log.warn("Unknown transit line category: " + lineNew.getName() + " Route: "+ route.getId());
-					}
+                    double avgFreeSpeed;
+
+                    switch (lineNew.getName()) {
+                        case "S3":
+                        case "S68":
+                            avgFreeSpeed = 14.69907402;
+                            log.info("S-Bahn --> line: " + lineNew.getName());
+                            break;
+                        case "S11":
+                            avgFreeSpeed = 18.74999993;
+                            log.info("S-Bahn --> line: " + lineNew.getName());
+                            break;
+                        case "S9":
+                        case "S8":
+                        case "S6":
+                        case "S1":
+                            avgFreeSpeed = 16.6666666;
+                            log.info("S-Bahn --> line: " + lineNew.getName());
+                            break;
+                        case "S5":
+                            avgFreeSpeed = 12.5;
+                            log.info("S-Bahn --> line: " + lineNew.getName());
+                            break;
+                        case "S4":
+                        case "S28":
+                            avgFreeSpeed = 11.66666662;
+                            log.info("S-Bahn --> line: " + lineNew.getName());
+                            break;
+                        case "S7":
+                            avgFreeSpeed = 9.722222183;
+                            log.info("S-Bahn --> line: " + lineNew.getName());
+                            break;
+                        case "S2":
+                            avgFreeSpeed = 8.3333333;
+                            log.info("S-Bahn --> line: " + lineNew.getName());
+
+                            break;
+                        case "RB35":
+                            avgFreeSpeed = 17.97385635;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB52":
+                            avgFreeSpeed = 10.41666675;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB39":
+                            avgFreeSpeed = 11.1111112;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB54":
+                        case "RB44":
+                        case "RB43":
+                            avgFreeSpeed = 11.98743396;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB53":
+                        case "RB46":
+                        case "RB37":
+                        case "RB36":
+                        case "RB33":
+                        case "RB32":
+                        case "RB25":
+                            avgFreeSpeed = 13.888889;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB91":
+                        case "RB59":
+                            avgFreeSpeed = 16.6666668;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB51":
+                            avgFreeSpeed = 17.36111125;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB31":
+                            avgFreeSpeed = 18.51851867;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB45":
+                        case "RB40":
+                            avgFreeSpeed = 19.09722238;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB50":
+                        case "RB48":
+                        case "RB27":
+                            avgFreeSpeed = 19.4444446;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB34":
+                            avgFreeSpeed = 20.8333335;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB89":
+                            avgFreeSpeed = 22.43589762;
+                            log.info("RB --> line: " + lineNew.getName());
+                            break;
+                        case "RB69":
+                            avgFreeSpeed = 24.30555575;
+                            log.info("RB --> line: " + lineNew.getName());
+
+                            break;
+                        case "RE14":
+                            avgFreeSpeed = 16.20370383;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE10":
+                        case "RE8":
+                            avgFreeSpeed = 19.09722238;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE13":
+                            avgFreeSpeed = 19.4444446;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE16":
+                            avgFreeSpeed = 19.67592608;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE42":
+                            avgFreeSpeed = 20.37037053;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE57":
+                        case "RE3":
+                        case "RE6":
+                        case "RE7":
+                            avgFreeSpeed = 20.8333335;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE17":
+                            avgFreeSpeed = 21.70138906;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE4":
+                            avgFreeSpeed = 22.2222224;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE19":
+                            avgFreeSpeed = 22.72727291;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE2":
+                            avgFreeSpeed = 23.6111113;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE5":
+                            avgFreeSpeed = 25.92592613;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE11":
+                            avgFreeSpeed = 27.08333355;
+                            log.info("RE --> line: " + lineNew.getName());
+                            break;
+                        case "RE1":
+                            avgFreeSpeed = 26.14379106;
+                            log.info("RE --> line: " + lineNew.getName());
+
+                            break;
+                        case "ICE78":
+                            avgFreeSpeed = 26.62037058;
+                            log.info("ICE --> line: " + lineNew.getName());
+                            break;
+                        case "ICE-43":
+                            avgFreeSpeed = 31.48148173;
+                            log.info("ICE --> line: " + lineNew.getName());
+                            break;
+                        case "ICE-42":
+                            avgFreeSpeed = 48.35390985;
+                            log.info("ICE --> line: " + lineNew.getName());
+                            break;
+                        case "ICE-41":
+                            avgFreeSpeed = 44.23868348;
+                            log.info("ICE --> line: " + lineNew.getName());
+                            break;
+                        case "ICE-10":
+                            avgFreeSpeed = 44.6428575;
+                            log.info("ICE --> line: " + lineNew.getName());
+                            break;
+                        case "ICE-1":
+                            avgFreeSpeed = 35.714286;
+                            log.info("ICE --> line: " + lineNew.getName());
+
+                            break;
+                        case "IC-50-MDV":
+                            avgFreeSpeed = 25.13227533;
+                            log.info("IC --> line: " + lineNew.getName());
+                            break;
+                        case "IC-37":
+                        case "IC-32":
+                            avgFreeSpeed = 27.777778;
+                            log.info("IC --> line: " + lineNew.getName());
+                            break;
+                        case "IC-55":
+                            avgFreeSpeed = 30.30303055;
+                            log.info("IC --> line: " + lineNew.getName());
+                            break;
+                        case "EC-30-IC-30":
+                            avgFreeSpeed = 32.60869591;
+                            log.info("IC --> line: " + lineNew.getName());
+                            break;
+                        case "IC-35":
+                            avgFreeSpeed = 38.01169621;
+                            log.info("IC --> line: " + lineNew.getName());
+                            break;
+                        case "IC-31":
+                            avgFreeSpeed = 43.20987689;
+                            log.info("IC --> line: " + lineNew.getName());
+
+                            break;
+                        case "Thalys":
+                            avgFreeSpeed = 22.8174605;
+                            log.info("Thalys --> line: " + lineNew.getName());
+
+                            break;
+                        case "FLX20":
+                            avgFreeSpeed = 22.54428359;
+                            log.info("FLX20 --> line: " + lineNew.getName());
+
+                            break;
+                        default:
+                            avgFreeSpeed = 11.111111;
+                            log.warn("Unknown transit line category: " + lineNew.getName() + " Route: " + route.getId());
+                            break;
+                    }
 					link.setFreespeed(avgFreeSpeed);
 					
 					log.info("Adding link " + link.getId() + " to the scenario.");
@@ -1444,13 +1468,7 @@ public class AddDeparturesToTransitNetworkFromOSM {
 			scenario.getTransitSchedule().addTransitLine(lineNew);
 			lineCounter++;
 		}
-				
-		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(outputScheduleFile);
-		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(outptTransitVehicleFile);
-		new NetworkWriter(scenario.getNetwork()).write(outputNetworkFile);
-		
-		Controler controler = new Controler(scenario);
-		controler.run();
+        return scenario;
 	}
 
 	private Departure createVehicleAndReturnDeparture(int routeCounter, TransitRoute routeNew, VehicleType type, double depCounter, double t) {
@@ -1462,5 +1480,4 @@ public class AddDeparturesToTransitNetworkFromOSM {
 		departure.setVehicleId(vehicle.getId());	
 		return departure;
 	}
-
 }

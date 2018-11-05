@@ -2,15 +2,10 @@ package org.matsim.scenarioCreation.network;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.vividsolutions.jts.geom.Geometry;
 import lombok.val;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.counts.Counts;
 import org.matsim.scenarioCreation.counts.CombinedCountsWriter;
 import org.matsim.scenarioCreation.counts.NemoLongTermCountsCreator;
@@ -96,23 +91,5 @@ public class CreateFineNetworkAndCarCounts {
         @Parameter(names = "-svnDir", required = true,
                 description = "Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder")
         private String svnDir;
-    }
-
-    private static class FineNetworkFilter implements OsmNetworkReader.OsmFilter {
-
-        private final List<Geometry> geometries = new ArrayList<>();
-
-        FineNetworkFilter(String pathToShapeFile) {
-            ShapeFileReader.getAllFeatures(pathToShapeFile).forEach(feature -> geometries.add((Geometry) feature.getDefaultGeometry()));
-        }
-
-        @Override
-        public boolean coordInFilter(Coord coord, int hierarchyLevel) {
-            // use all streets which are level 4 or less (motorways and secondary streets)
-            if (hierarchyLevel <= 4) return true;
-
-            // if coord is within the supplied shape use every street regardless of level
-            return geometries.stream().anyMatch(geometry -> geometry.contains(MGC.coord2Point(coord)));
-        }
     }
 }
