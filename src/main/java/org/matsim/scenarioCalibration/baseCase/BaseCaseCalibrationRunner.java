@@ -89,8 +89,7 @@ public class BaseCaseCalibrationRunner {
         // add Modal Distance analysis
         DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistributionWithSeparatePt(
                 config.counts().getCountsScaleFactor(),
-                scenario.getConfig().plansCalcRoute(),
-                true, false
+                scenario.getConfig().plansCalcRoute()
         );
         controler.addOverridingModule(new ModalDistanceAnalysisModule(distanceDistribution));
         controler.addOverridingModule(new AbstractModule() {
