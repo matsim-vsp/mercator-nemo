@@ -95,6 +95,14 @@ public class CreateScenarioFromOsmFile {
 			Id<TransitLine> lineId = Id.create("line"  + lineCounter, TransitLine.class);
 			TransitLine lineNew = scenario.getTransitSchedule().getFactory().createTransitLine(lineId);
 			lineNew.setName(line.getId().toString().replaceAll("[^a-zA-Z0-9]", "-"));
+
+			/*
+			This very fragile test filters out two museum lines without departures
+			 */
+            if (lineNew.getName().equals("6283865") || lineNew.getName().equals("6290015")) {
+                log.info("Skipping line #" + lineNew.getName() + " this is a historical train.");
+                continue;
+            }
 		
 			int routeCounter = 0;
 			for (TransitRoute route : line.getRoutes().values()) {
@@ -1446,10 +1454,6 @@ public class CreateScenarioFromOsmFile {
 						routeNew.addDeparture(createVehicleAndReturnDeparture(routeCounter, routeNew, type, depCounter, t));
 						depCounter++;
 					}
-					
-				} else if (lineNew.getName().equals("6283865") || lineNew.getName().equals("6290015")) {
-					log.warn("Skipping " + lineNew.getName());
-					
 				} else {
 					log.warn("Unknown transit line category: " + lineNew.getName());
 						
