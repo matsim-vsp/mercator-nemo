@@ -27,7 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import playground.vsp.openberlinscenario.cemdap.input.DemandGeneratorCensus;
+import playground.vsp.openberlinscenario.cemdap.input.SynPopCreator;
 import playground.vsp.openberlinscenario.cemdap.input.ZoneAndLOSGeneratorV2;
 
 /**
@@ -76,7 +76,7 @@ public class CemdapInputGenerator {
         String[] commuterFilesOutgoing = {commuterFileOutgoing1, commuterFileOutgoing2, commuterFileOutgoing3, commuterFileOutgoing4, commuterFileOutgoing5};
 
 //        {// person and plans file which contains only attributes; these will be required to generate matsim plans files
-            DemandGeneratorCensus demandGeneratorCensus = new DemandGeneratorCensus(commuterFilesOutgoing, censusFile, outputBase, numberOfPlansPerPerson,
+            SynPopCreator demandGeneratorCensus = new SynPopCreator(commuterFilesOutgoing, censusFile, outputBase, numberOfPlansPerPerson,
                     Arrays.asList("05"), defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio);
             demandGeneratorCensus.setWriteMatsimPlanFiles(writeMatsimPlanFiles);
             demandGeneratorCensus.setIncludeChildren(includeChildren);
