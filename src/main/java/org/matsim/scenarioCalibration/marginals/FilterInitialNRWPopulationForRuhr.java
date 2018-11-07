@@ -27,6 +27,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.util.NEMOUtils;
+
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+
+import playground.vsp.openberlinscenario.cemdap.output.ActivityTypes;
 import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansConverter;
 
 import java.util.ArrayList;
@@ -42,10 +47,14 @@ import java.util.stream.Collectors;
 
 public class FilterInitialNRWPopulationForRuhr {
 
-    private static final String plansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
+//    private static final String plansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
+//    private static final String plansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-11-07_10pct/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities.xml.gz";
 
-    private static final String outPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
+//    private static final String outPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-05-28_shorterIntraZonalDist/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
+//    private static final String outPlansFile = "../shared-svn/projects/nemo_mercator/data/matsim_input/2018-11-07_10pct/plans_1pct_fullChoiceSet_coordsAssigned_splitActivities_filteredForRuhr.xml.gz";
 
+	static String outPlansFile;
+    
     //some assumptions
     private static final boolean keepOnlySelectedPlans = false;
 
@@ -67,7 +76,11 @@ public class FilterInitialNRWPopulationForRuhr {
     }
 
     public static void main(String[] args) {
-        Population inputPopulation = NEMOUtils.loadScenarioFromPlans(plansFile).getPopulation();
+    	InputArguments arguments = new InputArguments();
+        JCommander.newBuilder().addObject(arguments).build().parse(args);
+    	
+        Population inputPopulation = NEMOUtils.loadScenarioFromPlans(arguments.inputPopulationFile).getPopulation();
+        outPlansFile = arguments.outputPopulationFile;
         new FilterInitialNRWPopulationForRuhr().processAndWritePlans(inputPopulation);
     }
 
@@ -102,5 +115,13 @@ public class FilterInitialNRWPopulationForRuhr {
             outPerson = person;
         }
         this.outPopulation.addPerson(outPerson);
+    }
+    
+    private static class InputArguments {
+        @Parameter(names = "-inputPopulationFile", required = true)
+        private String inputPopulationFile;
+        
+        @Parameter(names = "-outputPopulationFile", required = true)
+        private String outputPopulationFile;
     }
 }
