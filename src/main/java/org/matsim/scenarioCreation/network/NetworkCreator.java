@@ -1,12 +1,11 @@
 package org.matsim.scenarioCreation.network;
 
-
-import lombok.AllArgsConstructor;
-import lombok.val;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.bicycle.network.BicycleOsmNetworkReaderV2;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+
 class NetworkCreator {
 
     private static final double BIKE_PCU = 0.25;
@@ -37,11 +36,22 @@ class NetworkCreator {
     private final CoordinateTransformation transformation;
     private final Set<String> cleaningModes;
 
+    private NetworkCreator(NetworkInput input, CountsInput countsInput, boolean withBicyclePaths, boolean withRideOnCarLinks,
+                           OsmNetworkReader.OsmFilter osmFilter, CoordinateTransformation ct, Set<String> cleaningModes) {
+        this.input = input;
+        this.countsInput = countsInput;
+        this.withBicyclePaths = withBicyclePaths;
+        this.withRideOnCarLinks = withRideOnCarLinks;
+        this.osmFilter = osmFilter;
+        this.transformation = ct;
+        this.cleaningModes = cleaningModes;
+    }
+
     Network createNetwork() {
 
-        val network = createEmptyNetwork();
-        val nodeIdsToKeep = readNodeIds(Arrays.asList(countsInput.getInputLongtermCountNodesMapping(), countsInput.getInputShorttermCountMapping()));
-        val networkReader = createNetworkReader(network, nodeIdsToKeep);
+        Network network = createEmptyNetwork();
+        Set<Long> nodeIdsToKeep = readNodeIds(Arrays.asList(countsInput.getInputLongtermCountNodesMapping(), countsInput.getInputShorttermCountMapping()));
+        OsmNetworkReader networkReader = createNetworkReader(network, nodeIdsToKeep);
         networkReader.parse(input.getInputOsmFile());
 
         logger.info("validate network before cleaning");
@@ -58,8 +68,8 @@ class NetworkCreator {
     }
 
     private Network createEmptyNetwork() {
-        val config = ConfigUtils.createConfig();
-        val scenario = ScenarioUtils.createScenario(config);
+        Config config = ConfigUtils.createConfig();
+        Scenario scenario = ScenarioUtils.createScenario(config);
         return scenario.getNetwork();
     }
 
@@ -97,7 +107,7 @@ class NetworkCreator {
 
         network.getLinks().values().stream().filter(link -> link.getAllowedModes().contains(TransportMode.car))
                 .forEach(link -> {
-                    val modes = new HashSet<String>(link.getAllowedModes());
+                    Set<String> modes = new HashSet<>(link.getAllowedModes());
                     modes.add(TransportMode.ride);
                     link.setAllowedModes(modes);
                 });
@@ -105,7 +115,7 @@ class NetworkCreator {
 
     private Set<Long> readNodeIds(List<String> listOfCSVFiles) {
 
-        val config = new TabularFileParserConfig();
+        TabularFileParserConfig config = new TabularFileParserConfig();
         config.setDelimiterTags(new String[]{";"});
         logger.info("start reading osm node ids of counts");
 
@@ -157,7 +167,7 @@ class NetworkCreator {
          * @param filter only links filtered by this filter will be contained in the network
          * @return Current Builder instance
          */
-        public Builder withOsmFilter(OsmNetworkReader.OsmFilter filter) {
+        Builder withOsmFilter(OsmNetworkReader.OsmFilter filter) {
             this.osmFilter = filter;
             return this;
         }
@@ -177,17 +187,17 @@ class NetworkCreator {
          * With this set BicycleOsmNetworkReaderV2 is used to parse the network. The default is OsmNetworkReader
          * @return Current Builder instance
          */
-        public Builder withByciclePaths() {
+        Builder withByciclePaths() {
             this.withBicyclePaths = true;
             return this;
         }
 
-        public Builder withRideOnCarLinks() {
+        Builder withRideOnCarLinks() {
             this.withRideOnCarLinks = true;
             return this;
         }
 
-        public Builder withCleaningModes(String... modes) {
+        Builder withCleaningModes(String... modes) {
             this.cleaningModes = new HashSet<>(Arrays.asList(modes));
             return this;
         }
@@ -197,7 +207,7 @@ class NetworkCreator {
          */
         public NetworkCreator build() {
 
-            val input = new NetworkInput(svnDir);
+            NetworkInput input = new NetworkInput(svnDir);
             return new NetworkCreator(
                     input,
                     new CountsInput(svnDir),

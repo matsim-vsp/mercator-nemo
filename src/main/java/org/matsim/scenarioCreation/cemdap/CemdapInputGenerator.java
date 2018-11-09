@@ -19,16 +19,14 @@
 
 package org.matsim.scenarioCreation.cemdap;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.matsim.core.utils.gis.ShapeFileReader;
+
 import playground.vsp.openberlinscenario.cemdap.input.SynPopCreator;
 import playground.vsp.openberlinscenario.cemdap.input.ZoneAndLOSGeneratorV2;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by amit on 22.06.17.
@@ -76,16 +74,16 @@ public class CemdapInputGenerator {
         String[] commuterFilesOutgoing = {commuterFileOutgoing1, commuterFileOutgoing2, commuterFileOutgoing3, commuterFileOutgoing4, commuterFileOutgoing5};
 
 //        {// person and plans file which contains only attributes; these will be required to generate matsim plans files
-            SynPopCreator demandGeneratorCensus = new SynPopCreator(commuterFilesOutgoing, censusFile, outputBase, numberOfPlansPerPerson,
+            SynPopCreator synPopCreator = new SynPopCreator(commuterFilesOutgoing, censusFile, outputBase, numberOfPlansPerPerson,
                     Arrays.asList("05"), defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio);
-            demandGeneratorCensus.setWriteMatsimPlanFiles(writeMatsimPlanFiles);
-            demandGeneratorCensus.setIncludeChildren(includeChildren);
-            demandGeneratorCensus.setIdsOfMunicipalitiesForSpatialRefinement(new ArrayList<>(new LinkedHashSet<String>(idsOfMunicipalitiesConsideredForSpatialRefinement)));
-            demandGeneratorCensus.setRefinementFeatureKeyInShapefile(plzFeatureKey);
-            demandGeneratorCensus.setMunicipalityFeatureKeyInShapefile(municipalityFeatureKey);
-            demandGeneratorCensus.setShapeFileForSpatialRefinement(spatialRefinementShapeFile);
+            synPopCreator.setWriteMatsimPlanFiles(writeMatsimPlanFiles);
+            synPopCreator.setIncludeChildren(includeChildren);
+            synPopCreator.setIdsOfMunicipalitiesForSpatialRefinement(new ArrayList<>(new LinkedHashSet<String>(idsOfMunicipalitiesConsideredForSpatialRefinement)));
+            synPopCreator.setRefinementFeatureKeyInShapefile(plzFeatureKey);
+            synPopCreator.setMunicipalityFeatureKeyInShapefile(municipalityFeatureKey);
+            synPopCreator.setShapeFileForSpatialRefinement(spatialRefinementShapeFile);
 
-            demandGeneratorCensus.generateDemand();
+            synPopCreator.generateDemand();
 //        }
         { // zones and lor files
 

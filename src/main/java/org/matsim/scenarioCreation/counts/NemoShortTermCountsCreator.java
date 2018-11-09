@@ -22,7 +22,6 @@
 package org.matsim.scenarioCreation.counts;
 
 
-import lombok.val;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -108,7 +107,7 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 		String now = format.format(Calendar.getInstance().getTime());
 		description += "\n created: " + now;
 
-        val result = convert(description);
+		Map<String, Counts<Link>> result = convert(description);
 
         finish(result);
         return result;
@@ -286,8 +285,8 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
         @Override
         protected NemoShortTermCountsCreator newInstance() {
 
-            val input = new CountsInput(svnDir);
-            val creator = new NemoShortTermCountsCreator(
+			CountsInput input = new CountsInput(svnDir);
+			NemoShortTermCountsCreator creator = new NemoShortTermCountsCreator(
                     columnCombinations, network,
                     input.getInputShorttermCountDataRootDir(), input.getInputShorttermCountMapping(), loggingFolder
             );

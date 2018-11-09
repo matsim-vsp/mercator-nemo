@@ -1,8 +1,6 @@
 package org.matsim.scenarioCreation.counts;
 
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 public class CountsInput {
 
     private static final String INPUT_LONGTERM_COUNT_DATA_ROOT_DIR = "/projects/nemo_mercator/data/original_files/counts_rohdaten/dauerzaehlstellen";
@@ -12,7 +10,11 @@ public class CountsInput {
 
     private String svnDir;
 
-    public String getInputLongtermCountDataRootDir() {
+    public CountsInput(String svnDir) {
+        this.svnDir = svnDir;
+    }
+
+    String getInputLongtermCountDataRootDir() {
         return svnDir + INPUT_LONGTERM_COUNT_DATA_ROOT_DIR;
     }
 
@@ -20,7 +22,7 @@ public class CountsInput {
         return svnDir + INPUT_LONGTERM_COUNT_NODES_MAPPING;
     }
 
-    public String getInputShorttermCountDataRootDir() {
+    String getInputShorttermCountDataRootDir() {
         return svnDir + INPUT_SHORTTERM_COUNT_DATA_ROOT_DIR;
     }
 

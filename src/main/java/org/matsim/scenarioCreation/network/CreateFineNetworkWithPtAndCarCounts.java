@@ -2,9 +2,10 @@ package org.matsim.scenarioCreation.network;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import lombok.val;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.utils.MergeNetworks;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.counts.Counts;
@@ -38,13 +39,13 @@ public class CreateFineNetworkWithPtAndCarCounts {
     public static void main(String[] args) throws IOException {
 
         // parse input variables
-        val arguments = new CreateFineNetworkWithPtAndCarCounts.InputArguments();
+        InputArguments arguments = new CreateFineNetworkWithPtAndCarCounts.InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-        val networkOutputParams = new NetworkOutput(arguments.svnDir);
-        val networkInputParams = new NetworkInput(arguments.svnDir);
-        val ptInputParams = new PtInput(arguments.svnDir);
-        val ptOutputParams = new PtOutput(arguments.svnDir);
+        NetworkOutput networkOutputParams = new NetworkOutput(arguments.svnDir);
+        NetworkInput networkInputParams = new NetworkInput(arguments.svnDir);
+        PtInput ptInputParams = new PtInput(arguments.svnDir);
+        PtOutput ptOutputParams = new PtOutput(arguments.svnDir);
 
         // ensure output folder is present
         final Path outputNetwork = networkOutputParams.getOutputNetworkDir().resolve(SUBDIR).resolve(FILE_PREFIX + ".xml.gz");
@@ -52,10 +53,10 @@ public class CreateFineNetworkWithPtAndCarCounts {
         Files.createDirectories(ptOutputParams.getTransitScheduleFile().getParent());
 
         // read in transit-network, vehicles and schedule from osm
-        val scenarioFromOsmSchedule = new CreateScenarioFromOsmFile().run(ptInputParams.getOsmScheduleFile().toString());
+        Scenario scenarioFromOsmSchedule = new CreateScenarioFromOsmFile().run(ptInputParams.getOsmScheduleFile().toString());
 
         // read in transit-network, vehicles and schedule from gtfs
-        val scenarioFromGtfsSchedule = new CreateScenarioFromGtfs().run(ptInputParams.getGtfsFile().toString());
+        Scenario scenarioFromGtfsSchedule = new CreateScenarioFromGtfs().run(ptInputParams.getGtfsFile().toString());
 
         // merge two transit networks into gtfs network
         MergeNetworks.merge(scenarioFromGtfsSchedule.getNetwork(), "", scenarioFromOsmSchedule.getNetwork());
@@ -68,7 +69,7 @@ public class CreateFineNetworkWithPtAndCarCounts {
                 .write(ptOutputParams.getTransitScheduleFile().toString());
 
         // create the network from scratch
-        val creator = new NetworkCreator.Builder()
+        NetworkCreator creator = new NetworkCreator.Builder()
                 .setNetworkCoordinateSystem(NEMOUtils.NEMO_EPSG)
                 .setSvnDir(arguments.svnDir)
                 .withByciclePaths()
@@ -77,7 +78,7 @@ public class CreateFineNetworkWithPtAndCarCounts {
                 .withRideOnCarLinks()
                 .build();
 
-        val network = creator.createNetwork();
+        Network network = creator.createNetwork();
 
         logger.info("merge transit networks and car/ride/bike network");
         MergeNetworks.merge(network, "", scenarioFromGtfsSchedule.getNetwork());
@@ -87,22 +88,22 @@ public class CreateFineNetworkWithPtAndCarCounts {
 
         // create long term counts
         Set<String> columnCombinations = new HashSet<>(Collections.singletonList(RawDataVehicleTypes.Pkw.toString()));
-        val longTermCountsCreator = new NemoLongTermCountsCreator.Builder()
+        NemoLongTermCountsCreator longTermCountsCreator = new NemoLongTermCountsCreator.Builder()
                 .setSvnDir(arguments.svnDir)
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 50025L)
                 .build();
-        val longTermCounts = longTermCountsCreator.run();
+        Map<String, Counts<Link>> longTermCounts = longTermCountsCreator.run();
 
         // create short term counts
-        val shortTermCountsCreator = new NemoShortTermCountsCreator.Builder()
+        NemoShortTermCountsCreator shortTermCountsCreator = new NemoShortTermCountsCreator.Builder()
                 .setSvnDir(arguments.svnDir)
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 5025L)
                 .build();
-        val shortTermCounts = shortTermCountsCreator.run();
+        Map<String, Counts<Link>> shortTermCounts = shortTermCountsCreator.run();
 
         writeCounts(networkOutputParams, columnCombinations, longTermCounts, shortTermCounts);
     }
@@ -124,7 +125,7 @@ public class CreateFineNetworkWithPtAndCarCounts {
         // create a separate counts file for each column combination
         // each counts file contains all counts long term and short term count stations
         columnCombinations.forEach(combination -> {
-            val writer = new CombinedCountsWriter<Link>();
+            CombinedCountsWriter<Link> writer = new CombinedCountsWriter<>();
             Arrays.stream(countsMaps).forEach(map -> writer.addCounts(map.get(combination)));
             logger.info("writing counts to folder: " + output.getOutputNetworkDir().resolve(SUBDIR).toString());
             writer.write(output.getOutputNetworkDir().resolve(SUBDIR).resolve(FILE_PREFIX + "_counts_" + combination + ".xml").toString());

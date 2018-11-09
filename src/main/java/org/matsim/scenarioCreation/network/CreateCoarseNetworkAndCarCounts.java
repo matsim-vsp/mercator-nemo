@@ -2,8 +2,8 @@ package org.matsim.scenarioCreation.network;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import lombok.val;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.counts.Counts;
 import org.matsim.scenarioCreation.counts.CombinedCountsWriter;
@@ -26,42 +26,42 @@ public class CreateCoarseNetworkAndCarCounts {
     public static void main(String[] args) throws IOException {
 
         // parse input variables
-        val arguments = new InputArguments();
+        InputArguments arguments = new InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-        val outputParams = new NetworkOutput(arguments.svnDir);
+        NetworkOutput outputParams = new NetworkOutput(arguments.svnDir);
 
         //ensure all output directories are present
         Files.createDirectories(outputParams.getOutputNetworkDir().resolve(SUBDIR));
 
         // create the network from scratch with default setting of network creator
-        val creator = new NetworkCreator.Builder()
+        NetworkCreator creator = new NetworkCreator.Builder()
                 .setNetworkCoordinateSystem(NEMOUtils.NEMO_EPSG)
                 .setSvnDir(arguments.svnDir)
                 .build();
 
-        val network = creator.createNetwork();
+        Network network = creator.createNetwork();
         logger.info("Writing network to: " + outputParams.getOutputNetworkDir().resolve(SUBDIR));
         new NetworkWriter(network).write(outputParams.getOutputNetworkDir().resolve(SUBDIR).resolve("nemo_coarse_network.xml.gz").toString());
 
         // create long term counts
         Set<String> columnCombinations = new HashSet<>(Collections.singletonList(RawDataVehicleTypes.Pkw.toString()));
-        val longTermCountsCreator = new NemoLongTermCountsCreator.Builder()
+        NemoLongTermCountsCreator longTermCountsCreator = new NemoLongTermCountsCreator.Builder()
                 .setSvnDir(arguments.svnDir)
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 50025L)
                 .build();
-        val longTermCounts = longTermCountsCreator.run();
+        Map<String, Counts<Link>> longTermCounts = longTermCountsCreator.run();
 
         // create short term counts
-        val shortTermCountsCreator = new NemoShortTermCountsCreator.Builder()
+        NemoShortTermCountsCreator shortTermCountsCreator = new NemoShortTermCountsCreator.Builder()
                 .setSvnDir(arguments.svnDir)
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 5025L)
                 .build();
-        val shortTermCounts = shortTermCountsCreator.run();
+        Map<String, Counts<Link>> shortTermCounts = shortTermCountsCreator.run();
 
         writeCounts(outputParams, columnCombinations, longTermCounts, shortTermCounts);
     }
@@ -72,7 +72,7 @@ public class CreateCoarseNetworkAndCarCounts {
         // create a separate counts file for each column combination
         // each counts file contains all counts long term and short term count stations
         columnCombinations.forEach(combination -> {
-            val writer = new CombinedCountsWriter<Link>();
+            CombinedCountsWriter<Link> writer = new CombinedCountsWriter<>();
             Arrays.stream(countsMaps).forEach(map -> writer.addCounts(map.get(combination)));
             writer.write(output.getOutputNetworkDir().resolve(SUBDIR).resolve("nemo_coarse_network_counts_" + combination + ".xml").toString());
         });

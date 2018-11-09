@@ -1,6 +1,5 @@
 package org.matsim.scenarioCreation.counts;
 
-import lombok.val;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 
@@ -17,12 +16,12 @@ public class CombinedCountsWriter<T> {
 
     public void write(String filename) {
 
-        val combinedCounts = new Counts<T>();
+        Counts<T> combinedCounts = new Counts<>();
         countsList.forEach(counts -> counts.getCounts().forEach((id, count) -> {
             // can't use map and flat map since 'getcounts' returns a treemap which doesn't implement streaming
             combinedCounts.getCounts().put(id, count);
         }));
-        val writer = new CountsWriter(combinedCounts);
+        CountsWriter writer = new CountsWriter(combinedCounts);
         writer.write(filename);
     }
 }
