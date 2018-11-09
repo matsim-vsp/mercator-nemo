@@ -21,7 +21,6 @@
  */
 package org.matsim.scenarioCreation.counts;
 
-import lombok.val;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -114,7 +113,7 @@ public class NemoLongTermCountsCreator {
 		SimpleDateFormat format = new SimpleDateFormat("YY_MM_dd_HHmmss");
 		String now = format.format(Calendar.getInstance().getTime());
 	  	description += "\n created: " + now;
-        val result = convert(description);
+		Map<String, Counts<Link>> result = convert(description);
 
         // finish alters things in result but we won't change that now.
         finish(result);
@@ -168,9 +167,9 @@ public class NemoLongTermCountsCreator {
 
     protected Map<String, Counts<Link>> convert(String countsDescription) {
 
-        val countsPerColumnCombination = new HashMap<String, Counts<Link>>();
+		Map<String, Counts<Link>> countsPerColumnCombination = new HashMap<>();
         for (String combination : this.columnCombination) {
-            val container = new Counts<Link>();
+			Counts<Link> container = new Counts<>();
             container.setDescription(container.getDescription() + countsDescription);
 			container.setYear(this.lastDayOfAnalysis.getYear());
 
@@ -572,7 +571,7 @@ public class NemoLongTermCountsCreator {
 						it.remove();
 					}
                 if (count.getVolumes().size() > 0) {
-                    for (val volume : (Collection<Volume>) count.getVolumes().values()) {
+					for (Volume volume : (Collection<Volume>) count.getVolumes().values()) {
                         if (volume.getValue() < 0) {
                             nrOfCountsWithPartiallyMissingInformation++;
                             break;
@@ -867,8 +866,8 @@ public class NemoLongTermCountsCreator {
 
         protected NemoLongTermCountsCreator newInstance() {
 
-            val input = new CountsInput(svnDir);
-            val creator = new NemoLongTermCountsCreator(
+			CountsInput input = new CountsInput(svnDir);
+			NemoLongTermCountsCreator creator = new NemoLongTermCountsCreator(
                     columnCombinations, network,
                     input.getInputLongtermCountDataRootDir(),
                     input.getInputLongtermCountNodesMapping(),

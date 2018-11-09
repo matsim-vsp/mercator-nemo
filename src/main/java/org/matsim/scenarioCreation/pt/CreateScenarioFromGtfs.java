@@ -20,7 +20,6 @@
 package org.matsim.scenarioCreation.pt;
 
 import com.conveyal.gtfs.GTFSFeed;
-import lombok.val;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -56,7 +55,7 @@ public class CreateScenarioFromGtfs {
         log.info("GTFS zip file: " + gtfsZipFile);
 
         // Convert GTFS to matsim transit schedule
-        val scenario = createScenarioFromGtfsFile(gtfsZipFile, date, ct);
+        Scenario scenario = createScenarioFromGtfsFile(gtfsZipFile, date, ct);
 
         //Create a network around the schedule
         new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), NEMOUtils.TRANSIT_NETWORK_PREFIX).createNetwork();

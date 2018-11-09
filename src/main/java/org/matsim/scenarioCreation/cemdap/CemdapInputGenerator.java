@@ -19,16 +19,12 @@
 
 package org.matsim.scenarioCreation.cemdap;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import playground.vsp.openberlinscenario.cemdap.input.SynPopCreator;
 import playground.vsp.openberlinscenario.cemdap.input.ZoneAndLOSGeneratorV2;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by amit on 22.06.17.
