@@ -79,20 +79,19 @@ public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
     private static void connectNodeToNetwork(Network network, Network highwayNetwork, Node node) {
 
         // search for possible connections with increasing radius
-        Collection<Node> nodes = getNearestNodes(network, node, 30);
-
-        if (nodes.size() == 0) {
-            nodes = getNearestNodes(network, node, 50);
-        }
-        if (nodes.size() == 0) {
-            nodes = getNearestNodes(network, node, 100);
-        }
-        nodes.forEach(nearNode -> {
-            if (!highwayNetwork.getNodes().values().contains(nearNode)) {
-                network.addLink(createLinkWithAttributes(network.getFactory(), node, nearNode));
-                network.addLink(createLinkWithAttributes(network.getFactory(), nearNode, node));
-            }
-        });
+        Collection<Node> nodes = getNearestNodes(network, node, 100);
+        nodes.stream()
+                .filter(nearNode -> !highwayNetwork.getNodes().values().contains(nearNode))
+                .sorted((node1, node2) -> {
+                    Double dist1 = NetworkUtils.getEuclideanDistance(node1.getCoord(), node.getCoord());
+                    Double dist2 = NetworkUtils.getEuclideanDistance(node2.getCoord(), node.getCoord());
+                    return dist1.compareTo(dist2);
+                })
+                .limit(1)
+                .forEach(nearNode -> {
+                    network.addLink(createLinkWithAttributes(network.getFactory(), node, nearNode, 4.17));
+                    network.addLink(createLinkWithAttributes(network.getFactory(), nearNode, node, 4.17));
+                });
     }
 
     private static Collection<Node> getNearestNodes(Network network, Node node, double distance) {
@@ -101,14 +100,14 @@ public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
     }
 
     private static Link copyWithUUID(NetworkFactory factory, Link link) {
-        return createLinkWithAttributes(factory, link.getFromNode(), link.getToNode());
+        return createLinkWithAttributes(factory, link.getFromNode(), link.getToNode(), 8.33); // with 30km/h
     }
 
     private static Link copyWithUUIDAndReverseDirection(NetworkFactory factory, Link link) {
-        return createLinkWithAttributes(factory, link.getToNode(), link.getFromNode());
+        return createLinkWithAttributes(factory, link.getToNode(), link.getFromNode(), 8.33); // with 30km/h
     }
 
-    private static Link createLinkWithAttributes(NetworkFactory factory, Node fromNode, Node toNode) {
+    private static Link createLinkWithAttributes(NetworkFactory factory, Node fromNode, Node toNode, double freeSpeed) {
 
         Link result = factory.createLink(
                 Id.createLinkId("bike-highway_" + UUID.randomUUID().toString()),
@@ -116,7 +115,7 @@ public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
         );
         result.setAllowedModes(new HashSet<>(Collections.singletonList(TransportMode.bike)));
         result.setCapacity(10000); // TODO find source for capacity
-        result.setFreespeed(8.33); // 30 km/h
+        result.setFreespeed(freeSpeed);
         result.setNumberOfLanes(1);
         result.setLength(NetworkUtils.getEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
         return result;
