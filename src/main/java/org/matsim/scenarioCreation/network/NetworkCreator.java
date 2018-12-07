@@ -99,8 +99,9 @@ class NetworkCreator {
     private void cleanNetwork(Network network) {
         if (cleaningModes.isEmpty())
             new NetworkCleaner().run(network);
-        else
-            new MultimodalNetworkCleaner(network).run(cleaningModes);
+        else {
+            cleaningModes.forEach(mode -> new MultimodalNetworkCleaner(network).run(new HashSet<>(Collections.singletonList(mode))));
+        }
     }
 
     private void addRideOnCarLinks(Network network) {
