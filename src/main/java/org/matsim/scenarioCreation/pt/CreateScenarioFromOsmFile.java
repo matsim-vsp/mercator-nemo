@@ -85,6 +85,7 @@ public class CreateScenarioFromOsmFile {
 		VehicleCapacity capacity = scenario.getTransitVehicles().getFactory().createVehicleCapacity();
 		capacity.setSeats(500);
 		type.setCapacity(capacity);
+		type.setPcuEquivalents(0);
 		scenario.getTransitVehicles().addVehicleType(type);
 		
 		// create transit lines

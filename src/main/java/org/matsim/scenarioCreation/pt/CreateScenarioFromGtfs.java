@@ -60,8 +60,9 @@ public class CreateScenarioFromGtfs {
         //Create a network around the schedule
         new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), NEMOUtils.TRANSIT_NETWORK_PREFIX).createNetwork();
 
-        //Create simple transit vehicles
+        //Create simple transit vehicles with a pcu of 0
         new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();
+        scenario.getTransitVehicles().getVehicleTypes().forEach((id, type) -> type.setPcuEquivalents(0));
 
         // correct network
         scenario.getNetwork().getLinks().values().stream()

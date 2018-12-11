@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -17,9 +16,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -29,8 +25,6 @@ import playground.vsp.cadyts.marginals.AgentFilter;
 import playground.vsp.cadyts.marginals.ModalDistanceAnalysisModule;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.Arrays;
 
 @SuppressWarnings("WeakerAccess")
@@ -110,7 +104,8 @@ public class BaseCaseCalibrationRunner {
             }
         });
 
-        CustomLinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator( scenario.getNetwork() );
+        //TODO put this back in, when CustomLinkSpeedCalculator is ready
+       /* CustomLinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator( scenario.getNetwork() );
 
         controler.addOverridingQSimModule( new AbstractQSimModule(){
             @Override
@@ -125,6 +120,7 @@ public class BaseCaseCalibrationRunner {
                 } ) ;
             }
         } ) ;
+        */
 
         // add overridingModules from method parameters
         Arrays.stream(overridingModule).forEach(controler::addOverridingModule);
