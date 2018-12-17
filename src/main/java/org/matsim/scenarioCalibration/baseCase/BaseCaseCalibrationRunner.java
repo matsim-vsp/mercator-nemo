@@ -7,8 +7,6 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -16,8 +14,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
 import org.matsim.util.NEMOUtils;
@@ -39,6 +36,18 @@ public class BaseCaseCalibrationRunner {
     private Config config;
     private Scenario scenario;
     private Controler controler;
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public Scenario getScenario() {
+        return scenario;
+    }
+
+    public Controler getControler() {
+        return controler;
+    }
 
     public BaseCaseCalibrationRunner(String configPath, String runId, String outputDir, String inputDir) {
 
@@ -64,7 +73,7 @@ public class BaseCaseCalibrationRunner {
         System.exit(0);
     }
 
-    public Controler prepareControler(AbstractModule... overridingModule) {
+    public Controler prepareControler(AbstractQSimModule... overridingQSimModule) {
 
         if (scenario == null) prepareScenario();
 
@@ -104,26 +113,8 @@ public class BaseCaseCalibrationRunner {
             }
         });
 
-        //TODO put this back in, when CustomLinkSpeedCalculator is ready
-       /* CustomLinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator( scenario.getNetwork() );
-
-        controler.addOverridingQSimModule( new AbstractQSimModule(){
-            @Override
-            protected void configureQSim(){
-                bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
-                    @Inject private EventsManager events ;
-                    @Override public QNetworkFactory get() {
-                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
-                        factory.setLinkSpeedCalculator(linkSpeedCalculator);
-                        return factory ;
-                    }
-                } ) ;
-            }
-        } ) ;
-        */
-
-        // add overridingModules from method parameters
-        Arrays.stream(overridingModule).forEach(controler::addOverridingModule);
+        // add overridingQSimModules from method parameters
+        Arrays.stream(overridingQSimModule).forEach(controler::addOverridingQSimModule);
 
         return controler;
     }
@@ -185,23 +176,4 @@ public class BaseCaseCalibrationRunner {
         @Parameter(names = "-inputDir", required = true)
         private String inputDir;
     }
-
-    public static final String BIKESPEED = "bikespeed" ;
-
-    static class CustomLinkSpeedCalculator implements LinkSpeedCalculator{
-
-        private final Network network;
-
-        public CustomLinkSpeedCalculator( Network network ) {
-            this.network = network;
-        }
-
-        @Override
-        public double getMaximumVelocity( QVehicle vehicle, Link link, double time ) {
-            double bikespeed = (double) link.getAttributes().getAttribute( BIKESPEED );
-            return bikespeed ;
-        }
-
-    }
-
 }

@@ -255,6 +255,7 @@ public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
             result.setAllowedModes(new HashSet<>(Collections.singletonList(TransportMode.bike)));
             result.setCapacity(10000); // set to pretty much unlimited
             result.setFreespeed(8.3); // 30km/h
+            result.getAttributes().putAttribute(BikeLinkSpeedCalculator.BIKE_SPEED_FACTOR_KEY, 1.0); // bikes can reach their max velocity on bike highways
             result.setNumberOfLanes(1);
             result.setLength(NetworkUtils.getEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
             return result;

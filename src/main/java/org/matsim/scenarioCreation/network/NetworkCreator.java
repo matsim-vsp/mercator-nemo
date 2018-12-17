@@ -64,6 +64,8 @@ class NetworkCreator {
         if (withRideOnCarLinks) {
             addRideOnCarLinks(network);
         }
+
+        addBikeSpeedFactor(network);
         return network;
     }
 
@@ -112,6 +114,14 @@ class NetworkCreator {
                     modes.add(TransportMode.ride);
                     link.setAllowedModes(modes);
                 });
+    }
+
+    private void addBikeSpeedFactor(Network network) {
+        // we assume that bikes can only reach 0.5 of their max velocity on regular streets
+        // they're able to go 1.0 on bike highways
+        network.getLinks().forEach((id, link) -> link.getAttributes().putAttribute(
+                BikeLinkSpeedCalculator.BIKE_SPEED_FACTOR_KEY, 0.5
+        ));
     }
 
     private Set<Long> readNodeIds(List<String> listOfCSVFiles) {
