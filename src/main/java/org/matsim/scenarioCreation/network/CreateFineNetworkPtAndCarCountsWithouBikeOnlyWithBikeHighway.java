@@ -41,7 +41,6 @@ public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
 
     private static final String SUBDIR = "fine_with-pt_without-bike-only-links_with-bike-highway";
     private static final String FILE_PREFIX = "nemo_fine_network_with-pt_without-bike-only-links_with-bike-highway";
-    private static final String inputFile = "C:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\matsim_input\\network\\fine_with-pt_without-bike-only-links\\nemo_fine_network_with-pt_without-bike-only-links.xml.gz";
     private static final Logger logger = LoggerFactory.getLogger(CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway.class);
 
     public static void main(String[] args) throws IOException {
