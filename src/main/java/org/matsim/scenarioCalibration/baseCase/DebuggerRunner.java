@@ -48,6 +48,8 @@ public class DebuggerRunner {
 
         DebuggerRunner.InputArguments arguments = new InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
+
+        new DebuggerRunner(arguments.configPath, arguments.runId, arguments.outputDir, arguments.inputDir).run();
     }
 
     public void run() {
