@@ -38,6 +38,7 @@ public class CreateCoarseNetworkAndCarCounts {
         NetworkCreator creator = new NetworkCreator.Builder()
                 .setNetworkCoordinateSystem(NEMOUtils.NEMO_EPSG)
                 .setSvnDir(arguments.svnDir)
+                .withRideOnCarLinks()
                 .build();
 
         Network network = creator.createNetwork();
