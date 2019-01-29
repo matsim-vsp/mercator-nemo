@@ -21,11 +21,15 @@
  */
 package org.matsim.scenarioCreation.counts;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -37,8 +41,9 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.logging.*;
 import java.util.logging.Formatter;
+import java.util.logging.*;
+import java.util.stream.Collectors;
 
 /**
  * @author tschlenther
@@ -56,6 +61,7 @@ public class NemoLongTermCountsCreator {
 	private final String pathToCountData;
 	private final String pathToOSMMappingFile;
 	final Network network;
+	private Geometry filter;
 	
 	private LocalDate firstDayOfAnalysis = null;
 	private LocalDate lastDayOfAnalysis = null;
@@ -79,14 +85,15 @@ public class NemoLongTermCountsCreator {
 	private Map<String,Id<Link>> linkIDsOfCountingStations = new HashMap<String,Id<Link>>();
 	final List<Long> countingStationsToOmit = new ArrayList<Long>();
 
-    protected NemoLongTermCountsCreator(Set<String> columnCombination, Network network,
-                                        String countDataRootDirectory, String countsMapping,
-                                        String outputPath) {
+	protected NemoLongTermCountsCreator(Set<String> columnCombination, Network network, Geometry filter,
+										String countDataRootDirectory, String countsMapping,
+										String outputPath) {
 		this.network = network;
         this.pathToCountData = countDataRootDirectory;
 		this.outputPath = outputPath;
         this.pathToOSMMappingFile = countsMapping;
         this.columnCombination = columnCombination;
+		this.filter = filter;
     }
 	
 	/**
@@ -520,8 +527,8 @@ public class NemoLongTermCountsCreator {
                             }
                         }
                     }
-
-                    linkIDsOfCounts.put(row[0], countLinkID);
+					if (countLinkID != null && isWithinFilter(network.getLinks().get(countLinkID)))
+						linkIDsOfCounts.put(row[0], countLinkID);
                 }
                 header = false;
             }
@@ -539,6 +546,14 @@ public class NemoLongTermCountsCreator {
             linkFinder.writeNetworkThatShowsAllFoundPaths(outputPath + "visNetOfReconstructedPaths_" + format.format(Calendar.getInstance().getTime()) + ".xml");
         }
     }
+
+	private boolean isWithinFilter(Link link) {
+		try {
+			return (link == null || filter.contains(MGC.coord2Point(link.getCoord())));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
     protected void finish(Map<String, Counts<Link>> countsPerColumnCombination) {
 
@@ -752,6 +767,7 @@ public class NemoLongTermCountsCreator {
         int weekRangeMax = 5;
         Network network;
         Set<String> columnCombinations;
+		Geometry filter;
 
         /**
          * @param svnDir Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder
@@ -849,6 +865,19 @@ public class NemoLongTermCountsCreator {
             return this;
         }
 
+		public AbstractBuilder<T> useCountsWithinGeometry(Geometry filter) {
+			this.filter = filter;
+			return this;
+		}
+
+		public AbstractBuilder<T> useCountsWithinGeometry(String pathToShapeFile) {
+			GeometryFactory factory = new GeometryFactory();
+			List<Geometry> geometries = ShapeFileReader.getAllFeatures(pathToShapeFile).stream()
+					.map(feature -> (Geometry) feature.getDefaultGeometry())
+					.collect(Collectors.toList());
+			return this.useCountsWithinGeometry(factory.buildGeometry(geometries).union());
+		}
+
         /**
          * Create a new instance
          * @return new instance of counts creator
@@ -868,7 +897,7 @@ public class NemoLongTermCountsCreator {
 
 			CountsInput input = new CountsInput(svnDir);
 			NemoLongTermCountsCreator creator = new NemoLongTermCountsCreator(
-                    columnCombinations, network,
+					columnCombinations, network, filter,
                     input.getInputLongtermCountDataRootDir(),
                     input.getInputLongtermCountNodesMapping(),
                     loggingFolder

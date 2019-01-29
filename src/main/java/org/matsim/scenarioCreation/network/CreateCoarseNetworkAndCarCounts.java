@@ -29,6 +29,7 @@ public class CreateCoarseNetworkAndCarCounts {
         InputArguments arguments = new InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
+        NetworkInput inputParams = new NetworkInput(arguments.svnDir);
         NetworkOutput outputParams = new NetworkOutput(arguments.svnDir);
 
         //ensure all output directories are present
@@ -52,6 +53,7 @@ public class CreateCoarseNetworkAndCarCounts {
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 50025L)
+                .useCountsWithinGeometry(inputParams.getInputNetworkShapeFilter())
                 .build();
         Map<String, Counts<Link>> longTermCounts = longTermCountsCreator.run();
 
@@ -61,6 +63,7 @@ public class CreateCoarseNetworkAndCarCounts {
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 5025L)
+                .useCountsWithinGeometry(inputParams.getInputNetworkShapeFilter())
                 .build();
         Map<String, Counts<Link>> shortTermCounts = shortTermCountsCreator.run();
 

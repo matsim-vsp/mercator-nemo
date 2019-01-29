@@ -58,6 +58,7 @@ public class CreateFineNetworkAndCarCounts {
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 50025L)
+                .useCountsWithinGeometry(inputParams.getInputNetworkShapeFilter())
                 .build();
         Map<String, Counts<Link>> longTermCounts = longTermCountsCreator.run();
 
@@ -67,6 +68,7 @@ public class CreateFineNetworkAndCarCounts {
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 5025L)
+                .useCountsWithinGeometry(inputParams.getInputNetworkShapeFilter())
                 .build();
         Map<String, Counts<Link>> shortTermCounts = shortTermCountsCreator.run();
 
@@ -84,7 +86,6 @@ public class CreateFineNetworkAndCarCounts {
             writer.write(output.getOutputNetworkDir().resolve(SUBDIR).resolve("nemo_fine_network_counts_" + combination + ".xml").toString());
         });
     }
-
 
     private static class InputArguments {
 

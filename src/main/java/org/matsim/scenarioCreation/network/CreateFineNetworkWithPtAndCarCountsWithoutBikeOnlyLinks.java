@@ -93,6 +93,7 @@ public class CreateFineNetworkWithPtAndCarCountsWithoutBikeOnlyLinks {
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 50025L)
+                .useCountsWithinGeometry(networkInputParams.getInputNetworkShapeFilter())
                 .build();
         Map<String, Counts<Link>> longTermCounts = longTermCountsCreator.run();
 
@@ -102,6 +103,7 @@ public class CreateFineNetworkWithPtAndCarCountsWithoutBikeOnlyLinks {
                 .withNetwork(network)
                 .withColumnCombinations(columnCombinations)
                 .withStationIdsToOmit(5002L, 5025L)
+                .useCountsWithinGeometry(networkInputParams.getInputNetworkShapeFilter())
                 .build();
         Map<String, Counts<Link>> shortTermCounts = shortTermCountsCreator.run();
 

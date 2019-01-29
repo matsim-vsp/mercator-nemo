@@ -22,6 +22,7 @@
 package org.matsim.scenarioCreation.counts;
 
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -56,12 +57,13 @@ import static java.nio.file.FileVisitResult.TERMINATE;
 public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 
     protected NemoShortTermCountsCreator(Set<String> columnCombination,
-                                         Network network,
-                                         String countDataRootDirectory,
-                                         String countsMapping,
-                                         String logginFolder) {
+										 Network network,
+										 Geometry filter,
+										 String countDataRootDirectory,
+										 String countsMapping,
+										 String logginFolder) {
 
-        super(columnCombination, network, countDataRootDirectory, countsMapping, logginFolder);
+		super(columnCombination, network, filter, countDataRootDirectory, countsMapping, logginFolder);
     }
 
     public static void deleteFileOrFolder(final Path path) throws IOException {
@@ -287,7 +289,7 @@ public class NemoShortTermCountsCreator extends NemoLongTermCountsCreator {
 
 			CountsInput input = new CountsInput(svnDir);
 			NemoShortTermCountsCreator creator = new NemoShortTermCountsCreator(
-                    columnCombinations, network,
+					columnCombinations, network, filter,
                     input.getInputShorttermCountDataRootDir(), input.getInputShorttermCountMapping(), loggingFolder
             );
 
