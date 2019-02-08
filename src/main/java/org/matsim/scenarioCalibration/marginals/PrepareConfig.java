@@ -36,6 +36,7 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Created by amit on 02.03.18.
@@ -113,7 +114,7 @@ public class PrepareConfig {
 
         if ( rideAsMainMode ) {
             outConfig.travelTimeCalculator().setSeparateModes(true);
-            outConfig.travelTimeCalculator().setAnalyzedModes("car,ride");
+            outConfig.travelTimeCalculator().setAnalyzedModes(new HashSet<>(Arrays.asList("car", "ride")));
         } else{
             //using overriding modules
         }
