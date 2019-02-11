@@ -85,18 +85,19 @@ public class NemoModeLocationChoiceCalibrator {
         boolean useEssenBochumReferenceData = false;
 
         if (args.length > 0) {
-            configFile = args[0];
-            outputDir = args[1];
-            runId = args[2];
-            lastIt = Integer.valueOf(args[3]);
-            cadytsCountsWt = Double.valueOf(args[4]);
-            cadytsMarginalsWt = Double.valueOf(args[5]);
-            shapeFile = args[6];
-            keepInitialPlans = Boolean.valueOf(args[7]);
+            // the following comments show the settings for cadyts run 307
+            configFile = args[0]; ///net/ils4/ziemke/nemo/marginals/input/preparedConfig_25.xml
+            outputDir = args[1]; ///net/ils4/ziemke/nemo/marginals/$JOB_NAME/output/
+            runId = args[2]; //$JOB_NAME
+            lastIt = Integer.valueOf(args[3]); //700
+            cadytsCountsWt = Double.valueOf(args[4]); //15.0
+            cadytsMarginalsWt = Double.valueOf(args[5]); //5.0
+            shapeFile = args[6]; // /net/ils4/agarwal/nemo/data/marginals/input/ruhrgebiet_boundary.shp
+            keepInitialPlans = Boolean.valueOf(args[7]); //true
 
-            if (args.length>8) removeStayHomePlanForMaxShortDistTrips = Boolean.valueOf(args[8]);
-            if (args.length>9) mergeShortDistanceBins = Boolean.valueOf(args[9]);
-            if (args.length>10) useEssenBochumReferenceData = Boolean.valueOf(args[10]);
+            if (args.length > 8) removeStayHomePlanForMaxShortDistTrips = Boolean.valueOf(args[8]); //false
+            if (args.length > 9) mergeShortDistanceBins = Boolean.valueOf(args[9]); // true
+            if (args.length > 10) useEssenBochumReferenceData = Boolean.valueOf(args[10]); //false
         }
 
         Config config = ConfigUtils.loadConfig(configFile);

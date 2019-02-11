@@ -22,6 +22,7 @@ package org.matsim.util;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -32,6 +33,8 @@ import playground.vsp.analysis.modules.modalAnalyses.modalTripTime.ModalTripTrav
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -257,5 +260,16 @@ public final class NEMOUtils {
                 this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
             }
         };
+    }
+
+    public static List<PlanCalcScoreConfigGroup.ActivityParams> createTypicalDurations(String type, long minDurationInSeconds, long maxDurationInSeconds, long durationDifferenceInSeconds) {
+
+        List<PlanCalcScoreConfigGroup.ActivityParams> result = new ArrayList<>();
+        for (long duration = minDurationInSeconds; duration <= maxDurationInSeconds; duration += durationDifferenceInSeconds) {
+            final PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams(type + "_" + duration + ".0");
+            params.setTypicalDuration(duration);
+            result.add(params);
+        }
+        return result;
     }
 }

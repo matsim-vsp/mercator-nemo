@@ -11,6 +11,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
+import org.matsim.util.NEMOUtils;
 import playground.vsp.cadyts.marginals.BeelineDistanceCollector;
 import playground.vsp.cadyts.marginals.prep.DistanceBin;
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
@@ -22,10 +23,10 @@ import java.util.Map;
 import java.util.SortedMap;
 
 public class CadytsModeAnalysisDebugging {
-    private final String configFile = "/Users/ihab/Documents/workspace/runs-svn/nemo/marginals/run307/output/run307.output_config.xml";
-    private final String eventsFile = "C:\\Users\\Janek\\runs-svn\\nemo\\marginals\\run307\\output\\run307.output_events.xml.gz";
-    private final String networkFile = "C:\\Users\\Janek\\runs-svn\\nemo\\marginals\\run307\\output\\run307.output_network.xml.gz";
-    private final String shapeFile = "C:/Users/Janek/shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
+    private final String plansFile = "G:\\Users\\Janek\\runs-svn\\nemo\\marginals\\run307\\output\\run307.output_plans.xml.gz";
+    private final String eventsFile = "G:\\Users\\Janek\\runs-svn\\nemo\\marginals\\run307\\output\\run307.output_events.xml.gz";
+    private final String networkFile = "G:\\Users\\Janek\\runs-svn\\nemo\\marginals\\run307\\output\\run307.output_network.xml.gz";
+    private final String shapeFile = "G:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\shapeFiles\\shapeFile_Ruhrgebiet\\ruhrgebiet_boundary.shp";
 
     public static void main(String[] args) {
         CadytsModeAnalysisDebugging anaMain = new CadytsModeAnalysisDebugging();
@@ -47,11 +48,12 @@ public class CadytsModeAnalysisDebugging {
 
         Config config = ConfigUtils.createConfig();
         config.network().setInputFile(networkFile);
+        config.plans().setInputFile(plansFile);
+        config.global().setCoordinateSystem(NEMOUtils.NEMO_EPSG);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         EventsManager events = EventsUtils.createEventsManager();
 
         DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
-
 
         RuhrAgentsFilter filter = new RuhrAgentsFilter(scenario, shapeFile);
         BeelineDistanceCollector handler1 = new BeelineDistanceCollector(scenario, inputDistanceDistribution, events, filter);
@@ -77,7 +79,7 @@ public class CadytsModeAnalysisDebugging {
         MatsimEventsReader reader = new MatsimEventsReader(events);
         reader.readFile(eventsFile);
 
-        writeData(handler1.getOutputDistanceDistribution(), "C:\\Users\\Janek\\Desktop\\run307_amitsAnalyse.csv");
+        writeData(handler1.getOutputDistanceDistribution(), "G:\\Users\\Janek\\Desktop\\run307_amitsAnalyse.csv");
 
     }
 
