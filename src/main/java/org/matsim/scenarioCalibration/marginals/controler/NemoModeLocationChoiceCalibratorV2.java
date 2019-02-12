@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashSet;
 
+@SuppressWarnings("Duplicates")
 public class NemoModeLocationChoiceCalibratorV2 {
 
     private final String inputDir;
@@ -231,7 +232,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
         @Parameter(names = "-countsWeight")
         double countsWeight = 15;
 
-        @Parameter(names = "marginalsWeight")
+        @Parameter(names = "-marginalsWeight")
         double marginalsWeight = 5.0;
     }
 }
