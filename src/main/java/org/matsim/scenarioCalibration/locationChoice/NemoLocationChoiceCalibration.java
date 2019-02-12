@@ -39,6 +39,8 @@ import org.matsim.util.NEMOUtils;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * Created by amit on 03.11.17.
@@ -112,7 +114,7 @@ public class NemoLocationChoiceCalibration {
 
                 final ScoringParameters params = parameters.getScoringParameters(person);
                 sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-                        controler.getScenario().getNetwork()));
+                        controler.getScenario().getNetwork(), new HashSet<>(Collections.singletonList("pt"))));
                 sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
                 sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 

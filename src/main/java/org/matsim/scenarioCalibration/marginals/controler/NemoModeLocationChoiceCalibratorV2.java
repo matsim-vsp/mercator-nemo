@@ -33,6 +33,8 @@ import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
 import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.HashSet;
 
 public class NemoModeLocationChoiceCalibratorV2 {
 
@@ -57,7 +59,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
         this.cadytsMarginalsWeight = arguments.marginalsWeight;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         LocationChoiceArguments arguments = new LocationChoiceArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
@@ -139,7 +141,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
 
                 final ScoringParameters params = parameters.getScoringParameters(person);
                 sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-                        controler.getScenario().getNetwork()));
+                        controler.getScenario().getNetwork(), new HashSet<>(Collections.singletonList("pt"))));
                 sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
                 sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 

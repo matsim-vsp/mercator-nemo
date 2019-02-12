@@ -45,6 +45,8 @@ import playground.vsp.cadyts.marginals.ModalDistanceDistributionControlerListene
 import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * Created by amit on 01.05.18.
@@ -134,7 +136,7 @@ public class RuhrCountsCadytsRun {
 
                 final ScoringParameters params = parameters.getScoringParameters(person);
                 sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-                        controler.getScenario().getNetwork()));
+                        controler.getScenario().getNetwork(), new HashSet<>(Collections.singletonList("pt"))));
                 sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
                 sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 

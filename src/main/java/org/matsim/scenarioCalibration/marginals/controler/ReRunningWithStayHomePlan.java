@@ -39,6 +39,8 @@ import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
 
 public class ReRunningWithStayHomePlan {
 	
@@ -173,7 +175,7 @@ public class ReRunningWithStayHomePlan {
 
                     final ScoringParameters params = parameters.getScoringParameters(person);
                     sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-                            controler.getScenario().getNetwork()));
+                            controler.getScenario().getNetwork(), new HashSet<>(Collections.singletonList("pt"))));
                     sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
                     sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
@@ -207,7 +209,7 @@ public class ReRunningWithStayHomePlan {
 
                     final ScoringParameters params = parameters.getScoringParameters(person);
                     sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-                            controler.getScenario().getNetwork()));
+                            controler.getScenario().getNetwork(), new HashSet<>(Collections.singletonList("pt"))));
                     sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
                     sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
