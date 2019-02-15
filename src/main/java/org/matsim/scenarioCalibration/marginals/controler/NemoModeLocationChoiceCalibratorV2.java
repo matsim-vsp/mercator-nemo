@@ -1,6 +1,5 @@
 package org.matsim.scenarioCalibration.marginals.controler;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.matsim.api.core.v01.Scenario;
@@ -89,14 +88,6 @@ public class NemoModeLocationChoiceCalibratorV2 {
                 // what is this doing?
                 if (getConfig().strategy().getPlanSelectorForRemoval().equals(InitialPlanKeeperPlanRemoval.initial_plans_keeper_plan_remover))
                     bindPlanSelectorForRemoval().to(InitialPlanKeeperPlanRemoval.class);
-            }
-        });
-
-        // use fast pt router
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                install(new SwissRailRaptorModule());
             }
         });
 
