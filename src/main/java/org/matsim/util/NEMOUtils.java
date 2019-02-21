@@ -91,7 +91,7 @@ public final class NEMOUtils {
         return ScenarioUtils.loadScenario(config);
     }
 
-    public static DistanceDistribution getDistanceDistributionFromMiD(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+    public static DistanceDistribution getDistanceDistributionFromMiD(double countScaleFactor, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
         DistanceDistribution distanceDistribution = new DistanceDistribution();
         Map<String, PlansCalcRouteConfigGroup.ModeRoutingParams> modeRoutingParamsMap = plansCalcRouteConfigGroup.getModeRoutingParams();
 
@@ -106,11 +106,11 @@ public final class NEMOUtils {
         distanceDistribution.setBeelineDistanceFactorForNetworkModes(
                 TransportMode.ride, getBeelineDistanceFactor(modeRoutingParamsMap, TransportMode.ride, 1.3));
 
-        distanceDistribution.setModeToScalingFactor(TransportMode.car, 100.0);
-        distanceDistribution.setModeToScalingFactor(TransportMode.pt, 100.0);
-        distanceDistribution.setModeToScalingFactor(TransportMode.bike, 100.0);
-        distanceDistribution.setModeToScalingFactor(TransportMode.ride, 100.0);
-        distanceDistribution.setModeToScalingFactor(TransportMode.walk, 100.0);
+        distanceDistribution.setModeToScalingFactor(TransportMode.car, countScaleFactor);
+        distanceDistribution.setModeToScalingFactor(TransportMode.pt, countScaleFactor);
+        distanceDistribution.setModeToScalingFactor(TransportMode.bike, countScaleFactor);
+        distanceDistribution.setModeToScalingFactor(TransportMode.ride, countScaleFactor);
+        distanceDistribution.setModeToScalingFactor(TransportMode.walk, countScaleFactor);
 
         // we are using extended MiD data for the Ruhrgebiet area. Data can be found in shared-svn\projects\nemo_mercator\data\original_files\MID\MiD2017_Wege_RVR-Gebiet_mit_Berechnungen.xlsx
         distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(0, 1000.), 357488);

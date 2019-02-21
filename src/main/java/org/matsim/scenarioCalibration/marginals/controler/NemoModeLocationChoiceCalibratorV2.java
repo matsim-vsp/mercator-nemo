@@ -101,7 +101,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
         });
 
         // marginal cadyts
-        DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistributionFromMiD(scenario.getConfig().plansCalcRoute());
+        DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistributionFromMiD(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
 
         RuhrAgentsFilter filter = new RuhrAgentsFilter(scenario, inputDir + "/ruhrgebiet_boundary.shp");
         controler.addOverridingModule(new AbstractModule() {
