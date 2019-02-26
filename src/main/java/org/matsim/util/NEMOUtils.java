@@ -88,6 +88,7 @@ public final class NEMOUtils {
         Config config = new Config();
         config.addCoreModules();
         config.plans().setInputFile(plansFile);
+        config.global().setCoordinateSystem(NEMOUtils.NEMO_EPSG);
         return ScenarioUtils.loadScenario(config);
     }
 
