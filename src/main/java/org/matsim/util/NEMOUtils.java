@@ -114,35 +114,35 @@ public final class NEMOUtils {
         distanceDistribution.setModeToScalingFactor(TransportMode.walk, countScaleFactor);
 
         // we are using extended MiD data for the Ruhrgebiet area. Data can be found in shared-svn\projects\nemo_mercator\data\original_files\MID\MiD2017_Wege_RVR-Gebiet_mit_Berechnungen.xlsx
-        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(0, 1000.), 357488);
-        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(0, 1000), 28540);
-        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(0.0, 1000.), 212908);
-        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(0.0, 1000.), 1842358);
-        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(0.0, 1000.), 124379);
+        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(0, 1000.), 10000, 357488);
+        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(0, 1000), 10000, 28540);
+        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(0.0, 1000.), 10000, 212908);
+        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(0.0, 1000.), 10000, 1842358);
+        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(0.0, 1000.), 1000, 124379);
 
-        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(1000.0, 3000.), 1213004);
-        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(1000.0, 3000.), 437762);
-        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(1000.0, 3000.), 541548);
-        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(1000.0, 3000.), 832557);
-        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(1000.0, 3000.), 483180);
+        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(1000.0, 3000.), 10000, 1213004);
+        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(1000.0, 3000.), 10000, 437762);
+        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(1000.0, 3000.), 10000, 541548);
+        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(1000.0, 3000.), 10000, 832557);
+        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(1000.0, 3000.), 1000, 483180);
 
-        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(3000.0, 5000.), 842537);
-        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(3000.0, 5000.), 323085);
-        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(3000.0, 5000.), 328707);
-        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(3000.0, 5000.), 132547);
-        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(3000.0, 5000.), 232588);
+        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(3000.0, 5000.), 10000, 842537);
+        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(3000.0, 5000.), 10000, 323085);
+        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(3000.0, 5000.), 10000, 328707);
+        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(3000.0, 5000.), 10000, 132547);
+        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(3000.0, 5000.), 1000, 232588);
 
-        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(5000.0, 10000.), 1274829);
-        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(5000.0, 10000.), 326567);
-        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(5000.0, 10000.), 99804);
-        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(5000.0, 10000.), 68559);
-        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(5000.0, 10000.), 325927);
+        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(5000.0, 10000.), 10000, 1274829);
+        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(5000.0, 10000.), 10000, 326567);
+        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(5000.0, 10000.), 10000, 99804);
+        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(5000.0, 10000.), 10000, 68559);
+        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(5000.0, 10000.), 1000, 325927);
 
-        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(10000.0, 1000000.), 1979366);
-        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(10000.0, 1000000.), 456848);
-        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(10000.0, 1000000.), 63259);
-        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(10000.0, 1000000.), 33138);
-        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(10000.0, 1000000.), 322899);
+        distanceDistribution.addToDistribution(TransportMode.car, new DistanceBin.DistanceRange(10000.0, 1000000.), 10000, 1979366);
+        distanceDistribution.addToDistribution(TransportMode.pt, new DistanceBin.DistanceRange(10000.0, 1000000.), 10000, 456848);
+        distanceDistribution.addToDistribution(TransportMode.bike, new DistanceBin.DistanceRange(10000.0, 1000000.), 10000, 63259);
+        distanceDistribution.addToDistribution(TransportMode.walk, new DistanceBin.DistanceRange(10000.0, 1000000.), 10000, 33138);
+        distanceDistribution.addToDistribution(TransportMode.ride, new DistanceBin.DistanceRange(10000.0, 1000000.), 1000, 322899);
 
         return distanceDistribution;
     }
@@ -152,101 +152,6 @@ public final class NEMOUtils {
             String modeKey,
             double defaultValue) {
         return modeRoutingParams.containsKey(modeKey) ? modeRoutingParams.get(modeKey).getBeelineDistanceFactor() : defaultValue;
-    }
-
-    public static DistanceDistribution getDistanceDistribution(double carCountScaleFactor, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup,
-                                                               boolean mergeShortDistanceBins, boolean useEssenBochumReferenceData) {
-        DistanceDistribution inputDistanceDistribution = new DistanceDistribution();
-
-        Map<String, PlansCalcRouteConfigGroup.ModeRoutingParams> modeRoutingParams = plansCalcRouteConfigGroup.getModeRoutingParams();
-
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("car", modeRoutingParams.containsKey("car") ? modeRoutingParams.get("car").getBeelineDistanceFactor() : 1.3); //+pt;
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("bike", modeRoutingParams.containsKey("bike") ? modeRoutingParams.get("bike").getBeelineDistanceFactor() : 1.3);
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("walk", modeRoutingParams.containsKey("walk") ? modeRoutingParams.get("walk").getBeelineDistanceFactor() : 1.3);
-        inputDistanceDistribution.setBeelineDistanceFactorForNetworkModes("ride", modeRoutingParams.containsKey("ride") ? modeRoutingParams.get("ride").getBeelineDistanceFactor() : 1.3);
-
-        inputDistanceDistribution.setModeToScalingFactor("car", carCountScaleFactor);
-        inputDistanceDistribution.setModeToScalingFactor("bike", 100.0);
-        inputDistanceDistribution.setModeToScalingFactor("walk", 100.0);
-        inputDistanceDistribution.setModeToScalingFactor("ride", 100.0);
-
-        if (useEssenBochumReferenceData) {
-            if (mergeShortDistanceBins) {
-
-                inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0, 3000.), 1681862.0 + 349515.0);
-                inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(0.0, 3000.), 233988.0 + 88247.0);
-                inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0, 3000.), 969147.0 + 1660012.0);
-                inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0, 3000.), 522180.0 + 120346.0);
-
-            } else {
-
-                inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0, 1000.), 349515.0); //car+PT
-                inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(0.0, 1000.), 88247.0);
-                inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0, 1000.), 1660012.0);
-                inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0, 1000.), 120346.0);
-
-                inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(1000.0, 3000.), 1681862.0);
-                inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(1000.0, 3000.), 233988.0);
-                inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(1000.0, 3000.), 969147.0);
-                inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(1000.0, 3000.), 522180.0);
-
-            }
-
-            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(3000.0, 5000.), 1559081.0);
-            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(3000.0, 5000.), 151014.0);
-            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(3000.0, 5000.), 176786.0);
-            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(3000.0, 5000.), 369415.0);
-
-            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(5000.0, 10000.), 2125322.0);
-            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(5000.0, 10000.), 63506.0);
-            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(5000.0, 10000.), 36089.0);
-            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(5000.0, 10000.), 508044.0);
-
-            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(10000.0, 1000000.), 2894404.0);
-            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(10000.0, 1000000.), 51604.0);
-            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(10000.0, 1000000.), 0.0);
-            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(10000.0, 1000000.), 326112.0);
-            return inputDistanceDistribution;
-
-        } else { // Essen as representative for urban parts in Ruhr and ...
-
-            if (mergeShortDistanceBins) {
-
-                inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0, 3000.), 1547035.0 + 245472.0);
-                inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(0.0, 3000.), 213707.0 + 62279.0);
-                inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0, 3000.), 1000502.0 + 1379412.0);
-                inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0, 3000.), 392418.0 + 60623.0);
-
-            } else {
-
-                inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(0.0, 1000.), 245472.0); //car+PT
-                inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(0.0, 1000.), 62279.0);
-                inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(0.0, 1000.), 1379412.0);
-                inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(0.0, 1000.), 60623.0);
-
-                inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(1000.0, 3000.), 1547035.0);
-                inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(1000.0, 3000.), 213707.0);
-                inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(1000.0, 3000.), 1000502.0);
-                inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(1000.0, 3000.), 392418.0);
-
-            }
-
-            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(3000.0, 5000.), 1604974.0);
-            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(3000.0, 5000.), 132017.0);
-            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(3000.0, 5000.), 191563.0);
-            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(3000.0, 5000.), 337532.0);
-
-            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(5000.0, 10000.), 2189502.0);
-            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(5000.0, 10000.), 90592.0);
-            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(5000.0, 10000.), 45296.0);
-            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(5000.0, 10000.), 442931.0);
-
-            inputDistanceDistribution.addToDistribution("car", new DistanceBin.DistanceRange(10000.0, 1000000.), 2959574.0);
-            inputDistanceDistribution.addToDistribution("bike", new DistanceBin.DistanceRange(10000.0, 1000000.), 52738.0);
-            inputDistanceDistribution.addToDistribution("walk", new DistanceBin.DistanceRange(10000.0, 1000000.), 0.0);
-            inputDistanceDistribution.addToDistribution("ride", new DistanceBin.DistanceRange(10000.0, 1000000.), 306624.0);
-            return inputDistanceDistribution;
-        }
     }
 
     public static AbstractModule createModalShareAnalysis() {
