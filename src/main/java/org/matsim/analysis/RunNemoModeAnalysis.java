@@ -41,9 +41,9 @@ public class RunNemoModeAnalysis {
 //		final String outputDirectory = "/Users/ihab/Desktop/modal-split-analysis-transit-walk/";
 //		final String runId = "test";
 
-		final String runId = "nemo_baseCase_030";
-		final String runDirectory = "C:\\Users\\Janek\\Desktop\\baseCase_030";
-		final String outputBaseDirectory = "C:\\Users\\Janek\\Desktop\\baseCase_030\\modal-split-analysis";
+		final String runId = "nemo_baseCase_070";
+		final String runDirectory = "C:\\Users\\Janek\\Desktop\\baseCase_070\\";
+		final String outputBaseDirectory = "C:\\Users\\Janek\\Desktop\\baseCase_070\\modal-split-analysis";
 
 		// if iteration < 0 --> analysis of the final iteration
 		int iteration = -1;
@@ -68,7 +68,7 @@ public class RunNemoModeAnalysis {
 //		filter.setPersonAttribute("berlin");
 //		filter.setPersonAttributeName("home-activity-zone");
 
-		filter.setZoneFile("/Users/ihab/Documents/workspace/shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp");
+		filter.setZoneFile("C:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\matsim_input\\baseCase\\ruhrgebiet_boundary.shp");
 		filter.setRelevantActivityType("home");
 
 		filter.preProcess(scenario);
@@ -88,9 +88,7 @@ public class RunNemoModeAnalysis {
 		distanceGroups.add(new Tuple<>(1000., 3000.));
 		distanceGroups.add(new Tuple<>(3000., 5000.));
 		distanceGroups.add(new Tuple<>(5000., 10000.));
-		distanceGroups.add(new Tuple<>(10000., 20000.));
-		distanceGroups.add(new Tuple<>(20000., 100000.));
-		distanceGroups.add(new Tuple<>(100000., 1000000.));
+		distanceGroups.add(new Tuple<>(10000., 1000000.));
 		analysis.writeTripRouteDistances(outputDirectory, distanceGroups);
 		analysis.writeTripEuclideanDistances(outputDirectory, distanceGroups);
 	}
