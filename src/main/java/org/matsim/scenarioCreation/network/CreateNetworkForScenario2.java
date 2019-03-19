@@ -1,18 +1,8 @@
 package org.matsim.scenarioCreation.network;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,9 +35,11 @@ import org.matsim.vehicles.Vehicles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class CreateNetworkForScenario2 {
 
@@ -163,8 +155,7 @@ public class CreateNetworkForScenario2 {
     }
 
 
-	
-	public static void banCarfromResidentialAreasAndCreateBikeLinks(Network network, String shpFile) {
+	private static void banCarfromResidentialAreasAndCreateBikeLinks(Network network, String shpFile) {
 
 		List<Geometry> geometries = new ArrayList<>();
 		ShapeFileReader.getAllFeatures(shpFile)
@@ -238,7 +229,7 @@ public class CreateNetworkForScenario2 {
 		}
 	}
 
-	public static boolean linkIsInShape(Link link, List<Geometry> geometries) {
+	private static boolean linkIsInShape(Link link, List<Geometry> geometries) {
 
 		Coord fromCoord = link.getFromNode().getCoord();
 		Coord toCoord = link.getToNode().getCoord();
@@ -246,15 +237,11 @@ public class CreateNetworkForScenario2 {
 				.anyMatch(geometry -> geometry.contains(MGC.coord2Point(fromCoord)));
 		boolean toCoordInShape = geometries.stream().anyMatch(geometry -> geometry.contains(MGC.coord2Point(toCoord)));
 
-		if (fromCoordInShape && toCoordInShape) {
-			return true;
-		} else {
-			return false;
-		}
+		return fromCoordInShape && toCoordInShape;
 
 	}
 
-	public static void addMorePtDepartures(Scenario scenario) {
+	private static void addMorePtDepartures(Scenario scenario) {
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 
@@ -262,11 +249,8 @@ public class CreateNetworkForScenario2 {
 			for (TransitRoute route : line.getRoutes().values()) {
 
 				// putting all departures in a list to sort them by time
-				List<Departure> departures = new ArrayList<>();
 
-				for (Departure departure : route.getDepartures().values()) {
-					departures.add(departure);
-				}
+				List<Departure> departures = new ArrayList<>(route.getDepartures().values());
 
 				departures.sort(Comparator.comparing(Departure::getDepartureTime));
 
@@ -303,7 +287,7 @@ public class CreateNetworkForScenario2 {
 		}
 	}
 
-	public static Departure createVehicleAndReturnDeparture(Scenario scenario, Departure oldDeparture, double t) {
+	private static Departure createVehicleAndReturnDeparture(Scenario scenario, Departure oldDeparture, double t) {
 
 		// create vehicle
 		Id<Vehicle> oldVehicleId = oldDeparture.getVehicleId();
