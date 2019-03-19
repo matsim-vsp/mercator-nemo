@@ -21,17 +21,15 @@
  */
 package org.matsim.scenarioCreation.network;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader.OsmFilter;
 import org.opengis.feature.simple.SimpleFeature;
-import com.vividsolutions.jts.geom.Geometry;
+
+import java.util.ArrayList;
+import java.util.List;
 /**
  * @author tschlenther
  *

@@ -4,7 +4,7 @@ class NetworkInput {
 
     private static final String INPUT_OSM_FILE = "/projects/nemo_mercator/data/matsim_input/zz_archive/network/06042018/NRW_completeTransportNet.osm.gz";
     private static final String INPUT_NETWORK_SHAPE_FILTER = "/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
-    private static final String INPUT_BIKE_HIGHWAY_NETWORK = "/projects/nemo_mercator/data/original_files/BikeWays/Network_RSV_Edited.xml";
+    private static final String INPUT_BIKE_HIGHWAY_NETWORK = "/projects/nemo_mercator/data/original_files/BikeWays/Network_EMSCHERWEG_AND_RSV";
 
     private String svnDir;
 

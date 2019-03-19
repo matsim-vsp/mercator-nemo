@@ -19,18 +19,15 @@
 
 package org.matsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.vsp.corineLandcover.GeometryUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by amit on 01.02.18.

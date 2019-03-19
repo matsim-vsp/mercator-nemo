@@ -21,7 +21,7 @@ package org.matsim.scenarioCreation.network;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;

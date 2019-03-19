@@ -1,5 +1,6 @@
 package org.matsim.scenarioCreation.network;
 
+<<<<<<< HEAD
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +16,11 @@ import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+=======
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import org.locationtech.jts.geom.Geometry;
+>>>>>>> branch 'master' of https://github.com/matsim-vsp/mercator-nemo.git
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,9 +56,11 @@ import org.matsim.vehicles.Vehicles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.Map.Entry;
 
 /*
  * Creates the network and transit schedule+vehicles for Nemo Scenario 2
@@ -161,7 +169,19 @@ public class CreateNetworkForScenario2 {
 		private String svnDir;
 	}
 
+<<<<<<< HEAD
 	public static void banCarfromResidentialAreasAndCreateBikeLinks(Network network, String shpFile) {
+=======
+    private static class InputArguments {
+
+        @Parameter(names = "-svnDir", required = true,
+                description = "Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder")
+        private String svnDir;
+    }
+
+
+	private static void banCarfromResidentialAreasAndCreateBikeLinks(Network network, String shpFile) {
+>>>>>>> branch 'master' of https://github.com/matsim-vsp/mercator-nemo.git
 
 		List<Geometry> geometries = new ArrayList<>();
 		ShapeFileReader.getAllFeatures(shpFile)
@@ -235,7 +255,7 @@ public class CreateNetworkForScenario2 {
 		}
 	}
 
-	public static boolean linkIsInShape(Link link, List<Geometry> geometries) {
+	private static boolean linkIsInShape(Link link, List<Geometry> geometries) {
 
 		Coord fromCoord = link.getFromNode().getCoord();
 		Coord toCoord = link.getToNode().getCoord();
@@ -243,15 +263,11 @@ public class CreateNetworkForScenario2 {
 				.anyMatch(geometry -> geometry.contains(MGC.coord2Point(fromCoord)));
 		boolean toCoordInShape = geometries.stream().anyMatch(geometry -> geometry.contains(MGC.coord2Point(toCoord)));
 
-		if (fromCoordInShape && toCoordInShape) {
-			return true;
-		} else {
-			return false;
-		}
+		return fromCoordInShape && toCoordInShape;
 
 	}
 
-	public static void addMorePtDepartures(Scenario scenario) {
+	private static void addMorePtDepartures(Scenario scenario) {
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 
@@ -259,11 +275,8 @@ public class CreateNetworkForScenario2 {
 			for (TransitRoute route : line.getRoutes().values()) {
 
 				// putting all departures in a list to sort them by time
-				List<Departure> departures = new ArrayList<>();
 
-				for (Departure departure : route.getDepartures().values()) {
-					departures.add(departure);
-				}
+				List<Departure> departures = new ArrayList<>(route.getDepartures().values());
 
 				departures.sort(Comparator.comparing(Departure::getDepartureTime));
 
@@ -300,7 +313,7 @@ public class CreateNetworkForScenario2 {
 		}
 	}
 
-	public static Departure createVehicleAndReturnDeparture(Scenario scenario, Departure oldDeparture, double t) {
+	private static Departure createVehicleAndReturnDeparture(Scenario scenario, Departure oldDeparture, double t) {
 
 		// create vehicle
 		Id<Vehicle> oldVehicleId = oldDeparture.getVehicleId();
