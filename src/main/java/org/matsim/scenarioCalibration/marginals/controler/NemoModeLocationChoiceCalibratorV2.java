@@ -191,9 +191,9 @@ public class NemoModeLocationChoiceCalibratorV2 {
         result.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
         result.strategy().setMaxAgentPlanMemorySize(15);
 
-        result.facilities().setAddEmptyActivityOption(false);
-        result.facilities().setRemovingLinksAndCoordinates(false); //keeping coordinates
-        result.facilities().setAssigningOpeningTime(false);
+        //   result.facilities().setAddEmptyActivityOption(false);
+        //   result.facilities().setRemovingLinksAndCoordinates(false); //keeping coordinates
+        //   result.facilities().setAssigningOpeningTime(false);
         result.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile);
 
         final long minDuration = 600;
