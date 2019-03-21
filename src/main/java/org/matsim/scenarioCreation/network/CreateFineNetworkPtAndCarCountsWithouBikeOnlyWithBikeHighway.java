@@ -37,6 +37,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("ALL")
 public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
 
     private static final String SUBDIR = "fine_with-pt_without-bike-only-links_with-bike-highway";

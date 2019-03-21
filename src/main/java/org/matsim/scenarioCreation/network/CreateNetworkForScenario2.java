@@ -1,26 +1,9 @@
 package org.matsim.scenarioCreation.network;
 
-<<<<<<< HEAD
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
-=======
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.locationtech.jts.geom.Geometry;
->>>>>>> branch 'master' of https://github.com/matsim-vsp/mercator-nemo.git
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
-
+import java.util.stream.Collectors;
 /*
  * Creates the network and transit schedule+vehicles for Nemo Scenario 2
  * - fine network
@@ -169,19 +152,7 @@ public class CreateNetworkForScenario2 {
 		private String svnDir;
 	}
 
-<<<<<<< HEAD
-	public static void banCarfromResidentialAreasAndCreateBikeLinks(Network network, String shpFile) {
-=======
-    private static class InputArguments {
-
-        @Parameter(names = "-svnDir", required = true,
-                description = "Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder")
-        private String svnDir;
-    }
-
-
 	private static void banCarfromResidentialAreasAndCreateBikeLinks(Network network, String shpFile) {
->>>>>>> branch 'master' of https://github.com/matsim-vsp/mercator-nemo.git
 
 		List<Geometry> geometries = new ArrayList<>();
 		ShapeFileReader.getAllFeatures(shpFile)

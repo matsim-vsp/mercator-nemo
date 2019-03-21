@@ -41,9 +41,9 @@ public class RunNemoModeAnalysis {
 //		final String outputDirectory = "/Users/ihab/Desktop/modal-split-analysis-transit-walk/";
 //		final String runId = "test";
 
-		final String runId = "nemo_baseCase_070";
-		final String runDirectory = "C:\\Users\\Janek\\Desktop\\baseCase_070\\";
-		final String outputBaseDirectory = "C:\\Users\\Janek\\Desktop\\baseCase_070\\modal-split-analysis";
+        final String runId = "nemo_baseCase_089";
+        final String runDirectory = "G:\\Users\\Janek\\Desktop\\baseCase_089\\";
+        final String outputBaseDirectory = "G:\\Users\\Janek\\Desktop\\baseCase_089\\modal-split-analysis";
 
 		// if iteration < 0 --> analysis of the final iteration
 		int iteration = -1;
@@ -68,7 +68,7 @@ public class RunNemoModeAnalysis {
 //		filter.setPersonAttribute("berlin");
 //		filter.setPersonAttributeName("home-activity-zone");
 
-		filter.setZoneFile("C:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\matsim_input\\baseCase\\ruhrgebiet_boundary.shp");
+        filter.setZoneFile("G:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\matsim_input\\baseCase\\ruhrgebiet_boundary.shp");
 		filter.setRelevantActivityType("home");
 
 		filter.preProcess(scenario);

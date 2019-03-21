@@ -3,8 +3,6 @@ package org.matsim.scenarioCalibration.baseCase;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -16,18 +14,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.scenarioCalibration.marginals.RuhrAgentsFilter;
-import org.matsim.util.NEMOUtils;
-import playground.vsp.cadyts.marginals.AgentFilter;
-import playground.vsp.cadyts.marginals.ModalDistanceAnalysisModule;
-import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
 
 import java.util.Arrays;
 
 @SuppressWarnings("WeakerAccess")
 public class BaseCaseCalibrationRunner {
-
-    private static final String ruhrShapeFile = "/ruhrgebiet_boundary.shp";
 
     private final String configPath;
     private final String runId;
@@ -93,23 +84,6 @@ public class BaseCaseCalibrationRunner {
             public void install() {
                 addTravelTimeBinding(TransportMode.ride).to(networkTravelTime());
                 addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());
-            }
-        });
-
-        // use special analysis for modalShare
-		controler.addOverridingModule(NEMOUtils.createModalShareAnalysis());
-
-        // add Modal Distance analysis
-        DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistributionFromMiD(
-                config.counts().getCountsScaleFactor(),
-                scenario.getConfig().plansCalcRoute()
-        );
-        controler.addOverridingModule(new ModalDistanceAnalysisModule(distanceDistribution));
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(AgentFilter.class).to(RuhrAgentsFilter.class);
-                bind(Key.get(String.class, Names.named(RuhrAgentsFilter.ruhr_boundary_shape))).toInstance(inputDir + ruhrShapeFile);
             }
         });
 
