@@ -549,7 +549,7 @@ public class NemoLongTermCountsCreator {
 
 	private boolean isWithinFilter(Link link) {
 		try {
-			return (link == null || filter.contains(MGC.coord2Point(link.getCoord())));
+			return (filter == null || link == null || filter.contains(MGC.coord2Point(link.getCoord())));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

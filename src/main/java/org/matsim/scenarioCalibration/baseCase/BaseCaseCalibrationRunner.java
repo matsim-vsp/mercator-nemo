@@ -15,6 +15,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 @SuppressWarnings("WeakerAccess")
@@ -38,6 +39,10 @@ public class BaseCaseCalibrationRunner {
 
     public Controler getControler() {
         return controler;
+    }
+
+    public BaseCaseCalibrationRunner(String runId, String outputDir, String inputDir) {
+        this(Paths.get(inputDir).resolve("config.xml").toString(), runId, outputDir, inputDir);
     }
 
     public BaseCaseCalibrationRunner(String configPath, String runId, String outputDir, String inputDir) {

@@ -38,16 +38,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("ALL")
-public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
+public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighwayAndBridge {
 
-    private static final String SUBDIR = "fine_with-pt_without-bike-only-links_with-bike-highway";
-    private static final String FILE_PREFIX = "nemo_fine_network_with-pt_without-bike-only-links_with-bike-highway";
-    private static final Logger logger = LoggerFactory.getLogger(CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway.class);
+    private static final String SUBDIR = "fine_with-pt_without-bike-only-links_with-bike-highway_and-bridge";
+    private static final String FILE_PREFIX = "nemo_fine_network_with-pt_without-bike-only-links_with-bike-highway_and-bridge";
+    private static final Logger logger = LoggerFactory.getLogger(CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighwayAndBridge.class);
 
     public static void main(String[] args) throws IOException {
 
         // parse input
-        CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway.InputArguments arguments = new CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway.InputArguments();
+        CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighwayAndBridge.InputArguments arguments = new CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighwayAndBridge.InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
         NetworkOutput outputParams = new NetworkOutput(arguments.svnDir);
@@ -90,7 +90,7 @@ public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
 
         logger.info("merge bike highways into network");
         Network highwayInput = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(highwayInput).readFile(inputParams.getInputBikeHighwayNetwork());
+        new MatsimNetworkReader(highwayInput).readFile(inputParams.getInputBikeHighwayNetworkWithBridge());
         BikeNetworkMerger merger = new BikeNetworkMerger(network);
         network = merger.mergeBikeHighways(highwayInput);
 

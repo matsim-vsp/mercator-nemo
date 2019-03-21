@@ -11,8 +11,8 @@ import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 
 public class FilterSelectedPlansFromCadytsOutput {
 
-	private static final String plansFilePath = "/nemo/cadytsV2/cadytsV2_014/cadytsV2_014.output_plans.xml.gz";
-	private static final String outputFilePath = "/projects/nemo_mercator/data/matsim_input/baseCase/selectedPlans_from_cadytsV2_014.xml.gz";
+    private static final String plansFilePath = "/nemo/baseCaseCalibration/nemo_baseCase_089/output/nemo_baseCase_089.output_plans.xml.gz";
+    private static final String outputFilePath = "/projects/nemo_mercator/data/matsim_input/scenario_bike-highways/selectedPlans_from_baseCase_089.xml.gz";
 
     public static void main(String[] args) {
 
