@@ -30,16 +30,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class CreateFineNetworkWithPtAndCarCountsWithoutBikeOnlyLinks {
+public class CreateFineNetworkPtAndCarCountsWithoutBikeOnly {
 
     private static final String SUBDIR = "fine_with-pt_without-bike-only-links";
     private static final String FILE_PREFIX = "nemo_fine_network_with-pt_without-bike-only-links";
-    private static final Logger logger = LoggerFactory.getLogger(CreateFineNetworkWithPtAndCarCounts.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreateFineNetworkPtAndCarCountsWithoutBikeOnly.class);
 
     public static void main(String[] args) throws IOException {
 
         // parse input variables
-        InputArguments arguments = new CreateFineNetworkWithPtAndCarCountsWithoutBikeOnlyLinks.InputArguments();
+        InputArguments arguments = new CreateFineNetworkPtAndCarCountsWithoutBikeOnly.InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
         NetworkOutput networkOutputParams = new NetworkOutput(arguments.svnDir);

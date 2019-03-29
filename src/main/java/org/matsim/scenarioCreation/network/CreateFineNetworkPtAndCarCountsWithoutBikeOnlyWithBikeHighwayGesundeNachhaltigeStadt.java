@@ -57,11 +57,11 @@ import java.util.stream.Collectors;
  * - PT: number of vehicles doubled
  */
 
-public class CreateNetworkForScenario2 {
+public class CreateFineNetworkPtAndCarCountsWithoutBikeOnlyWithBikeHighwayGesundeNachhaltigeStadt {
 
-	private static final String SUBDIR = "fine_with-pt_scenario2";
-	private static final String FILE_PREFIX = "nemo_fine_network_with-pt_scenario2";
-	private static final Logger logger = LoggerFactory.getLogger(CreateFineNetworkPtAndCarCounts.class);
+	private static final String SUBDIR = "fineNetworkPtAndCarCountsWithoutBikeOnlyWithBikeHighwayGesundeNachhaltigeStadt";
+	private static final String FILE_PREFIX = "fineNetworkPtAndCarCountsWithoutBikeOnlyWithBikeHighwayGesundeNachhaltigeStadt";
+	private static final Logger logger = LoggerFactory.getLogger(CreateFineNetworkPtAndCarCountsWithoutBikeOnlyWithBikeHighwayGesundeNachhaltigeStadt.class);
 
 	public static void main(String[] args) throws IOException {
 
