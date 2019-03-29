@@ -1,8 +1,21 @@
 package org.matsim.scenarioCreation.network;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -14,6 +27,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.MergeNetworks;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -39,12 +53,9 @@ import org.matsim.vehicles.Vehicles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+
 /*
  * Creates the network and transit schedule+vehicles for Nemo Scenario 2
  * - fine network
@@ -95,15 +106,22 @@ public class CreateFineNetworkPtAndCarCountsWithoutBikeOnlyWithBikeHighwayGesund
 		new TransitScheduleWriterV2(scenarioFromGtfsSchedule.getTransitSchedule())
 				.write(ptOutputParams.getTransitScheduleFile().toString());
 
+		final String[] cleaningModesArray = {TransportMode.car, TransportMode.ride, TransportMode.bike};
+		
 		// create the network from scratch
 		NetworkCreator creator = new NetworkCreator.Builder().setNetworkCoordinateSystem(NEMOUtils.NEMO_EPSG)
-				.setSvnDir(arguments.svnDir).withByciclePaths()
+				.setSvnDir(arguments.svnDir)
+				.withByciclePaths()
 				.withOsmFilter(new FineNetworkFilterWithoutBikeOnlyLinks(inputParams.getInputNetworkShapeFilter()))
-				.withCleaningModes(TransportMode.car, TransportMode.ride, TransportMode.bike).withRideOnCarLinks()
+				.withCleaningModes(cleaningModesArray)
+				.withRideOnCarLinks()
 				.build();
 		Network network = creator.createNetwork();
 		
 		banCarfromResidentialAreasAndCreateBikeLinks(network, inputParams.getInputNetworkShapeFilter());
+		for (String mode : new HashSet<>(Arrays.asList(cleaningModesArray))) {
+			new MultimodalNetworkCleaner(network).run(new HashSet<>(Collections.singletonList(mode)));
+		}
 
 		logger.info("merge transit networks and car/ride/bike network");
 		MergeNetworks.merge(network, "", scenarioFromGtfsSchedule.getNetwork());

@@ -48,7 +48,6 @@ public class RemoveRouteInfoFromPlans {
 	
 	private static String inputPlans = "/Users/ihab/Desktop/selectedPlans_from_baseCase_089.xml.gz";
 	private static String outputPlans = "/Users/ihab/Desktop/selectedPlans_from_baseCase_089_without-routes.xml.gz";
-//	private static final String[] attributes = {"OpeningClosingTimes"};
 	private static final String[] attributes = {};
 	
 	public static void main(String[] args) {
@@ -106,19 +105,11 @@ public class RemoveRouteInfoFromPlans {
 				MainModeIdentifierOnlyTransitWalkImpl modeIdentifier = new MainModeIdentifierOnlyTransitWalkImpl();
 				String mode = modeIdentifier.identifyMainMode(trip.getTripElements());			
 				plan.addLeg(factory.createLeg(mode));
-				plan.addActivity(trip.getDestinationActivity());
+				Activity act = trip.getDestinationActivity();
+//				act.setLinkId(null);
+				plan.addActivity(act );
 			}
 												
-//			for (PlanElement pE : selectedPlan.getPlanElements()) {
-//				if (pE instanceof Leg) {
-//					Leg leg = (Leg) pE;
-//					
-//					if (leg.getMode().equals(TransportMode.car)) {
-//						leg.setRoute(null);
-//					}
-//					
-//				}
-//			}
 			popOutput.addPerson(personNew);
 			personNew.addPlan(plan);
 		}
