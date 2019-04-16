@@ -31,11 +31,11 @@ import org.matsim.api.core.v01.network.Link;
 * @author ikaddoura
 */
 
-public final class BerlinNetworkModification {
-	private static final Logger log = Logger.getLogger(BerlinNetworkModification.class);
-	private final BerlinShpUtils shpUtils;
+public final class SmartCityNetworkModification {
+	private static final Logger log = Logger.getLogger(SmartCityNetworkModification.class);
+	private final SmartCityShpUtils shpUtils;
 
-	public BerlinNetworkModification(BerlinShpUtils shpUtils) {
+	public SmartCityNetworkModification(SmartCityShpUtils shpUtils) {
 		this.shpUtils = shpUtils;
 	}
 	
@@ -49,11 +49,11 @@ public final class BerlinNetworkModification {
 				log.info("link #" + counter);
 			counter++;
 			if (link.getAllowedModes().contains(TransportMode.car)
-					&& link.getAllowedModes().contains(TransportMode.ride)
-					&& link.getAllowedModes().contains("freight")) {
+					&& link.getAllowedModes().contains(TransportMode.ride))
+			{
 				Set<String> allowedModes = new HashSet<>();
 				allowedModes.add(TransportMode.car);
-				allowedModes.add("freight");
+				//allowedModes.add("freight");
 				allowedModes.add(TransportMode.ride);
 				allowedModes.add(taxiNetworkMode);
 
@@ -68,7 +68,11 @@ public final class BerlinNetworkModification {
 
 			} else if (link.getAllowedModes().contains(TransportMode.pt)) {
 				// skip pt links
-			} else {
+			} 
+			else if (link.getAllowedModes().contains(TransportMode.bike)) {
+				// skip bike  links
+			} 
+			else {
 				throw new RuntimeException("Aborting...");
 			}
 		}

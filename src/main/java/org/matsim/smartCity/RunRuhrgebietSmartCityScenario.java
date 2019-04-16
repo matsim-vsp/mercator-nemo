@@ -90,8 +90,8 @@ public final class RunRuhrgebietSmartCityScenario {
 			
 		} else {
 			
-			String configFileName = "scenarios/berlin-v5.3-1pct/input/berlin-drtA-v5.3-1pct-Berlkoenig.config.xml";
-			this.drtServiceAreaShapeFile = "http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/berlin-sav-v5.2-10pct/input/shp-berlkoenig-area/berlkoenig-area.shp";
+			String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml";
+			this.drtServiceAreaShapeFile = "C://Users/Gregor/Desktop/RuhrScenario/ruhrgebiet_boundary.shp";
 			
 			this.ruhrgebiet = new RunRuhrgebietScenario( new String[]{"--config-path", configFileName, "--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile} );			
 		}
@@ -136,8 +136,8 @@ public final class RunRuhrgebietSmartCityScenario {
 		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
 		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 		
-		BerlinShpUtils shpUtils = new BerlinShpUtils(drtServiceAreaShapeFile);
-		new BerlinNetworkModification(shpUtils).addSAVmode(scenario, drtNetworkMode, drtServiceAreaAttribute);
+		SmartCityShpUtils shpUtils = new SmartCityShpUtils(drtServiceAreaShapeFile);
+		new SmartCityNetworkModification(shpUtils).addSAVmode(scenario, drtNetworkMode, drtServiceAreaAttribute);
 
 		hasPreparedScenario = true ;
 		return scenario;

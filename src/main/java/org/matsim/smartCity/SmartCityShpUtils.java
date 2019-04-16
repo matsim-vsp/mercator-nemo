@@ -46,12 +46,12 @@ import org.opengis.feature.simple.SimpleFeature;
 * @author ikaddoura
 */
 
-public final class BerlinShpUtils {
+public final class SmartCityShpUtils {
 
 	private Map<Integer, Geometry> carRestrictedAreaGeometries;
 	private Map<Integer, Geometry> serviceAreaGeometries;
 
-	public BerlinShpUtils(String carRestrictedAreaShpFile, String drtServiceAreaShapeFile) {
+	public SmartCityShpUtils(String carRestrictedAreaShpFile, String drtServiceAreaShapeFile) {
 		
 		if (carRestrictedAreaShpFile != null && carRestrictedAreaShpFile != "" && carRestrictedAreaShpFile != "null" ) {
 			this.carRestrictedAreaGeometries = loadShapeFile(carRestrictedAreaShpFile);
@@ -62,7 +62,7 @@ public final class BerlinShpUtils {
 		}
 	}
 
-	public BerlinShpUtils(String serviceAreaShapeFile) {
+	public SmartCityShpUtils(String serviceAreaShapeFile) {
 		this(null, serviceAreaShapeFile);
 	}
 

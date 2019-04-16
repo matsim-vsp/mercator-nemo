@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="254830153" x="370464.82028093695" y="5714917.672027974" >
+		</node>
+		<node id="254842212" x="370427.83527843823" y="5714491.982292956" >
+		</node>
+		<node id="27407969" x="370263.35684429435" y="5714657.582279202" >
+		</node>
+		<node id="5199853836" x="370326.9792310168" y="5714593.7850273475" >
+		</node>
+		<node id="5199853837" x="370326.57389093115" y="5714739.186026132" >
+		</node>
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="228135" from="254830153" to="5199853837" length="225.76385273868328" freespeed="1.0" capacity="0.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="228136" from="5199853837" to="254830153" length="225.76385273868328" freespeed="1.0" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="332013" from="5199853836" to="254842212" length="143.30296239473995" freespeed="1.0" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="332014" from="254842212" to="5199853836" length="143.30296239473995" freespeed="1.0" capacity="0.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="507139" from="5199853837" to="27407969" length="103.22580345299744" freespeed="1.0" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="507140" from="27407969" to="5199853837" length="103.22580345299744" freespeed="1.0" capacity="0.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="507142" from="27407969" to="5199853836" length="90.0993753385602" freespeed="1.0" capacity="0.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="507143" from="5199853836" to="27407969" length="90.0993753385602" freespeed="1.0" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>
