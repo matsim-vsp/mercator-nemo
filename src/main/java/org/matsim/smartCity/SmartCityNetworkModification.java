@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 
 /**
-* @author ikaddoura
-*/
+ * @author ikaddoura
+ */
 
 public final class SmartCityNetworkModification {
 	private static final Logger log = Logger.getLogger(SmartCityNetworkModification.class);
@@ -38,9 +38,9 @@ public final class SmartCityNetworkModification {
 	public SmartCityNetworkModification(SmartCityShpUtils shpUtils) {
 		this.shpUtils = shpUtils;
 	}
-	
+
 	public void addSAVmode(Scenario scenario, String taxiNetworkMode, String serviceAreaAttribute) {
-		
+
 		log.info("Adjusting network...");
 
 		int counter = 0;
@@ -49,11 +49,10 @@ public final class SmartCityNetworkModification {
 				log.info("link #" + counter);
 			counter++;
 			if (link.getAllowedModes().contains(TransportMode.car)
-					&& link.getAllowedModes().contains(TransportMode.ride))
-			{
+					&& link.getAllowedModes().contains(TransportMode.ride)) {
 				Set<String> allowedModes = new HashSet<>();
 				allowedModes.add(TransportMode.car);
-				//allowedModes.add("freight");
+				// allowedModes.add("freight");
 				allowedModes.add(TransportMode.ride);
 				allowedModes.add(taxiNetworkMode);
 
@@ -68,15 +67,15 @@ public final class SmartCityNetworkModification {
 
 			} else if (link.getAllowedModes().contains(TransportMode.pt)) {
 				// skip pt links
-			} 
-			else if (link.getAllowedModes().contains(TransportMode.bike)) {
-				// skip bike  links
-			} 
-			else {
+			} else if (link.getAllowedModes().contains(TransportMode.bike)) {
+				// skip bike links
+			} else {
 				throw new RuntimeException("Aborting...");
 			}
+			
 		}
+		log.info("Done");
 	}
+	
 
 }
-

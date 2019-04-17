@@ -89,10 +89,8 @@ public final class RunRuhrgebietSmartCityScenario {
 			this.ruhrgebiet = new RunRuhrgebietScenario( args ) ;
 			
 		} else {
-			
 			String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml";
 			this.drtServiceAreaShapeFile = "C://Users/Gregor/Desktop/RuhrScenario/ruhrgebiet_boundary.shp";
-			
 			this.ruhrgebiet = new RunRuhrgebietScenario( new String[]{"--config-path", configFileName, "--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile} );			
 		}
 	}
@@ -121,7 +119,6 @@ public final class RunRuhrgebietSmartCityScenario {
 
 		// Add drt-specific fare module
 		controler.addOverridingModule(new DrtFareModule());
-		
 		hasPreparedControler = true ;
 		return controler;
 	}
@@ -172,9 +169,7 @@ public final class RunRuhrgebietSmartCityScenario {
 		if ( !hasPreparedControler ) {
 			prepareControler() ;
 		}
-		
 		controler.run();
 		log.info("Done.");
 	}
 }
-
