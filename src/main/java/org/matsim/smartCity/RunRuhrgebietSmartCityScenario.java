@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*cd 
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -47,9 +47,10 @@ import org.matsim.run.RunRuhrgebietScenario;
 /**
  * This class starts a simulation run with DRT.
  * 
- *  - The input DRT vehicles file specifies the number of vehicles and the vehicle capacity (a vehicle capacity of 1 means there is no ride-sharing).
- * 	- The DRT service area is set to the the inner-city Berlin area (see input shape file).
- * 	- Initial plans are not modified.
+ * - The input DRT vehicles file specifies the number of vehicles and the
+ * vehicle capacity (a vehicle capacity of 1 means there is no ride-sharing). -
+ * The DRT service area is set to the the inner-city Berlin area (see input
+ * shape file). - Initial plans are not modified.
  * 
  * @author ikaddoura
  */
@@ -58,50 +59,51 @@ public final class RunRuhrgebietSmartCityScenario {
 
 	private static final Logger log = Logger.getLogger(RunRuhrgebietSmartCityScenario.class);
 
-	public static final String DRT_SERVICE_AREA_SHAPE_FILE = "drt-service-area-shape-file";
+	public static final String DRT_SERVICE_AREA_SHAPE_FILE = "ruhrgebiet_boundary";
 
 	public static final String drtServiceAreaAttribute = "drtServiceArea";
 	private final String drtNetworkMode = TransportMode.car;
 
 	private final String drtServiceAreaShapeFile;
-	
+
 	private Config config;
 	private Scenario scenario;
 	private Controler controler;
 	private RunRuhrgebietScenario ruhrgebiet;
-	
-	private boolean hasPreparedConfig = false ;
-	private boolean hasPreparedScenario = false ;
-	private boolean hasPreparedControler = false ;
 
-	public static void main(String[] args) throws CommandLine.ConfigurationException{
-		new RunRuhrgebietSmartCityScenario( args ).run() ;
+	private boolean hasPreparedConfig = false;
+	private boolean hasPreparedScenario = false;
+	private boolean hasPreparedControler = false;
+
+	public static void main(String[] args) throws CommandLine.ConfigurationException {
+		new RunRuhrgebietSmartCityScenario(args).run();
 	}
 
-	public RunRuhrgebietSmartCityScenario( String [] args ) throws CommandLine.ConfigurationException{
-		if ( args.length != 0 ){
-			CommandLine cmd = new CommandLine.Builder( args )
-					.allowPositionalArguments(false)
-					.requireOptions(RunRuhrgebietScenario.CONFIG_PATH, DRT_SERVICE_AREA_SHAPE_FILE)
-					.build();
-			
-			this.drtServiceAreaShapeFile = cmd.getOptionStrict( DRT_SERVICE_AREA_SHAPE_FILE );
-			this.ruhrgebiet = new RunRuhrgebietScenario( args ) ;
-			
+	public RunRuhrgebietSmartCityScenario(String[] args) throws CommandLine.ConfigurationException {
+		if (args.length != 0) {
+			CommandLine cmd = new CommandLine.Builder(args).allowPositionalArguments(false)
+					.requireOptions(RunRuhrgebietScenario.CONFIG_PATH, DRT_SERVICE_AREA_SHAPE_FILE).build();
+
+			this.drtServiceAreaShapeFile = cmd.getOptionStrict(DRT_SERVICE_AREA_SHAPE_FILE);
+			this.ruhrgebiet = new RunRuhrgebietScenario(args);
+
 		} else {
-			String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml";
-			this.drtServiceAreaShapeFile = "C://Users/Gregor/Desktop/RuhrScenario/ruhrgebiet_boundary.shp";
-			this.ruhrgebiet = new RunRuhrgebietScenario( new String[]{"--config-path", configFileName, "--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile} );			
+			//String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml";
+			String configFileName = RunRuhrgebietScenario.CONFIG_PATH;
+			//this.drtServiceAreaShapeFile = "C://Users/Gregor/Desktop/RuhrScenario/ruhrgebiet_boundary.shp";
+			this.drtServiceAreaShapeFile = DRT_SERVICE_AREA_SHAPE_FILE;
+			this.ruhrgebiet = new RunRuhrgebietScenario(new String[] { "--config-path", configFileName,
+					"--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile });
 		}
 	}
-	
+
 	public Controler prepareControler() {
-		if ( !hasPreparedScenario ) {
-			prepareScenario() ;
+		if (!hasPreparedScenario) {
+			prepareScenario();
 		}
-		
+
 		controler = ruhrgebiet.prepareControler();
-		
+
 		// drt + dvrp module
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DvrpModule());
@@ -112,62 +114,62 @@ public final class RunRuhrgebietSmartCityScenario {
 		controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(DrtConfigGroup.get(config).getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(PassengerRequestValidator.class).toInstance(
-						new ServiceAreaRequestValidator(drtServiceAreaAttribute));
+				bindModal(PassengerRequestValidator.class)
+						.toInstance(new ServiceAreaRequestValidator(drtServiceAreaAttribute));
 			}
 		});
 
 		// Add drt-specific fare module
 		controler.addOverridingModule(new DrtFareModule());
-		hasPreparedControler = true ;
+		hasPreparedControler = true;
 		return controler;
 	}
-	
+
 	public Scenario prepareScenario() {
-		if ( !hasPreparedConfig ) {
-			prepareConfig( ) ;
+		if (!hasPreparedConfig) {
+			prepareConfig();
 		}
-		
+
 		scenario = ruhrgebiet.prepareScenario();
-		
+
 		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
 		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-		
+
 		SmartCityShpUtils shpUtils = new SmartCityShpUtils(drtServiceAreaShapeFile);
 		new SmartCityNetworkModification(shpUtils).addSAVmode(scenario, drtNetworkMode, drtServiceAreaAttribute);
 
-		hasPreparedScenario = true ;
+		hasPreparedScenario = true;
 		return scenario;
 	}
-	
+
 	public Config prepareConfig(ConfigGroup... modulesToAdd) {
-		
+
 		// dvrp, drt config groups
 		List<ConfigGroup> drtModules = new ArrayList<>();
 		drtModules.add(new DvrpConfigGroup());
 		drtModules.add(new DrtConfigGroup());
 		drtModules.add(new DrtFaresConfigGroup());
-		
-		List<ConfigGroup> modules = new ArrayList<>();		
+
+		List<ConfigGroup> modules = new ArrayList<>();
 		for (ConfigGroup module : drtModules) {
 			modules.add(module);
-		}	
+		}
 		for (ConfigGroup module : modulesToAdd) {
 			modules.add(module);
 		}
-		
+
 		ConfigGroup[] modulesArray = new ConfigGroup[modules.size()];
 		config = ruhrgebiet.prepareConfig(modules.toArray(modulesArray));
-		
+
 		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
-		
-		hasPreparedConfig = true ;
-		return config ;
+
+		hasPreparedConfig = true;
+		return config;
 	}
-	
-	 public void run() {
-		if ( !hasPreparedControler ) {
-			prepareControler() ;
+
+	public void run() {
+		if (!hasPreparedControler) {
+			prepareControler();
 		}
 		controler.run();
 		log.info("Done.");
