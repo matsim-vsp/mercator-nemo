@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.ReducePopulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
@@ -88,10 +89,12 @@ public final class RunRuhrgebietSmartCityScenario {
 			this.ruhrgebiet = new RunRuhrgebietScenario(args);
 
 		} else {
-			//String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml";
-			String configFileName = RunRuhrgebietScenario.CONFIG_PATH;
-			//this.drtServiceAreaShapeFile = "C://Users/Gregor/Desktop/RuhrScenario/ruhrgebiet_boundary.shp";
-			this.drtServiceAreaShapeFile = DRT_SERVICE_AREA_SHAPE_FILE;
+			
+			String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml/";
+			//String configFileName = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet-v1.0-1pct.configDRT.xml";
+			//this.drtServiceAreaShapeFile = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet_boundary.shp";
+			this.drtServiceAreaShapeFile = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet_boundary.shp";
+			//this.drtServiceAreaShapeFile = DRT_SERVICE_AREA_SHAPE_FILE;
 			this.ruhrgebiet = new RunRuhrgebietScenario(new String[] { "--config-path", configFileName,
 					"--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile });
 		}
@@ -160,7 +163,8 @@ public final class RunRuhrgebietSmartCityScenario {
 
 		ConfigGroup[] modulesArray = new ConfigGroup[modules.size()];
 		config = ruhrgebiet.prepareConfig(modules.toArray(modulesArray));
-
+		config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
+		config.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
 		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
 
 		hasPreparedConfig = true;
