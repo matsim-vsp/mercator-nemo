@@ -13,7 +13,7 @@ public class FineNetworkFilter implements OsmNetworkReader.OsmFilter {
 
     private final List<Geometry> geometries = new ArrayList<>();
 
-    FineNetworkFilter(String pathToShapeFile) {
+    public FineNetworkFilter(String pathToShapeFile) {
         ShapeFileReader.getAllFeatures(pathToShapeFile).forEach(feature -> geometries.add((Geometry) feature.getDefaultGeometry()));
     }
 

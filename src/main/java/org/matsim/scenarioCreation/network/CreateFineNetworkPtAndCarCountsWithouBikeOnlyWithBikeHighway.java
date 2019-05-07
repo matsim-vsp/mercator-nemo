@@ -50,7 +50,7 @@ public class CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway {
         CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway.InputArguments arguments = new CreateFineNetworkPtAndCarCountsWithouBikeOnlyWithBikeHighway.InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-        NetworkOutput outputParams = new NetworkOutput(arguments.svnDir);
+        SupplyOutput outputParams = new SupplyOutput(arguments.svnDir);
         NetworkInput inputParams = new NetworkInput(arguments.svnDir);
         PtInput ptInputParams = new PtInput(arguments.svnDir);
         PtOutput ptOutputParams = new PtOutput(arguments.svnDir);

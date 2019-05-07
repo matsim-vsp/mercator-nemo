@@ -1,4 +1,4 @@
-package org.matsim.analysis;
+package org.matsim.nemo.analysis;
 /* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *

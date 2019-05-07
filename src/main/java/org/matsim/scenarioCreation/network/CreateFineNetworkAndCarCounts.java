@@ -30,7 +30,7 @@ public class CreateFineNetworkAndCarCounts {
         InputArguments arguments = new CreateFineNetworkAndCarCounts.InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-        NetworkOutput outputParams = new NetworkOutput(arguments.svnDir);
+        SupplyOutput outputParams = new SupplyOutput(arguments.svnDir);
         NetworkInput inputParams = new NetworkInput(arguments.svnDir);
 
         // ensure output directory is present
@@ -76,7 +76,7 @@ public class CreateFineNetworkAndCarCounts {
     }
 
     @SafeVarargs
-    private static void writeCounts(NetworkOutput output, Set<String> columnCombinations, Map<String, Counts<Link>>... countsMaps) {
+    private static void writeCounts(SupplyOutput output, Set<String> columnCombinations, Map<String, Counts<Link>>... countsMaps) {
 
         // create a separate counts file for each column combination
         // each counts file contains all counts long term and short term count stations

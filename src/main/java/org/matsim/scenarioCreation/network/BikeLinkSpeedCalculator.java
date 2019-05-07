@@ -7,7 +7,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 
 public class BikeLinkSpeedCalculator implements LinkSpeedCalculator {
 
-    static final String BIKE_SPEED_FACTOR_KEY = "bike_speed_factor";
+    public static final String BIKE_SPEED_FACTOR_KEY = "bike_speed_factor";
 
     @Override
     public double getMaximumVelocity(QVehicle qVehicle, Link link, double time) {

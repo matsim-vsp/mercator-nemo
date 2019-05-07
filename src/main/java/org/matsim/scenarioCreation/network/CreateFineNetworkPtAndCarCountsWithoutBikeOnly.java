@@ -42,13 +42,13 @@ public class CreateFineNetworkPtAndCarCountsWithoutBikeOnly {
         InputArguments arguments = new CreateFineNetworkPtAndCarCountsWithoutBikeOnly.InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-        NetworkOutput networkOutputParams = new NetworkOutput(arguments.svnDir);
+        SupplyOutput supplyOutputParams = new SupplyOutput(arguments.svnDir);
         NetworkInput networkInputParams = new NetworkInput(arguments.svnDir);
         PtInput ptInputParams = new PtInput(arguments.svnDir);
         PtOutput ptOutputParams = new PtOutput(arguments.svnDir);
 
         // ensure output folder is present
-        final Path outputNetwork = networkOutputParams.getOutputNetworkDir().resolve(SUBDIR).resolve(FILE_PREFIX + ".xml.gz");
+        final Path outputNetwork = supplyOutputParams.getOutputNetworkDir().resolve(SUBDIR).resolve(FILE_PREFIX + ".xml.gz");
         Files.createDirectories(outputNetwork.getParent());
         Files.createDirectories(ptOutputParams.getTransitScheduleFile().getParent());
 
@@ -83,7 +83,7 @@ public class CreateFineNetworkPtAndCarCountsWithoutBikeOnly {
         logger.info("merge transit networks and car/ride/bike network");
         MergeNetworks.merge(network, "", scenarioFromGtfsSchedule.getNetwork());
 
-        logger.info("Writing network to: " + networkOutputParams.getOutputNetworkDir().resolve(SUBDIR));
+        logger.info("Writing network to: " + supplyOutputParams.getOutputNetworkDir().resolve(SUBDIR));
         new NetworkWriter(network).write(outputNetwork.toString());
 
         // create long term counts
@@ -107,7 +107,7 @@ public class CreateFineNetworkPtAndCarCountsWithoutBikeOnly {
                 .build();
         Map<String, Counts<Link>> shortTermCounts = shortTermCountsCreator.run();
 
-        writeCounts(networkOutputParams, columnCombinations, longTermCounts, shortTermCounts);
+        writeCounts(supplyOutputParams, columnCombinations, longTermCounts, shortTermCounts);
     }
 
     private static void mergeSchedules(TransitSchedule schedule, TransitSchedule toBeMerged) {
@@ -122,7 +122,7 @@ public class CreateFineNetworkPtAndCarCountsWithoutBikeOnly {
 
     @SuppressWarnings("Duplicates")
     @SafeVarargs
-    private static void writeCounts(NetworkOutput output, Set<String> columnCombinations, Map<String, Counts<Link>>... countsMaps) {
+    private static void writeCounts(SupplyOutput output, Set<String> columnCombinations, Map<String, Counts<Link>>... countsMaps) {
 
         // create a separate counts file for each column combination
         // each counts file contains all counts long term and short term count stations

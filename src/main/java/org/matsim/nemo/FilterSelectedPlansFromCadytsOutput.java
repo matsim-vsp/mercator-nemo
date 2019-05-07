@@ -1,4 +1,4 @@
-package org.matsim.scenarioCalibration.baseCase;
+package org.matsim.nemo;
 
 
 import com.beust.jcommander.JCommander;

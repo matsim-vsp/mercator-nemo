@@ -17,22 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCalibration.locationChoice;
+package org.matsim.nemo.analysis;
+
+import org.matsim.api.core.v01.population.Person;
 
 /**
- * Created by amit on 09.11.17.
+ * @author ikaddoura
  */
 
-public class PlansAnalyzer {
+public interface AgentFilter {
+	boolean considerAgent(Person person);
 
-    public static void main(String[] args) {
-
-        String initialPlansFile = "data/input/plans/2018_jan_22/plans_1pct_fullChoiceSet_coordsAssigned.xml.gz";
-        String initialConfig = "data/locationChoice/input/config.xml";
-        String outputFile = "data/input/plans/2018_jan_22/";
-        //commenting following for time being, if required, move to vsp. Amit May'18
-//        new OutputPlansConsistencyCheck(initialPlansFile, initialConfig, outputFile).run();
-
-    }
-
+	String toFileName();
 }
+

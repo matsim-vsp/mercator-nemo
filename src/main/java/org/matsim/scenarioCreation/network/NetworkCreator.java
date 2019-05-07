@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-class NetworkCreator {
+public class NetworkCreator {
 
     private static final double BIKE_PCU = 0.25;
     private static Logger logger = LoggerFactory.getLogger(NetworkCreator.class);
@@ -47,7 +47,7 @@ class NetworkCreator {
         this.cleaningModes = cleaningModes;
     }
 
-    Network createNetwork() {
+    public Network createNetwork() {
 
         Network network = createEmptyNetwork();
         Set<Long> nodeIdsToKeep = readNodeIds(Arrays.asList(countsInput.getInputLongtermCountNodesMapping(), countsInput.getInputShorttermCountMapping()));
@@ -168,7 +168,7 @@ class NetworkCreator {
          * @param svnDir Path to the checked out https://svn.vsp.tu-berlin.de/repos/shared-svn root folder
          * @return Current Builder instance
          */
-        Builder setSvnDir(String svnDir) {
+        public Builder setSvnDir(String svnDir) {
             this.svnDir = svnDir;
             return this;
         }
@@ -178,7 +178,7 @@ class NetworkCreator {
          * @param filter only links filtered by this filter will be contained in the network
          * @return Current Builder instance
          */
-        Builder withOsmFilter(OsmNetworkReader.OsmFilter filter) {
+        public Builder withOsmFilter(OsmNetworkReader.OsmFilter filter) {
             this.osmFilter = filter;
             return this;
         }
@@ -188,7 +188,7 @@ class NetworkCreator {
          * @param networkCoordinateSystem set coordinate system transformation like e.g. EPSG:25832
          * @return Current Builder instance
          */
-        Builder setNetworkCoordinateSystem(String networkCoordinateSystem) {
+        public Builder setNetworkCoordinateSystem(String networkCoordinateSystem) {
             this.transformation =
                     TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, networkCoordinateSystem);
             return this;
@@ -198,17 +198,17 @@ class NetworkCreator {
          * With this set BicycleOsmNetworkReaderV2 is used to parse the network. The default is OsmNetworkReader
          * @return Current Builder instance
          */
-        Builder withByciclePaths() {
+        public Builder withByciclePaths() {
             this.withBicyclePaths = true;
             return this;
         }
 
-        Builder withRideOnCarLinks() {
+        public Builder withRideOnCarLinks() {
             this.withRideOnCarLinks = true;
             return this;
         }
 
-        Builder withCleaningModes(String... modes) {
+        public Builder withCleaningModes(String... modes) {
             this.cleaningModes = new HashSet<>(Arrays.asList(modes));
             return this;
         }

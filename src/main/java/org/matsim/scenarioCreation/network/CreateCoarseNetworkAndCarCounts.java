@@ -30,7 +30,7 @@ public class CreateCoarseNetworkAndCarCounts {
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
         NetworkInput inputParams = new NetworkInput(arguments.svnDir);
-        NetworkOutput outputParams = new NetworkOutput(arguments.svnDir);
+		SupplyOutput outputParams = new SupplyOutput(arguments.svnDir);
 
         //ensure all output directories are present
         Files.createDirectories(outputParams.getOutputNetworkDir().resolve(SUBDIR));
@@ -71,7 +71,7 @@ public class CreateCoarseNetworkAndCarCounts {
     }
 
     @SafeVarargs
-    private static void writeCounts(NetworkOutput output, Set<String> columnCombinations, Map<String, Counts<Link>>... countsMaps) {
+	private static void writeCounts(SupplyOutput output, Set<String> columnCombinations, Map<String, Counts<Link>>... countsMaps) {
 
         // create a separate counts file for each column combination
         // each counts file contains all counts long term and short term count stations

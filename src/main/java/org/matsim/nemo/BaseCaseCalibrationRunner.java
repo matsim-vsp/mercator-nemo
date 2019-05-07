@@ -1,4 +1,4 @@
-package org.matsim.scenarioCalibration.baseCase;
+package org.matsim.nemo;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import com.beust.jcommander.JCommander;

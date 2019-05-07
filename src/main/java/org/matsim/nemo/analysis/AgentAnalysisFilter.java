@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.analysis;
+package org.matsim.nemo.analysis;
 
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;

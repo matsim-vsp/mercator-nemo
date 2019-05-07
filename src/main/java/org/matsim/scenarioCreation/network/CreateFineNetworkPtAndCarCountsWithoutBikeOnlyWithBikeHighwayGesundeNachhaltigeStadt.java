@@ -1,21 +1,7 @@
 package org.matsim.scenarioCreation.network;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -53,8 +39,12 @@ import org.matsim.vehicles.Vehicles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /*
  * Creates the network and transit schedule+vehicles for Nemo Scenario 2
@@ -80,7 +70,7 @@ public class CreateFineNetworkPtAndCarCountsWithoutBikeOnlyWithBikeHighwayGesund
 		InputArguments arguments = new InputArguments();
 		JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-		NetworkOutput outputParams = new NetworkOutput(arguments.svnDir);
+		SupplyOutput outputParams = new SupplyOutput(arguments.svnDir);
 		NetworkInput inputParams = new NetworkInput(arguments.svnDir);
 		PtInput ptInputParams = new PtInput(arguments.svnDir);
 		PtOutput ptOutputParams = new PtOutput(arguments.svnDir);
