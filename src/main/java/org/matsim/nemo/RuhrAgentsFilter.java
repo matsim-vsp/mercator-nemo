@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCalibration.marginals;
+package org.matsim.nemo;
 
 
 import org.apache.log4j.Logger;
