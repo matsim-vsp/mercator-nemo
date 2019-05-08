@@ -17,12 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCreation.matsimPlans;
+package org.matsim.nemo.scenarioCreation.matsimPlans;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.util.NEMOUtils;
+import org.matsim.nemo.util.NEMOUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

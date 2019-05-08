@@ -23,9 +23,9 @@ import org.matsim.nemo.counts.*;
 import org.matsim.nemo.pt.CreatePtScheduleAndVehiclesFromGtfs;
 import org.matsim.nemo.pt.CreatePtScheduleAndVehiclesFromOsm;
 import org.matsim.nemo.pt.PtInput;
+import org.matsim.nemo.util.NEMOUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.util.NEMOUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 

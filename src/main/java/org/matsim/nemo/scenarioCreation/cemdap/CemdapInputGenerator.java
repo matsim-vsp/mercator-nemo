@@ -17,10 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCreation.cemdap;
+package org.matsim.nemo.scenarioCreation.cemdap;
 
 import org.matsim.core.utils.gis.ShapeFileReader;
-
 import playground.vsp.openberlinscenario.cemdap.input.SynPopCreator;
 import playground.vsp.openberlinscenario.cemdap.input.ZoneAndLOSGeneratorV2;
 
@@ -75,10 +74,10 @@ public class CemdapInputGenerator {
 
 //        {// person and plans file which contains only attributes; these will be required to generate matsim plans files
             SynPopCreator synPopCreator = new SynPopCreator(commuterFilesOutgoing, censusFile, outputBase, numberOfPlansPerPerson,
-                    Arrays.asList("05"), defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio);
+                    Collections.singletonList("05"), defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio);
             synPopCreator.setWriteMatsimPlanFiles(writeMatsimPlanFiles);
             synPopCreator.setIncludeChildren(includeChildren);
-            synPopCreator.setIdsOfMunicipalitiesForSpatialRefinement(new ArrayList<>(new LinkedHashSet<String>(idsOfMunicipalitiesConsideredForSpatialRefinement)));
+        synPopCreator.setIdsOfMunicipalitiesForSpatialRefinement(new ArrayList<>(new LinkedHashSet<>(idsOfMunicipalitiesConsideredForSpatialRefinement)));
             synPopCreator.setRefinementFeatureKeyInShapefile(plzFeatureKey);
             synPopCreator.setMunicipalityFeatureKeyInShapefile(municipalityFeatureKey);
             synPopCreator.setShapeFileForSpatialRefinement(spatialRefinementShapeFile);

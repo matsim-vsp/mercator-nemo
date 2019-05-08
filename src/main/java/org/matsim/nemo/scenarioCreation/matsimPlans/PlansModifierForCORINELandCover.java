@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCreation.matsimPlans;
+package org.matsim.nemo.scenarioCreation.matsimPlans;
+
+import org.apache.log4j.Logger;
+import playground.vsp.corineLandcover.CORINELandCoverCoordsModifier;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
-import playground.vsp.corineLandcover.CORINELandCoverCoordsModifier;
 
 /**
  * Created by amit on 24.10.17.

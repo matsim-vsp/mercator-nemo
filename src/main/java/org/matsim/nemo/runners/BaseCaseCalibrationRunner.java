@@ -18,7 +18,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-@SuppressWarnings("WeakerAccess")
 public class BaseCaseCalibrationRunner {
 
     private final String configPath;
@@ -45,7 +44,7 @@ public class BaseCaseCalibrationRunner {
         this(Paths.get(inputDir).resolve("config.xml").toString(), runId, outputDir, inputDir);
     }
 
-    public BaseCaseCalibrationRunner(String configPath, String runId, String outputDir, String inputDir) {
+    BaseCaseCalibrationRunner(String configPath, String runId, String outputDir, String inputDir) {
 
         this.configPath = configPath;
         this.runId = runId;
@@ -69,7 +68,7 @@ public class BaseCaseCalibrationRunner {
         System.exit(0);
     }
 
-    public Controler prepareControler(AbstractQSimModule... overridingQSimModule) {
+    Controler prepareControler(AbstractQSimModule... overridingQSimModule) {
 
         if (scenario == null) prepareScenario();
 
@@ -98,7 +97,7 @@ public class BaseCaseCalibrationRunner {
         return controler;
     }
 
-    public Scenario prepareScenario() {
+    private Scenario prepareScenario() {
 
         if (config == null) prepareConfig();
 
@@ -106,7 +105,7 @@ public class BaseCaseCalibrationRunner {
         return scenario;
     }
 
-    public Config prepareConfig(ConfigGroup... customModules) {
+    private Config prepareConfig(ConfigGroup... customModules) {
 
         OutputDirectoryLogging.catchLogEntries();
         config = ConfigUtils.loadConfig(configPath, customModules);

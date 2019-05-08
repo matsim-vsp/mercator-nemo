@@ -17,13 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCreation.matsimPlans;
+package org.matsim.nemo.scenarioCreation.matsimPlans;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;

@@ -6,7 +6,7 @@ import com.beust.jcommander.Parameter;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.util.NEMOUtils;
+import org.matsim.nemo.util.NEMOUtils;
 import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 
 public class FilterSelectedPlansFromCadytsOutput {

@@ -34,4 +34,4 @@
  * </ul>
  *
  */
-package org.matsim.scenarioCreation.matsimPlans;
+package org.matsim.nemo.scenarioCreation.matsimPlans;

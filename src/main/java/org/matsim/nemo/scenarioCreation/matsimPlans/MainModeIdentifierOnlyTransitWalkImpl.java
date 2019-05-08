@@ -17,14 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCreation.matsimPlans;
-
-import java.util.List;
+package org.matsim.nemo.scenarioCreation.matsimPlans;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.MainModeIdentifier;
+
+import java.util.List;
 
 /**
  * @author thibaut

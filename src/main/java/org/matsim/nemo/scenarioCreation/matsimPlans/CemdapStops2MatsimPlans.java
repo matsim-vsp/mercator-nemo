@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scenarioCreation.matsimPlans;
+package org.matsim.nemo.scenarioCreation.matsimPlans;
+
+import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansConverter;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansConverter;
 
 /**
  * Created by amit on 22.09.17.

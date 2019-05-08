@@ -22,7 +22,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import org.matsim.nemo.RuhrAgentsFilter;
-import org.matsim.util.NEMOUtils;
+import org.matsim.nemo.util.NEMOUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.cadyts.marginals.AgentFilter;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
@@ -35,7 +35,6 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashSet;
 
-@SuppressWarnings("Duplicates")
 public class NemoModeLocationChoiceCalibratorV2 {
 
     private final String inputDir;
