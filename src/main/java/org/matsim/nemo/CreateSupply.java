@@ -20,8 +20,8 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.counts.Counts;
 import org.matsim.nemo.counts.*;
-import org.matsim.nemo.pt.CreateScenarioFromGtfs;
-import org.matsim.nemo.pt.CreateScenarioFromOsmFile;
+import org.matsim.nemo.pt.CreatePtScheduleAndVehiclesFromGtfs;
+import org.matsim.nemo.pt.CreatePtScheduleAndVehiclesFromOsm;
 import org.matsim.nemo.pt.PtInput;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -158,10 +158,10 @@ public class CreateSupply {
 		double headwayFactor = scenarioName.equals(ScenarioName.healthyCity) ? 0.5 : 1.0;
 
 		// read in transit-network, vehicles and schedule from osm
-		Scenario scenarioFromOsmSchedule = new CreateScenarioFromOsmFile().run(ptInputParams.getOsmScheduleFile().toString(), headwayFactor);
+		Scenario scenarioFromOsmSchedule = new CreatePtScheduleAndVehiclesFromOsm().run(ptInputParams.getOsmScheduleFile().toString(), headwayFactor);
 
 		// read in transit-network, vehicles and schedule from gtfs
-		Scenario scenarioFromGtfsSchedule = new CreateScenarioFromGtfs().run(ptInputParams.getGtfsFile().toString());
+		Scenario scenarioFromGtfsSchedule = new CreatePtScheduleAndVehiclesFromGtfs().run(ptInputParams.getGtfsFile().toString());
 
 		// merge two transit networks into gtfs network
 		MergeNetworks.merge(scenarioFromGtfsSchedule.getNetwork(), "", scenarioFromOsmSchedule.getNetwork());

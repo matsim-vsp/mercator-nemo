@@ -43,9 +43,9 @@ import java.util.List;
  * @author ikaddoura
  */
 
-public class CreateScenarioFromGtfs {
+public class CreatePtScheduleAndVehiclesFromGtfs {
 
-    private static final Logger log = Logger.getLogger(CreateScenarioFromGtfs.class);
+    private static final Logger log = Logger.getLogger(CreatePtScheduleAndVehiclesFromGtfs.class);
 
     public Scenario run(String gtfsZipFile) {
 

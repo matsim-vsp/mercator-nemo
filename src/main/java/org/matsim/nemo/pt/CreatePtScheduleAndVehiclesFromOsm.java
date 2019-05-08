@@ -46,10 +46,10 @@ import java.util.*;
 * @author ikaddoura
 */
 
-public class CreateScenarioFromOsmFile {
+public class CreatePtScheduleAndVehiclesFromOsm {
 
     //private Scenario scenario;
-    private static final Logger log = Logger.getLogger(CreateScenarioFromGtfs.class);
+	private static final Logger log = Logger.getLogger(CreatePtScheduleAndVehiclesFromGtfs.class);
 
 	private Scenario scenario;
 	private int vehicleCounter = 0;
