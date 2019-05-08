@@ -1,4 +1,4 @@
-package org.matsim.nemo;
+package org.matsim.nemo.runners;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -21,6 +21,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
+import org.matsim.nemo.RuhrAgentsFilter;
 import org.matsim.util.NEMOUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.cadyts.marginals.AgentFilter;

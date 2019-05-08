@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.nemo.runners.BikeLinkSpeedCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

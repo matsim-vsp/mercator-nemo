@@ -16,6 +16,7 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.nemo.counts.CountsInput;
+import org.matsim.nemo.runners.BikeLinkSpeedCalculator;
 
 import java.util.*;
 import java.util.logging.Logger;

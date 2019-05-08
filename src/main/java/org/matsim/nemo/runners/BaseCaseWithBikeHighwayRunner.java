@@ -1,4 +1,4 @@
-package org.matsim.nemo;
+package org.matsim.nemo.runners;
 
 import com.beust.jcommander.JCommander;
 import com.google.inject.Inject;

@@ -1,4 +1,4 @@
-package org.matsim.nemo;
+package org.matsim.nemo.runners;
 
 import com.beust.jcommander.Parameter;
 

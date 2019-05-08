@@ -17,18 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.smartCity;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+package org.matsim.nemo.runners.smartCity;
 
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -41,6 +30,12 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 /**
 * @author ikaddoura

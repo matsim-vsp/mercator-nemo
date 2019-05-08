@@ -18,14 +18,14 @@
  * *********************************************************************** *
  */
 
-package org.matsim.smartCity;
-
-import java.util.HashSet;
-import java.util.Set;
+package org.matsim.nemo.runners.smartCity;
 
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
 * @author ikaddoura

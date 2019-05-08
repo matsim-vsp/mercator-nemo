@@ -36,7 +36,13 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 
-
+/**
+ * Script to create all the supply (network, counts, transit-vehicles and schedules). It takes the svn-directory and the
+ * scenario name as parameters. Possible scenario names can be found in {@link CreateSupply.ScenarioName}. If you want
+ * to add another scenario add the name and the validation in that class as well and then put switches into the scipt
+ * <p>
+ * All the ouptut is written to <path-to-your-svn>/projects/nemo_mercator/data/matsim_input/supply/<scenarioName>
+ */
 public class CreateSupply {
 
 	private static Logger logger = Logger.getLogger("CreateSupply");

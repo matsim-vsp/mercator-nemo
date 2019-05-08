@@ -17,10 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.smartCity;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.matsim.nemo.runners.smartCity;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +40,9 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.run.RunRuhrgebietScenario;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class starts a simulation run with DRT.

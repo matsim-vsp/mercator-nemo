@@ -1,4 +1,4 @@
-package org.matsim.nemo;
+package org.matsim.nemo.runners;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
