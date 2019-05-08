@@ -8,7 +8,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-import org.matsim.scenarioCreation.network.BikeLinkSpeedCalculator;
 
 public class BaseCaseWithBikeHighwayRunner {
 
