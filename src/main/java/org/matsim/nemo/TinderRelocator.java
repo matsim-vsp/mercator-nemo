@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -278,24 +277,50 @@ public class TinderRelocator {
                 counter1++;
             }
         }
+        counter1 = 0;
         for (PlanElement planElement : plan.getPlanElements()) {
             if (planElement instanceof Activity) {
                 Activity act = (Activity) planElement;
                 for (Activity value : map.values()) {
-                    euclideanDistances = CoordUtils.calcEuclideanDistance(temp, act.getCoord());
-                    if (euclideanDistances <= 1) {
-                        if (map.get(counter2).getType().contains("home_")) {
-                            map.get(counter2).setType(act.getType());
+                    //euclideanDistances = CoordUtils.calcEuclideanDistance(temp, act.getCoord());
+                    if (map.get(counter2).getCoord().equals(act.getCoord()) == true) {
+                        if (map.get(counter2).getType().contains("home_") && act.getType().contains("home_")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Home Duplicate removed.");
+                        } else if (map.get(counter2).getType().contains("work_") && act.getType().contains("work_")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Work Duplicate removed.");
+                        } else if (map.get(counter2).getType().contains("education_") && act.getType().contains("education_")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Education Duplicate removed.");
+                        } else if (map.get(counter2).getType().contains("leisure_") && act.getType().contains("leisure_")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Leisure Duplicate removed.");
+                        } else if (map.get(counter2).getType().contains("shopping_") && act.getType().contains("shopping_")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Shopping Duplicate removed.");
+                        } else if (map.get(counter2).getType().contains("other_") && act.getType().contains("other_")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Other Duplicate removed.");
+                        } else if (map.get(counter2).getType().contains("car") && act.getType().contains("car")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Car Duplicate removed.");
+                        } else if (map.get(counter2).getType().contains("ride") && act.getType().contains("ride")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Ride Duplicate removed.");
+                        } else if (map.get(counter2).getType().contains("bike") && act.getType().contains("bike")) {
+                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            System.out.println("Bike Duplicate removed.");
+                        } else {
+                            System.out.println("No duplicate found.");
                         }
-                        System.out.println("Duplicate removed.");
                     }
-                    temp = value.getCoord();
+                    // temp = value.getCoord();
                     counter2++;
                 }
             }
             counter2 = 0;
         }
-
         return map;
     }
 
