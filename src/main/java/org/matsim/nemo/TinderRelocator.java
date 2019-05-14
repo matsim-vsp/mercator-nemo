@@ -186,7 +186,7 @@ public class TinderRelocator {
     /**
      * @param activity
      */
-    private void checkId(Activity activity) {
+    private void checkId(Activity activity, boolean homeSelected) {
         Geometry homeArea = createCircle(home, 10000);
 
         if (activity.getType().contains("interaction")) {
@@ -195,7 +195,7 @@ public class TinderRelocator {
         } else {
             actId = getID(activity.getType());
             if (activity.getType().contains("home_")) { //home, always start at home
-                if (homeId != actId) {
+                if (homeSelected == false) { //one home only
                     activity.setCoord(coordSelector());
                     home = activity.getCoord();
                     homeId = actId;
@@ -204,7 +204,7 @@ public class TinderRelocator {
                     System.out.println("Back home");
                     activity.setCoord(home);
                 }
-                System.out.println("Home " + activity.getType() + " has been relocated.");
+                System.out.println("Home Activity " + activity.getType() + " has been relocated.");
             } else if (activity.getType().contains("work_")) { //work
                 if (workId != actId) {
                     activity.setCoord(coordLimiter(homeArea));
@@ -285,33 +285,33 @@ public class TinderRelocator {
                     //euclideanDistances = CoordUtils.calcEuclideanDistance(temp, act.getCoord());
                     if (map.get(counter2).getCoord().equals(act.getCoord()) == true) {
                         if (map.get(counter2).getType().contains("home_") && act.getType().contains("home_")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Home Duplicate removed.");
-                        } else if (map.get(counter2).getType().contains("work_") && act.getType().contains("work_")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                        } /*else if (map.get(counter2).getType().contains("work_") && act.getType().contains("work_")) {
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Work Duplicate removed.");
                         } else if (map.get(counter2).getType().contains("education_") && act.getType().contains("education_")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Education Duplicate removed.");
                         } else if (map.get(counter2).getType().contains("leisure_") && act.getType().contains("leisure_")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Leisure Duplicate removed.");
                         } else if (map.get(counter2).getType().contains("shopping_") && act.getType().contains("shopping_")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Shopping Duplicate removed.");
                         } else if (map.get(counter2).getType().contains("other_") && act.getType().contains("other_")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Other Duplicate removed.");
                         } else if (map.get(counter2).getType().contains("car") && act.getType().contains("car")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Car Duplicate removed.");
                         } else if (map.get(counter2).getType().contains("ride") && act.getType().contains("ride")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Ride Duplicate removed.");
                         } else if (map.get(counter2).getType().contains("bike") && act.getType().contains("bike")) {
-                            map.get(counter2).setFacilityId(act.getFacilityId());
+                            map.get(counter2).setType(act.getType());
                             System.out.println("Bike Duplicate removed.");
-                        } else {
+                        } */ else {
                             System.out.println("No duplicate found.");
                         }
                     }
@@ -329,15 +329,18 @@ public class TinderRelocator {
      */
     private void relocate() {
         HashMap<Integer, Activity> map;
+        boolean homeSelected = false;
         //The plan for each person is gotten from the the scenario
         for (Person person : population.getPersons().values()) {
             Plan plan = person.getSelectedPlan();
             map = generalizeActivity(plan);
             System.out.println("Start of plan. ------------------------------");
             for (Activity value : map.values()) {
-                checkId(value);
+                checkId(value, homeSelected);
+                homeSelected = true; //Assuming they always start at home
             }
             System.out.println("End of plan. ------------------------------");
+            homeSelected = false;
         }
     }
 
