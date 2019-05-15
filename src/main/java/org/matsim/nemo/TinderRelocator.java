@@ -150,11 +150,11 @@ public class TinderRelocator {
         double coordY = 0;
         Coord coord = new Coord(coordX, coordY);
 
-        while (!outerGeometry.contains(MGC.coord2Point(coord)) || innerGeometry.contains(MGC.coord2Point(coord))) {
+        while (!homeArea.contains(MGC.coord2Point(coord))) {
             coordX = minX + (Math.random() * (maxX - minX)); //Random double value between min longitude value and max latitude value
             coordY = minY + (Math.random() * (maxY - minY)); //Random double value between min latitude value and max latitude value
             coord = new Coord(coordX, coordY);
-            System.out.println("Coordinates changed successfully!");
+            System.out.println("Coordinates limited and changed successfully!");
         }
         return coord;
     }
@@ -282,40 +282,14 @@ public class TinderRelocator {
             if (planElement instanceof Activity) {
                 Activity act = (Activity) planElement;
                 for (Activity value : map.values()) {
-                    //euclideanDistances = CoordUtils.calcEuclideanDistance(temp, act.getCoord());
                     if (map.get(counter2).getCoord().equals(act.getCoord()) == true) {
                         if (map.get(counter2).getType().contains("home_") && act.getType().contains("home_")) {
                             map.get(counter2).setType(act.getType());
                             System.out.println("Home Duplicate removed.");
-                        } /*else if (map.get(counter2).getType().contains("work_") && act.getType().contains("work_")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Work Duplicate removed.");
-                        } else if (map.get(counter2).getType().contains("education_") && act.getType().contains("education_")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Education Duplicate removed.");
-                        } else if (map.get(counter2).getType().contains("leisure_") && act.getType().contains("leisure_")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Leisure Duplicate removed.");
-                        } else if (map.get(counter2).getType().contains("shopping_") && act.getType().contains("shopping_")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Shopping Duplicate removed.");
-                        } else if (map.get(counter2).getType().contains("other_") && act.getType().contains("other_")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Other Duplicate removed.");
-                        } else if (map.get(counter2).getType().contains("car") && act.getType().contains("car")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Car Duplicate removed.");
-                        } else if (map.get(counter2).getType().contains("ride") && act.getType().contains("ride")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Ride Duplicate removed.");
-                        } else if (map.get(counter2).getType().contains("bike") && act.getType().contains("bike")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Bike Duplicate removed.");
-                        } */ else {
+                        } else {
                             System.out.println("No duplicate found.");
                         }
                     }
-                    // temp = value.getCoord();
                     counter2++;
                 }
             }
@@ -327,13 +301,14 @@ public class TinderRelocator {
     /**
      * Relocater class
      */
-    private void relocate() {
+    public void relocate() {
         HashMap<Integer, Activity> map;
         boolean homeSelected = false;
         //The plan for each person is gotten from the the scenario
         for (Person person : population.getPersons().values()) {
             Plan plan = person.getSelectedPlan();
-            map = generalizeActivity(plan);
+            changePlan(plan);
+            /*map = generalizeActivity(plan);
             System.out.println("Start of plan. ------------------------------");
             for (Activity value : map.values()) {
                 checkId(value, homeSelected);
@@ -341,8 +316,30 @@ public class TinderRelocator {
             }
             System.out.println("End of plan. ------------------------------");
             homeSelected = false;
+            */
+
         }
     }
 
+    private void changePlan(Plan plan) {
+        Activity home;
+        Coord oldHome = null;
+        Geometry homeArea = null;
+        for (PlanElement planElement : plan.getPlanElements()) {
+            if (planElement instanceof Activity) {
+                Activity activity = (Activity) planElement;
+                if (activity.getType().contains("home_") && !activity.getCoord().equals(oldHome)) {
+                    oldHome = activity.getCoord();
+                    activity.setCoord(coordSelector());
+                    homeArea = createCircle(activity.getCoord(), 10000);
+                    home = activity;
+                } else if (activity.getType().contains("home_") && activity.getCoord().equals(oldHome)) {
+                    activity.setCoord(oldHome);
+                } else {
+                    activity.setCoord(coordLimiter(homeArea));
+                }
+            }
+        }
+    }
 
 }
