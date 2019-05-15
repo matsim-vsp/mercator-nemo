@@ -16,26 +16,13 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 
 
 public class TinderRelocator {
-    Coord home = new Coord(0, 0);
-    Coord work = new Coord(0, 0);
-    Coord ed = new Coord(0, 0);
-    Coord shopping = new Coord(0, 0);
-    Coord other = new Coord(0, 0);
-    Coord leisure = new Coord(0, 0);
     private Geometry innerGeometry;
     private Geometry outerGeometry;
+    private Geometry homeArea;
     private Population population;
-    private double homeId = 0;
-    private double workId = 0;
-    private double edId = 0;
-    private double shoppingId = 0;
-    private double otherId = 0;
-    private double leisureId = 0;
-    private double actId = 0;
 
     /**
      * @param population
@@ -184,157 +171,34 @@ public class TinderRelocator {
     }
 
     /**
-     * @param activity
-     */
-    private void checkId(Activity activity, boolean homeSelected) {
-        Geometry homeArea = createCircle(home, 10000);
-
-        if (activity.getType().contains("interaction")) {
-            activity.setCoord(coordLimiter(homeArea));//X and Y coordinates for new coord
-            System.out.println("Activity " + activity.getType() + " has been relocated.");
-        } else {
-            actId = getID(activity.getType());
-            if (activity.getType().contains("home_")) { //home, always start at home
-                if (homeSelected == false) { //one home only
-                    activity.setCoord(coordSelector());
-                    home = activity.getCoord();
-                    homeId = actId;
-                    System.out.println("HomeID: " + homeId);
-                } else {
-                    System.out.println("Back home");
-                    activity.setCoord(home);
-                }
-                System.out.println("Home Activity " + activity.getType() + " has been relocated.");
-            } else if (activity.getType().contains("work_")) { //work
-                if (workId != actId) {
-                    activity.setCoord(coordLimiter(homeArea));
-                    work = activity.getCoord();
-                    workId = actId;
-                    System.out.println("WorkId: " + workId);
-                } else {
-                    System.out.println("Back at Work");
-                    activity.setCoord(work);
-                }
-            } else if (activity.getType().contains("education_")) { //education
-                if (edId != actId) {
-                    activity.setCoord(coordLimiter(homeArea));
-                    ed = activity.getCoord();
-                    edId = actId;
-                    System.out.println("EduId: " + edId);
-                } else {
-                    System.out.println("Back at School.");
-                    activity.setCoord(ed);
-                }
-            } else if (activity.getType().contains("leisure_")) { //Leisure
-                if (leisureId != actId) {
-                    activity.setCoord(coordLimiter(homeArea));
-                    leisure = activity.getCoord();
-                    leisureId = actId;
-                    System.out.println("LeisureId: " + leisureId);
-                } else {
-                    System.out.println("Back at Leisure");
-                    activity.setCoord(leisure);
-                }
-            } else if (activity.getType().contains("shopping_")) { //Shopping
-                if (shoppingId != actId) {
-                    activity.setCoord(coordLimiter(homeArea));
-                    shopping = activity.getCoord();
-                    shoppingId = actId;
-                    System.out.println("ShoppingId: " + shoppingId);
-                } else {
-                    System.out.println("Back at Shopping");
-                    activity.setCoord(shopping);
-                }
-            } else if (activity.getType().contains("other_")) { //other
-                if (otherId != actId) {
-                    activity.setCoord(coordLimiter(homeArea));
-                    other = activity.getCoord();
-                    otherId = actId;
-                    System.out.println("OtherId: " + otherId);
-                } else {
-                    System.out.println("Back at Other");
-                    activity.setCoord(other);
-                }
-            }
-        }
-    }
-
-    /**
-     * @param plan
-     * @return
-     */
-    private HashMap<Integer, Activity> generalizeActivity(Plan plan) {
-        double euclideanDistances = 0;
-        int counter1 = 0;
-        int counter2 = 0;
-        HashMap<Integer, Activity> map = new HashMap<>();
-        Coord temp = new Coord(0, 0);
-
-        for (PlanElement planElement : plan.getPlanElements()) {
-            if (planElement instanceof Activity) {
-                Activity acti = (Activity) planElement;
-                map.put(counter1, acti); //Make map of keys
-                counter1++;
-            }
-        }
-        counter1 = 0;
-        for (PlanElement planElement : plan.getPlanElements()) {
-            if (planElement instanceof Activity) {
-                Activity act = (Activity) planElement;
-                for (Activity value : map.values()) {
-                    if (map.get(counter2).getCoord().equals(act.getCoord()) == true) {
-                        if (map.get(counter2).getType().contains("home_") && act.getType().contains("home_")) {
-                            map.get(counter2).setType(act.getType());
-                            System.out.println("Home Duplicate removed.");
-                        } else {
-                            System.out.println("No duplicate found.");
-                        }
-                    }
-                    counter2++;
-                }
-            }
-            counter2 = 0;
-        }
-        return map;
-    }
-
-    /**
      * Relocater class
      */
     public void relocate() {
-        HashMap<Integer, Activity> map;
         boolean homeSelected = false;
         //The plan for each person is gotten from the the scenario
         for (Person person : population.getPersons().values()) {
             Plan plan = person.getSelectedPlan();
             changePlan(plan);
-            /*map = generalizeActivity(plan);
-            System.out.println("Start of plan. ------------------------------");
-            for (Activity value : map.values()) {
-                checkId(value, homeSelected);
-                homeSelected = true; //Assuming they always start at home
-            }
-            System.out.println("End of plan. ------------------------------");
-            homeSelected = false;
-            */
-
         }
     }
 
+    /**
+     * @param plan
+     */
     private void changePlan(Plan plan) {
-        Activity home;
         Coord oldHome = null;
-        Geometry homeArea = null;
+        Activity home = null;
         for (PlanElement planElement : plan.getPlanElements()) {
             if (planElement instanceof Activity) {
                 Activity activity = (Activity) planElement;
-                if (activity.getType().contains("home_") && !activity.getCoord().equals(oldHome)) {
+                if (activity.getType().contains("home") && !activity.getCoord().equals(oldHome)) {
                     oldHome = activity.getCoord();
                     activity.setCoord(coordSelector());
                     homeArea = createCircle(activity.getCoord(), 10000);
                     home = activity;
-                } else if (activity.getType().contains("home_") && activity.getCoord().equals(oldHome)) {
-                    activity.setCoord(oldHome);
+                } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
+                    activity.setCoord(home.getCoord());
+                    System.out.println("Back Home.");
                 } else {
                     activity.setCoord(coordLimiter(homeArea));
                 }
