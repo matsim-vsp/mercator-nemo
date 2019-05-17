@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
-
 public class TinderRelocator {
     private Geometry innerGeometry;
     private Geometry outerGeometry;
@@ -117,7 +116,6 @@ public class TinderRelocator {
             coordX = minX + (Math.random() * (maxX - minX)); //Random double value between min longitude value and max latitude value
             coordY = minY + (Math.random() * (maxY - minY)); //Random double value between min latitude value and max latitude value
             coord = new Coord(coordX, coordY);
-            System.out.println("Coordinates changed successfully!");
         }
         return coord;
     }
@@ -142,7 +140,6 @@ public class TinderRelocator {
             coordX = minX + (Math.random() * (maxX - minX)); //Random double value between min longitude value and max latitude value
             coordY = minY + (Math.random() * (maxY - minY)); //Random double value between min latitude value and max latitude value
             coord = new Coord(coordX, coordY);
-            System.out.println("Coordinates limited and changed successfully!");
         }
         return coord;
     }
@@ -197,17 +194,25 @@ public class TinderRelocator {
                     activity.setCoord(coordSelector());
                     homeArea = createCircle(activity.getCoord(), randomRadius());
                     home = activity;
+                    System.out.println("\nCentral home coordinates relocated successfully!");
                 } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
                     activity.setCoord(home.getCoord());
-                    System.out.println("Back Home.");
+                    System.out.println("Back to home.");
                 } else {
                     activity.setCoord(coordLimiter(homeArea));
+                    System.out.println("Non-central coordinates relocated successfully, within radius!");
                 }
             }
         }
     }
 
-    private Double randomRadius() {
+    /**
+     * This generates a random radius value to be used as the homeArea radii
+     *
+     * @return randomRadius
+     */
+
+    private double randomRadius() {
         final int weightParam = 100;
         final int radiusMaxParam = 100000;
 
@@ -233,7 +238,7 @@ public class TinderRelocator {
             System.out.println("RandomNumGenerationError: Error should not occur.");
             randomRadius = -1;
         }
-
+        //Returns the double random radius which is generated.
         return randomRadius;
     }
 
