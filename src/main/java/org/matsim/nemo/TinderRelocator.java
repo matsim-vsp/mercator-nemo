@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
+
 public class TinderRelocator {
     private Geometry innerGeometry;
     private Geometry outerGeometry;
@@ -194,7 +195,7 @@ public class TinderRelocator {
                 if (activity.getType().contains("home") && !activity.getCoord().equals(oldHome)) {
                     oldHome = activity.getCoord();
                     activity.setCoord(coordSelector());
-                    homeArea = createCircle(activity.getCoord(), 10000);
+                    homeArea = createCircle(activity.getCoord(), randomRadius());
                     home = activity;
                 } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
                     activity.setCoord(home.getCoord());
@@ -204,6 +205,36 @@ public class TinderRelocator {
                 }
             }
         }
+    }
+
+    private Double randomRadius() {
+        final int weightParam = 100;
+        final int radiusMaxParam = 100000;
+
+        int weight = (int) Math.round(1 + (Math.random() * (weightParam - 1)));
+        double randomRadius;
+
+        if (weight >= weightParam * 0.6) {
+            randomRadius = radiusMaxParam * 0.01 + (Math.random() * (radiusMaxParam * 0.02 - radiusMaxParam * 0.01));
+            System.out.println("Rad: " + randomRadius + " m.");
+        } else if (weight >= weightParam * 0.3) {
+            randomRadius = radiusMaxParam * 0.02 + (Math.random() * (radiusMaxParam * 0.1 - radiusMaxParam * 0.02));
+            System.out.println("Rad: " + randomRadius + " m.");
+        } else if (weight >= weightParam * 0.1) {
+            randomRadius = radiusMaxParam * 0.1 + (Math.random() * (radiusMaxParam * 0.2 - radiusMaxParam * 0.1));
+            System.out.println("Rad: " + randomRadius + " m.");
+        } else if (weight >= weightParam * 0.03) {
+            randomRadius = radiusMaxParam * 0.2 + (Math.random() * (radiusMaxParam * 0.5 - radiusMaxParam * 0.2));
+            System.out.println("Rad: " + randomRadius + " m.");
+        } else if (weight >= 0) {
+            randomRadius = radiusMaxParam * 0.5 + (Math.random() * (radiusMaxParam * 1 - radiusMaxParam * 0.5));
+            System.out.println("Rad: " + randomRadius + " m.");
+        } else {
+            System.out.println("RandomNumGenerationError: Error should not occur.");
+            randomRadius = -1;
+        }
+
+        return randomRadius;
     }
 
 }
