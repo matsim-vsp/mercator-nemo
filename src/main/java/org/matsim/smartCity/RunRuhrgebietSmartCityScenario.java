@@ -26,6 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.ReducePopulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
@@ -42,6 +46,9 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.filter.NetworkFilterManager;
+import org.matsim.core.network.filter.NetworkLinkFilter;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.run.RunRuhrgebietScenario;
 
@@ -50,7 +57,7 @@ import org.matsim.run.RunRuhrgebietScenario;
  * 
  * - The input DRT vehicles file specifies the number of vehicles and the
  * vehicle capacity (a vehicle capacity of 1 means there is no ride-sharing). -
- * The DRT service area is set to the the inner-city Berlin area (see input
+ * The DRT service area is set to the the Ruhrgebiet area (see input
  * shape file). - Initial plans are not modified.
  * 
  * @author ikaddoura
@@ -165,8 +172,8 @@ public final class RunRuhrgebietSmartCityScenario {
 		config = ruhrgebiet.prepareConfig(modules.toArray(modulesArray));
 		config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
 		config.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
+		config.qsim().setNumberOfThreads(1); // drt is still single threaded!
 		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
-
 		hasPreparedConfig = true;
 		return config;
 	}
@@ -175,7 +182,33 @@ public final class RunRuhrgebietSmartCityScenario {
 		if (!hasPreparedControler) {
 			prepareControler();
 		}
-		controler.run();
+
+		Network network;
+		NetworkFilterManager networkFilterManager = new NetworkFilterManager(scenario.getNetwork());
+		networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
+			@Override
+			public boolean judgeLink(Link l) {
+				if (l.getAllowedModes().equals(TransportMode.bike)) {
+					return false;
+				}
+				else if (l.getAllowedModes().contains(TransportMode.car) && l.getAllowedModes().contains(TransportMode.ride)){
+					return true;
+				}
+				else {
+					return true;
+				}
+		}});
+
+		network = networkFilterManager.applyFilters();
+		XY2Links xy2Links = new XY2Links(network, scenario.getActivityFacilities());
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			xy2Links.run(p);
+		}
+
+        NetworkWriter writer = new NetworkWriter(network);
+		writer.write("C://Users//Gregor//Desktop//filteredNetwork.xml");
+
+		//controler.run();
 		log.info("Done.");
 	}
 }

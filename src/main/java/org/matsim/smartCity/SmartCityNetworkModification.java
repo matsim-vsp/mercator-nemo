@@ -41,41 +41,58 @@ public final class SmartCityNetworkModification {
 
 	public void addSAVmode(Scenario scenario, String taxiNetworkMode, String serviceAreaAttribute) {
 
+	/*	scenario.getNetwork().getLinks().values().parallelStream()
+				.filter(link -> link.getAllowedModes().contains(TransportMode.car) && link.getAllowedModes().contains(TransportMode.ride))
+				.forEach(link -> {
+					Set<String> allowedModes = new HashSet<>();
+					allowedModes.add(TransportMode.car);
+					// allowedModes.add("freight");
+					allowedModes.add(TransportMode.ride);
+					allowedModes.add(taxiNetworkMode);
+					link.setAllowedModes(allowedModes);
+
+					if (shpUtils.isCoordInDrtServiceArea(link.getFromNode().getCoord())
+							|| shpUtils.isCoordInDrtServiceArea(link.getToNode().getCoord())) {
+						link.getAttributes().putAttribute(serviceAreaAttribute, true);
+					} else {
+						link.getAttributes().putAttribute(serviceAreaAttribute, false);
+					}
+				});
+*/
 		log.info("Adjusting network...");
 
 		int counter = 0;
-//		for (Link link : scenario.getNetwork().getLinks().values()) {
-//			if (counter % 10000 == 0)
-//				log.info("link #" + counter);
-//			counter++;
-//			if (link.getAllowedModes().contains(TransportMode.car)
-//					&& link.getAllowedModes().contains(TransportMode.ride)) {
-//				Set<String> allowedModes = new HashSet<>();
-//				allowedModes.add(TransportMode.car);
-//				// allowedModes.add("freight");
-//				allowedModes.add(TransportMode.ride);
-//				allowedModes.add(taxiNetworkMode);
-//
-//				link.setAllowedModes(allowedModes);
-//
-//				if (shpUtils.isCoordInDrtServiceArea(link.getFromNode().getCoord())
-//						|| shpUtils.isCoordInDrtServiceArea(link.getToNode().getCoord())) {
-//					link.getAttributes().putAttribute(serviceAreaAttribute, true);
-//				} else {
-//					link.getAttributes().putAttribute(serviceAreaAttribute, false);
-//				}
-//
-//			} else if (link.getAllowedModes().contains(TransportMode.pt)) {
-//				// skip pt links
-//			} else if (link.getAllowedModes().contains(TransportMode.bike)) {
-//				// skip bike links
-//			} else {
-//				throw new RuntimeException("Aborting...");
-//			}
-//			
-//		}
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			if (counter % 10000 == 0)
+				log.info("link #" + counter);
+			counter++;
+			if (link.getAllowedModes().contains(TransportMode.car)
+					&& link.getAllowedModes().contains(TransportMode.ride)) {
+				Set<String> allowedModes = new HashSet<>();
+				allowedModes.add(TransportMode.car);
+				// allowedModes.add("freight");
+				allowedModes.add(TransportMode.ride);
+				allowedModes.add(taxiNetworkMode);
+				link.setAllowedModes(allowedModes);
+
+				if (shpUtils.isCoordInDrtServiceArea(link.getFromNode().getCoord())
+						|| shpUtils.isCoordInDrtServiceArea(link.getToNode().getCoord())) {
+					link.getAttributes().putAttribute(serviceAreaAttribute, true);
+				} else {
+					link.getAttributes().putAttribute(serviceAreaAttribute, false);
+				}
+
+			} else if (link.getAllowedModes().contains(TransportMode.pt)) {
+				// skip pt links
+			} else if (link.getAllowedModes().contains(TransportMode.bike)) {
+
+
+			} else {
+				throw new RuntimeException("Aborting...");
+			}
+		}
 		log.info("Done");
 	}
-	
+
 
 }
