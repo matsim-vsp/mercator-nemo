@@ -26,9 +26,9 @@ public class TinderRelocator {
     private Population population;
 
     /**
-     * @param population
-     * @param innerGeometry
-     * @param outerGeometry
+     * @param population the population
+     * @param innerGeometry the interior
+     * @param outerGeometry the exterior
      */
     TinderRelocator(Population population, Geometry innerGeometry, Geometry outerGeometry) {
         this.population = population;
@@ -38,9 +38,9 @@ public class TinderRelocator {
     }
 
     /**
-     * @param coord
-     * @param RADIUS
-     * @return circle shape
+     * @param coord coordinates of home are passed in
+     * @param RADIUS radius value is passed in meters
+     * @return circle shape as a geometry
      */
     //http://docs.geotools.org/stable/userguide/library/jts/geometry.html
     private static Geometry createCircle(Coord coord, final double RADIUS) {
@@ -52,7 +52,7 @@ public class TinderRelocator {
     }
 
     /**
-     * @param args
+     * @param args nothing is passed through
      */
     public static void main(String[] args) {
 
@@ -78,8 +78,8 @@ public class TinderRelocator {
     }
 
     /**
-     * @param pathToFile
-     * @return
+     * @param pathToFile the path to the shape file
+     * @return Geometry from path file
      */
     private static Geometry getFirstGeometryFromShapeFile(Path pathToFile) {
         for (SimpleFeature feature : ShapeFileReader.getAllFeatures(pathToFile.toString())) {
@@ -100,31 +100,31 @@ public class TinderRelocator {
     /**
      * @return coordinates
      */
-    Coord coordSelector() {
+    private Coord coordSelector() {
         //Max and Min values
         Envelope envelope = outerGeometry.getEnvelopeInternal();
 
-        final double maxX = envelope.getMaxX();
-        final double minX = envelope.getMinX();
-        final double maxY = envelope.getMaxY();
-        final double minY = envelope.getMinY();
+        final double maxXHome = envelope.getMaxX();
+        final double minXHome = envelope.getMinX();
+        final double maxYHome = envelope.getMaxY();
+        final double minYHome = envelope.getMinY();
 
         double coordX = 0;
         double coordY = 0;
         Coord coord = new Coord(coordX, coordY);
 
         while (!outerGeometry.contains(MGC.coord2Point(coord)) || innerGeometry.contains(MGC.coord2Point(coord))) {
-            coordX = minX + (Math.random() * (maxX - minX)); //Random double value between min longitude value and max latitude value
-            coordY = minY + (Math.random() * (maxY - minY)); //Random double value between min latitude value and max latitude value
+            coordX = minXHome + (Math.random() * (maxXHome - minXHome)); //Random double value between min longitude value and max latitude value
+            coordY = minYHome + (Math.random() * (maxYHome - minYHome)); //Random double value between min latitude value and max latitude value
             coord = new Coord(coordX, coordY);
         }
         return coord;
     }
 
     /**
-     * @return
+     * @return coord which are within range
      */
-    Coord coordLimiter(Geometry homeArea) {
+    private Coord coordLimiter(Geometry homeArea) {
         //Max and Min values
         Envelope envelope = homeArea.getEnvelopeInternal();
 
@@ -146,34 +146,9 @@ public class TinderRelocator {
     }
 
     /**
-     * @param activity
-     * @return actID
-     */
-    //https://stackoverflow.com/questions/18590901/check-if-a-string-contains-numbers-java
-    private double getID(String activity) {
-        if (activity == null || activity.isEmpty()) System.out.println("Error in reading activity.");
-
-        boolean numFound = false;
-
-        StringBuilder stringBuilder = new StringBuilder();
-        double actID = 0;
-        for (char c : activity.toCharArray()) {
-            if (Character.isDigit(c)) {
-                stringBuilder.append(c);
-                numFound = true;
-            } else if (numFound) {
-                break;
-            }
-        }
-        actID = Double.parseDouble(stringBuilder.toString());
-        return actID;
-    }
-
-    /**
      * Relocater class
      */
     public void relocate() {
-        boolean homeSelected = false;
         int seed = 1;
         //The plan for each person is gotten from the the scenario
         for (Person person : population.getPersons().values()) {
@@ -184,7 +159,7 @@ public class TinderRelocator {
     }
 
     /**
-     * @param plan
+     * @param plan is passed through
      */
     private void changePlan(Plan plan, int seed) {
         Coord oldHome = null;

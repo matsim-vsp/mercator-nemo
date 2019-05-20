@@ -21,7 +21,6 @@ import static org.matsim.api.core.v01.TransportMode.car;
 public class TinderRelocatorTest {
     private static Geometry innerGeometry;
     private static Geometry outerGeometry;
-    private Geometry homeArea;
 
     private static Geometry getFirstGeometryFromShapeFile(Path pathToFile) {
         for (SimpleFeature feature : ShapeFileReader.getAllFeatures(pathToFile.toString())) {
@@ -29,6 +28,10 @@ public class TinderRelocatorTest {
         }
         throw new RuntimeException("Runtime exception: error, geometry is broken. Unexpected Error.");
     }
+
+    /**
+     * Setting up the class
+     */
 
     @BeforeClass
     public static void setupClass() {
@@ -42,6 +45,9 @@ public class TinderRelocatorTest {
         outerGeometry = outer;
     }
 
+    /**
+     * Testing if one relocation occurs
+     */
     @Test
     public void relocateOne() {
         Coord home = new Coord(0, 0);
@@ -76,7 +82,6 @@ public class TinderRelocatorTest {
         tinderRelocator.relocate();
 
         assertTrue("AssertionFalse: More than one person was created in the population.", population.getPersons().size() == 1);
-        Person newPerson = population.getPersons().values().iterator().next();
 
         for (PlanElement planElement : plan.getPlanElements()) {
             if (planElement instanceof Activity) {
@@ -91,6 +96,9 @@ public class TinderRelocatorTest {
 
     }
 
+    /**
+     * Testing if multiple relocations occur
+     */
     @Test
     public void relocateMultiple() {
         Coord home = new Coord(0, 0);
