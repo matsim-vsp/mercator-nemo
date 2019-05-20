@@ -1,48 +1,37 @@
 package org.matsim.nemo;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.util.GeometricShapeFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.matsim.api.core.v01.TransportMode.car;
 
 public class TinderRelocatorTest {
-    Coord home;
-    Coord work;
-    private Geometry innerGeometry;
-    private Geometry outerGeometry;
+    private static Geometry innerGeometry;
+    private static Geometry outerGeometry;
     private Geometry homeArea;
 
     private static Geometry getFirstGeometryFromShapeFile(Path pathToFile) {
         for (SimpleFeature feature : ShapeFileReader.getAllFeatures(pathToFile.toString())) {
             return (Geometry) feature.getDefaultGeometry();
         }
-        throw new RuntimeException("Runtime exception/error, geometry is broken. Unexpected Error.");
+        throw new RuntimeException("Runtime exception: error, geometry is broken. Unexpected Error.");
     }
 
-    private static Geometry createCircle(Coord coord, final double RADIUS) {
-        GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
-        shapeFactory.setNumPoints(32);
-        shapeFactory.setCentre(new Coordinate(coord.getX(), coord.getY()));
-        shapeFactory.setSize(RADIUS * 2);
-        return shapeFactory.createCircle();
-    }
-
-    @Test
-    public void relocateOne() {
+    @BeforeClass
+    public static void setupClass() {
         Path shapeRuhrgebiet = Paths.get("/Users/nanddesai/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp");
         Path shapeLimits = Paths.get("/Users/nanddesai/nemo_mercator/data/original_files/shapeFiles/sourceShape_NRW/sourceShape_NRW/dvg2bld_nw.shp");
 
@@ -51,6 +40,12 @@ public class TinderRelocatorTest {
 
         innerGeometry = inner;
         outerGeometry = outer;
+    }
+
+    @Test
+    public void relocateOne() {
+        Coord home = new Coord(0, 0);
+        Coord work = new Coord(100, 0);
 
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         Person person = population.getFactory().createPerson(Id.createPersonId(1));
@@ -58,7 +53,6 @@ public class TinderRelocatorTest {
 
         Activity homeActivityInTheMorning = population.getFactory().createActivityFromCoord("home", home);
         homeActivityInTheMorning.setStartTime(9 * 60 * 60);
-        homeActivityInTheMorning.setCoord(coordSelector());
         plan.addActivity(homeActivityInTheMorning);
 
         Leg toWork = population.getFactory().createLeg(car);
@@ -66,7 +60,6 @@ public class TinderRelocatorTest {
 
         Activity workActivity = population.getFactory().createActivityFromCoord("work_1", work);
         workActivity.setEndTime(17 * 60 * 60);
-        workActivity.setCoord(coordSelector());
         plan.addActivity(workActivity);
 
         Leg toHome = population.getFactory().createLeg(car);
@@ -74,80 +67,83 @@ public class TinderRelocatorTest {
 
         Activity homeActivityInTheEvening = population.getFactory().createActivityFromCoord("home", home);
         homeActivityInTheEvening.setStartTime(17 * 60 * 60);
-        homeActivityInTheEvening.setCoord(homeActivityInTheMorning.getCoord());
         plan.addActivity(homeActivityInTheEvening);
 
-        person.addPlan(changePlan(plan));
+        person.addPlan(plan);
         population.addPerson(person);
 
-        PopulationWriter writer = new PopulationWriter(population);//Writes population into scenario
-        writer.write("/Users/nanddesai/Documents/NEMOProject/outputPath/population_relocated.xml.gz");
-    }
+        TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
+        tinderRelocator.relocate();
 
-    private Plan changePlan(Plan plan) {
-        Coord oldHome = null;
-        Activity home = null;
+        assertTrue("AssertionFalse: More than one person was created in the population.", population.getPersons().size() == 1);
+        Person newPerson = population.getPersons().values().iterator().next();
+
         for (PlanElement planElement : plan.getPlanElements()) {
             if (planElement instanceof Activity) {
                 Activity activity = (Activity) planElement;
-                if (activity.getType().contains("home") && !activity.getCoord().equals(oldHome)) {
-                    oldHome = activity.getCoord();
-                    activity.setCoord(coordSelector());
-                    homeArea = createCircle(activity.getCoord(), 10000);
-                    home = activity;
-                } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
-                    activity.setCoord(home.getCoord());
-                    System.out.println("Back Home.");
+                if (activity.toString().contains("home")) {
+                    assertFalse("Home was not relocated.", home.equals(activity.getCoord()));
                 } else {
-                    activity.setCoord(coordLimiter(homeArea));
-                    this.work = activity.getCoord();
+                    assertFalse("Work was not relocated.", work.equals(activity.getCoord()));
                 }
             }
         }
-        return plan;
+
     }
 
-    Coord coordSelector() {
-        //Max and Min values
-        Envelope envelope = outerGeometry.getEnvelopeInternal();
+    @Test
+    public void relocateMultiple() {
+        Coord home = new Coord(0, 0);
+        Coord work = new Coord(100, 100);
 
-        final double maxX = envelope.getMaxX();
-        final double minX = envelope.getMinX();
-        final double maxY = envelope.getMaxY();
-        final double minY = envelope.getMinY();
+        Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+        TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
 
-        double coordX = 0;
-        double coordY = 0;
-        Coord coord = new Coord(coordX, coordY);
-
-        while (!outerGeometry.contains(MGC.coord2Point(coord)) || innerGeometry.contains(MGC.coord2Point(coord))) {
-            coordX = minX + (Math.random() * (maxX - minX)); //Random double value between min longitude value and max latitude value
-            coordY = minY + (Math.random() * (maxY - minY)); //Random double value between min latitude value and max latitude value
-            coord = new Coord(coordX, coordY);
-            System.out.println("Coordinates changed successfully!");
+        for (int i = 0; i < 100; i++) {
+            population.addPerson(createPerson(population, home, work, i));
         }
-        return coord;
+
+        tinderRelocator.relocate();
+
+        for (PlanElement planElement : population.getPersons().values().iterator().next().getSelectedPlan().getPlanElements()) {
+            if (planElement instanceof Activity) {
+                Activity activity = (Activity) planElement;
+                if (activity.toString().contains("home")) {
+                    assertFalse("Home was not relocated.", home.equals(activity.getCoord()));
+                } else {
+                    assertFalse("Work was not relocated.", work.equals(activity.getCoord()));
+                }
+            }
+        }
+
+        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 100);
+        System.out.println("\n---MultipleRelocationTestPassed.---");
     }
 
-    Coord coordLimiter(Geometry homeArea) {
-        //Max and Min values
-        Envelope envelope = homeArea.getEnvelopeInternal();
+    private Person createPerson(Population population, Coord home, Coord work, int counter) {
+        Person person = population.getFactory().createPerson(Id.createPersonId(counter));
+        Plan plan = population.getFactory().createPlan();
 
-        final double maxX = envelope.getMaxX();
-        final double minX = envelope.getMinX();
-        final double maxY = envelope.getMaxY();
-        final double minY = envelope.getMinY();
+        Activity homeActivityInTheMorning = population.getFactory().createActivityFromCoord("home_" + counter, home);
+        homeActivityInTheMorning.setStartTime(9 * 60 * 60);
+        plan.addActivity(homeActivityInTheMorning);
 
-        double coordX = 0;
-        double coordY = 0;
-        Coord coord = new Coord(coordX, coordY);
+        Leg toWork = population.getFactory().createLeg(car);
+        plan.addLeg(toWork);
 
-        while (!homeArea.contains(MGC.coord2Point(coord))) {
-            coordX = minX + (Math.random() * (maxX - minX)); //Random double value between min longitude value and max latitude value
-            coordY = minY + (Math.random() * (maxY - minY)); //Random double value between min latitude value and max latitude value
-            coord = new Coord(coordX, coordY);
-            System.out.println("Coordinates limited and changed successfully!");
-        }
-        return coord;
+        Activity workActivity = population.getFactory().createActivityFromCoord("work_" + counter, work);
+        workActivity.setEndTime(17 * 60 * 60);
+        plan.addActivity(workActivity);
+
+        Leg toHome = population.getFactory().createLeg(car);
+        plan.addLeg(toHome);
+
+        Activity homeActivityInTheEvening = population.getFactory().createActivityFromCoord("home_" + counter, home);
+        homeActivityInTheEvening.setStartTime(17 * 60 * 60);
+        plan.addActivity(homeActivityInTheEvening);
+
+        person.addPlan(plan);
+
+        return person;
     }
 }

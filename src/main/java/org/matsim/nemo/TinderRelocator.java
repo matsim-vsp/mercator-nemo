@@ -16,6 +16,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Random;
 
 
 public class TinderRelocator {
@@ -173,17 +174,19 @@ public class TinderRelocator {
      */
     public void relocate() {
         boolean homeSelected = false;
+        int seed = 1;
         //The plan for each person is gotten from the the scenario
         for (Person person : population.getPersons().values()) {
             Plan plan = person.getSelectedPlan();
-            changePlan(plan);
+            changePlan(plan, seed);
+            seed++;
         }
     }
 
     /**
      * @param plan
      */
-    private void changePlan(Plan plan) {
+    private void changePlan(Plan plan, int seed) {
         Coord oldHome = null;
         Activity home = null;
         for (PlanElement planElement : plan.getPlanElements()) {
@@ -192,7 +195,7 @@ public class TinderRelocator {
                 if (activity.getType().contains("home") && !activity.getCoord().equals(oldHome)) {
                     oldHome = activity.getCoord();
                     activity.setCoord(coordSelector());
-                    homeArea = createCircle(activity.getCoord(), randomRadius());
+                    homeArea = createCircle(activity.getCoord(), randomRadius(seed));
                     home = activity;
                     System.out.println("\nCentral home coordinates relocated successfully!");
                 } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
@@ -200,7 +203,7 @@ public class TinderRelocator {
                     System.out.println("Back to home.");
                 } else {
                     activity.setCoord(coordLimiter(homeArea));
-                    System.out.println("Non-central coordinates relocated successfully, within radius!");
+                    System.out.println("Non-central activity coordinates relocated successfully, within radius!");
                 }
             }
         }
@@ -212,33 +215,16 @@ public class TinderRelocator {
      * @return randomRadius
      */
 
-    private double randomRadius() {
-        final int weightParam = 100;
-        final int radiusMaxParam = 100000;
+    private double randomRadius(int seed) {
+        final int weightParam = 24816;
+        Random ran = new Random(seed);
+        double weight = ran.nextInt(((weightParam - 1400) + 1) + 1400);
 
-        int weight = (int) Math.round(1 + (Math.random() * (weightParam - 1)));
-        double randomRadius;
+        double randomRadius = -Math.pow((0.00001 * weight + 2.15), 9) + Math.pow(0.000001 * weight, -2) + 1000;
 
-        if (weight >= weightParam * 0.6) {
-            randomRadius = radiusMaxParam * 0.01 + (Math.random() * (radiusMaxParam * 0.02 - radiusMaxParam * 0.01));
-            System.out.println("Rad: " + randomRadius + " m.");
-        } else if (weight >= weightParam * 0.3) {
-            randomRadius = radiusMaxParam * 0.02 + (Math.random() * (radiusMaxParam * 0.1 - radiusMaxParam * 0.02));
-            System.out.println("Rad: " + randomRadius + " m.");
-        } else if (weight >= weightParam * 0.1) {
-            randomRadius = radiusMaxParam * 0.1 + (Math.random() * (radiusMaxParam * 0.2 - radiusMaxParam * 0.1));
-            System.out.println("Rad: " + randomRadius + " m.");
-        } else if (weight >= weightParam * 0.03) {
-            randomRadius = radiusMaxParam * 0.2 + (Math.random() * (radiusMaxParam * 0.5 - radiusMaxParam * 0.2));
-            System.out.println("Rad: " + randomRadius + " m.");
-        } else if (weight >= 0) {
-            randomRadius = radiusMaxParam * 0.5 + (Math.random() * (radiusMaxParam * 1 - radiusMaxParam * 0.5));
-            System.out.println("Rad: " + randomRadius + " m.");
-        } else {
-            System.out.println("RandomNumGenerationError: Error should not occur.");
-            randomRadius = -1;
-        }
-        //Returns the double random radius which is generated.
+        System.out.println("\nRadius: " + randomRadius + " meters.");
+
+        //Returns the double random radius which is generated from graph.
         return randomRadius;
     }
 
