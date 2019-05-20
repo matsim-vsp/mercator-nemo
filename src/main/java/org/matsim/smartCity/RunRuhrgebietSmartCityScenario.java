@@ -46,9 +46,11 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.run.RunRuhrgebietScenario;
 
@@ -97,10 +99,10 @@ public final class RunRuhrgebietSmartCityScenario {
 
 		} else {
 			
-			String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml/";
-			//String configFileName = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet-v1.0-1pct.configDRT.xml";
-			//this.drtServiceAreaShapeFile = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet_boundary.shp";
-			this.drtServiceAreaShapeFile = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet_boundary.shp";
+			//String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml/";
+			String configFileName = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet-v1.0-1pct.configDRT.xml";
+			this.drtServiceAreaShapeFile = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet_boundary.shp";
+			//this.drtServiceAreaShapeFile = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet_boundary.shp";
 			//this.drtServiceAreaShapeFile = DRT_SERVICE_AREA_SHAPE_FILE;
 			this.ruhrgebiet = new RunRuhrgebietScenario(new String[] { "--config-path", configFileName,
 					"--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile });
@@ -183,32 +185,34 @@ public final class RunRuhrgebietSmartCityScenario {
 			prepareControler();
 		}
 
-		Network network;
+		Network network; 
 		NetworkFilterManager networkFilterManager = new NetworkFilterManager(scenario.getNetwork());
 		networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
 			@Override
 			public boolean judgeLink(Link l) {
-				if (l.getAllowedModes().equals(TransportMode.bike)) {
+				if (!(l.getAllowedModes().contains(TransportMode.car))) {
 					return false;
-				}
-				else if (l.getAllowedModes().contains(TransportMode.car) && l.getAllowedModes().contains(TransportMode.ride)){
-					return true;
 				}
 				else {
 					return true;
 				}
 		}});
-
+		
+		//PopulationWriter popWriter = new PopulationWriter(scenario.getPopulation());
+		//popWriter.write("C://Users//Gregor//Desktop//Population.xml");
+		
+		
 		network = networkFilterManager.applyFilters();
 		XY2Links xy2Links = new XY2Links(network, scenario.getActivityFacilities());
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			xy2Links.run(p);
 		}
+		
+		//popWriter.write("C://Users//Gregor//Desktop//filteredPopulation.xml");
+        //NetworkWriter writer = new NetworkWriter(network);
+		//writer.write("C://Users//Gregor//Desktop//filteredNetwork.xml");
 
-        NetworkWriter writer = new NetworkWriter(network);
-		writer.write("C://Users//Gregor//Desktop//filteredNetwork.xml");
-
-		//controler.run();
+		controler.run();
 		log.info("Done.");
 	}
 }

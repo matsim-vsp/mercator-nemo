@@ -14,7 +14,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <matsim.version>12.0-2019w14-SNAPSHOT</matsim.version>
+        <!--  <matsim.version>12.0-2019w14-SNAPSHOT</matsim.version>-->
+        <matsim.version>12.0-SNAPSHOT</matsim.version>
     </properties>
 
     <repositories>
@@ -140,7 +141,7 @@
         <dependency>
 	    	<groupId>com.github.matsim-vsp</groupId>
     		<artifactId>matsim-ruhrgebiet</artifactId>
-			<version>1.0</version>
+			<version>1.1.x-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>					
