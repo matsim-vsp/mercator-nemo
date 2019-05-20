@@ -45,6 +45,7 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -99,10 +100,10 @@ public final class RunRuhrgebietSmartCityScenario {
 
 		} else {
 			
-			//String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml/";
-			String configFileName = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet-v1.0-1pct.configDRT.xml";
-			this.drtServiceAreaShapeFile = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet_boundary.shp";
-			//this.drtServiceAreaShapeFile = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet_boundary.shp";
+			String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml/";
+			//String configFileName = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet-v1.0-1pct.configDRT.xml";
+			//this.drtServiceAreaShapeFile = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet_boundary.shp";
+			this.drtServiceAreaShapeFile = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet_boundary.shp";
 			//this.drtServiceAreaShapeFile = DRT_SERVICE_AREA_SHAPE_FILE;
 			this.ruhrgebiet = new RunRuhrgebietScenario(new String[] { "--config-path", configFileName,
 					"--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile });
@@ -176,6 +177,7 @@ public final class RunRuhrgebietSmartCityScenario {
 		config.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
 		config.qsim().setNumberOfThreads(1); // drt is still single threaded!
 		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
+		
 		hasPreparedConfig = true;
 		return config;
 	}
@@ -211,8 +213,11 @@ public final class RunRuhrgebietSmartCityScenario {
 		//popWriter.write("C://Users//Gregor//Desktop//filteredPopulation.xml");
         //NetworkWriter writer = new NetworkWriter(network);
 		//writer.write("C://Users//Gregor//Desktop//filteredNetwork.xml");
-
-		controler.run();
+		
+		ConfigWriter writer = new ConfigWriter(controler.getConfig());
+		writer.writeFileV2("C://Users//Gregor//Desktop//DRTConfig.xml");
+		
+		//controler.run();
 		log.info("Done.");
 	}
 }
