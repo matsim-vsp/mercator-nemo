@@ -13,6 +13,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -21,6 +22,7 @@ import static org.matsim.api.core.v01.TransportMode.car;
 public class TinderRelocatorTest {
     private static Geometry innerGeometry;
     private static Geometry outerGeometry;
+    private static Logger logger = Logger.getLogger("TinderRelocatorTest");
 
     private static Geometry getFirstGeometryFromShapeFile(Path pathToFile) {
         for (SimpleFeature feature : ShapeFileReader.getAllFeatures(pathToFile.toString())) {
@@ -133,10 +135,11 @@ public class TinderRelocatorTest {
 
     /**
      * Testing if we can move a percentage of the population
+     * Population consists of moving everything home+other activities.
      */
     @Test
-    public void relocateFractionOfPopulation() {
-        System.out.println("----FractionalRelocationTestBegin----");
+    public void relocateFractionOfPopulationAll() {
+        logger.info("----FractionalRelocationTestBegin----");
         Coord home = new Coord(0, 0);
         Coord work = new Coord(100, 100);
 
@@ -163,12 +166,54 @@ public class TinderRelocatorTest {
                 }
             }
         }
-        System.out.println("____________________________________________________");
-        System.out.println(relocatedPeople / 2 + " people were relocated.");
-        assertTrue("The percentage of people relocated is incorrect.", tinderRelocator.percentageOfPopulation(population, relocatedPeople / 2));
+        logger.info(relocatedPeople / 2 + " people were relocated.");
+        assertTrue("The percentage of people relocated is incorrect.", tinderRelocator.fractionOfPopulationRelocating(population, relocatedPeople / 2, tinderRelocator.relocateEverythingFraction));
         assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 1000);
 
-        System.out.println("\n----FractionalRelocationTestPassed.----");
+        logger.info("----FractionalRelocationTestPassed.----");
+    }
+
+    /**
+     * Tests if the relocation of homes only can happen fractionally
+     */
+    @Test
+    public void relocateFractionOfPopulationHomeOnly() {
+        logger.info("----FractionalRelocationOfHomeOnlyTestBegin----");
+        Coord home = new Coord(0, 0);
+        Coord work = new Coord(100, 100);
+
+        int numOfPeople = 10;
+        int sameCoordPlaces = 0;
+        int relocatedHomes = 0;
+
+        Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+        TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
+
+        for (int i = 1; i <= numOfPeople; i++) {
+            population.addPerson(createPerson(population, home, work, i));
+        }
+
+        tinderRelocator.relocate();
+
+        for (Person person : population.getPersons().values()) {
+            Plan plan = person.getSelectedPlan();
+            for (PlanElement planElement : plan.getPlanElements()) {
+                if (planElement instanceof Activity) {
+                    Activity activity = (Activity) planElement;
+                    if (!activity.getType().toString().contains("home") && activity.getCoord().equals(work)) {
+                        sameCoordPlaces++;
+                    }
+                    if (activity.getType().toString().contains("home") && !activity.getCoord().equals(home)) {
+                        relocatedHomes++;
+                    }
+                }
+            }
+        }
+        logger.info(relocatedHomes / 2 + " people were relocated.");
+        assertTrue("The percentage of homes relocated is incorrect.", tinderRelocator.fractionOfPopulationRelocating(population, relocatedHomes / 2, tinderRelocator.relocateOnlyHomeFraction));
+        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 10);
+
+        logger.info("----FractionalRelocationOfHomeOnlyTestPassed.----");
     }
 
     /**

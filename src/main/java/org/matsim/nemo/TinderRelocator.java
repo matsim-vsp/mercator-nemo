@@ -17,6 +17,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
+import java.util.logging.Logger;
 
 
 public class TinderRelocator {
@@ -24,6 +25,9 @@ public class TinderRelocator {
     private Geometry outerGeometry;
     private Geometry homeArea;
     private Population population;
+    final static double relocateEverythingFraction = 0; //eg. 0.4 means 40 percent of population is moving everything
+    final static double relocateOnlyHomeFraction = 0.5; //eg. 0.3 means 30 percent of population is moving only home
+    private static Logger logger = Logger.getLogger("TinderRelocator");
 
     /**
      * @param population the population
@@ -73,7 +77,7 @@ public class TinderRelocator {
         //Call relocate method
         tinderRelocator.relocate();
 
-        System.out.println();
+        logger.info("");
         PopulationWriter writer = new PopulationWriter(tinderRelocator.getPopulation());//Writes population into scenario
         writer.write("/Users/nanddesai/Documents/NEMOProject/outputPath/population_relocated.xml.gz");
     }
@@ -152,18 +156,23 @@ public class TinderRelocator {
      */
     public void relocate() {
         int seed = 1;
-        int relocatedPeople = 1;
+        int relocatedEverything = 1;
+        int relocatedHomeOnly = 1;
         //The plan for each person is gotten from the the scenario
         for (Person person : population.getPersons().values()) {
-            if (percentageOfPopulation(population, relocatedPeople)) {
-                System.out.println("\n\033[7mRelocating...\033[0m");
+            if (fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
                 Plan plan = person.getSelectedPlan();
-                changePlan(plan, seed);
+                changeEverythingInPlan(plan, seed);
                 seed++;
-                relocatedPeople++;
-                System.out.println("Person_" + person.getId().toString() + " \033[4m\033[32mhas been\033[0m relocated.");
+                relocatedEverything++;
+                logger.info("Person_" + person.getId().toString() + " has relocated EVERYTHING.");
+            } else if (fractionOfPopulationRelocating(population, relocatedHomeOnly, relocateOnlyHomeFraction) && !fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
+                Plan plan = person.getSelectedPlan();
+                changeOnlyHomeInPlan(plan);
+                relocatedHomeOnly++;
+                logger.info("Person_" + person.getId().toString() + " has relocated ONLY HOME.");
             } else {
-                System.out.println("\nPerson_" + person.getId().toString() + " is \033[4m\033[31mnot\033[0m relocated.");
+                logger.info("\nPerson_" + person.getId().toString() + " is NOT relocated.");
             }
         }
     }
@@ -174,9 +183,9 @@ public class TinderRelocator {
      * @return either true or false stating if percentage of
      * population has been relocated
      */
-    public Boolean percentageOfPopulation(Population population, int people) {
-        final double percent = 1.0; //given as a decimal. eg. 0.50 is 50%
-        if (people <= percent * population.getPersons().size()) {
+    public Boolean fractionOfPopulationRelocating(Population population, int people, double relocatingFrac) {
+        final double fracRelocating = relocatingFrac; //given as a decimal. eg. 0.50 is 50%
+        if (people <= fracRelocating * population.getPersons().size()) {
             return true;
         } else {
             return false;
@@ -184,9 +193,31 @@ public class TinderRelocator {
     }
 
     /**
+     * This changes the plan if only the home is needed to be moved.
+     *
+     * @param plan for selected person is imported from the relocator method.
+     */
+    private void changeOnlyHomeInPlan(Plan plan) {
+        Coord oldHome = null;
+        Activity home = null;
+        for (PlanElement planElement : plan.getPlanElements()) {
+            if (planElement instanceof Activity) {
+                Activity activity = (Activity) planElement;
+                if (activity.getType().contains("home") && !activity.getCoord().equals(oldHome)) {
+                    oldHome = activity.getCoord();
+                    activity.setCoord(coordSelector());
+                    home = activity;
+                } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
+                    activity.setCoord(home.getCoord());
+                }
+            }
+        }
+    }
+
+    /**
      * @param plan is passed through
      */
-    private void changePlan(Plan plan, int seed) {
+    private void changeEverythingInPlan(Plan plan, int seed) {
         Coord oldHome = null;
         Activity home = null;
         for (PlanElement planElement : plan.getPlanElements()) {
@@ -197,13 +228,10 @@ public class TinderRelocator {
                     activity.setCoord(coordSelector());
                     homeArea = createCircle(activity.getCoord(), randomRadius(seed));
                     home = activity;
-                    System.out.println("    Central home coordinates relocated successfully!");
                 } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
                     activity.setCoord(home.getCoord());
-                    System.out.println("    Back to home.");
                 } else {
                     activity.setCoord(coordLimiter(homeArea));
-                    System.out.println("    Non-central activity coordinates relocated successfully, within radius!");
                 }
             }
         }
@@ -225,7 +253,7 @@ public class TinderRelocator {
 
         double randomRadius = -Math.pow((0.00001 * weight + 2.15), 9) + Math.pow(0.000001 * weight, -2) + 1000;
 
-        System.out.println("Radius: " + randomRadius + " meters.");
+        //ogger.info("Home Radius: " + randomRadius + " meters."); //Displays the radius in logger statment
 
         //Returns the double random radius which is generated from graph.
         return randomRadius;
