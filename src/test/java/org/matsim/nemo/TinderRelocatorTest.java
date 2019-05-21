@@ -50,6 +50,7 @@ public class TinderRelocatorTest {
      */
     @Test
     public void relocateOne() {
+        System.out.println("----RelocationOfOneTestBegin----");
         Coord home = new Coord(0, 0);
         Coord work = new Coord(100, 0);
 
@@ -93,6 +94,7 @@ public class TinderRelocatorTest {
                 }
             }
         }
+        System.out.println("\n---OneRelocationTestPassed.---");
 
     }
 
@@ -101,13 +103,14 @@ public class TinderRelocatorTest {
      */
     @Test
     public void relocateMultiple() {
+        System.out.println("----MultipleRelocationTestBegin----");
         Coord home = new Coord(0, 0);
         Coord work = new Coord(100, 100);
 
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 1; i <= 100; i++) {
             population.addPerson(createPerson(population, home, work, i));
         }
 
@@ -128,6 +131,53 @@ public class TinderRelocatorTest {
         System.out.println("\n---MultipleRelocationTestPassed.---");
     }
 
+    /**
+     * Testing if we can move a percentage of the population
+     */
+    @Test
+    public void relocateFractionOfPopulation() {
+        System.out.println("----FractionalRelocationTestBegin----");
+        Coord home = new Coord(0, 0);
+        Coord work = new Coord(100, 100);
+
+        int numOfPeople = 1000;
+        int relocatedPeople = 0;
+
+        Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+        TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
+
+        for (int i = 1; i <= numOfPeople; i++) {
+            population.addPerson(createPerson(population, home, work, i));
+        }
+
+        tinderRelocator.relocate();
+
+        for (Person person : population.getPersons().values()) {
+            Plan plan = person.getSelectedPlan();
+            for (PlanElement planElement : plan.getPlanElements()) {
+                if (planElement instanceof Activity) {
+                    Activity activity = (Activity) planElement;
+                    if (activity.getType().toString().contains("home") && !activity.getCoord().equals(home)) {
+                        relocatedPeople++;
+                    }
+                }
+            }
+        }
+        System.out.println("____________________________________________________");
+        System.out.println(relocatedPeople / 2 + " people were relocated.");
+        assertTrue("The percentage of people relocated is incorrect.", tinderRelocator.percentageOfPopulation(population, relocatedPeople / 2));
+        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 1000);
+
+        System.out.println("\n----FractionalRelocationTestPassed.----");
+    }
+
+    /**
+     * @param population from test 2
+     * @param home       from test 2
+     * @param work       from test 2
+     * @param counter    from test 2
+     * @return returns a person
+     */
     private Person createPerson(Population population, Coord home, Coord work, int counter) {
         Person person = population.getFactory().createPerson(Id.createPersonId(counter));
         Plan plan = population.getFactory().createPlan();
@@ -154,4 +204,5 @@ public class TinderRelocatorTest {
 
         return person;
     }
+
 }

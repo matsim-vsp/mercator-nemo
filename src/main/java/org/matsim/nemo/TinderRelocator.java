@@ -73,6 +73,7 @@ public class TinderRelocator {
         //Call relocate method
         tinderRelocator.relocate();
 
+        System.out.println();
         PopulationWriter writer = new PopulationWriter(tinderRelocator.getPopulation());//Writes population into scenario
         writer.write("/Users/nanddesai/Documents/NEMOProject/outputPath/population_relocated.xml.gz");
     }
@@ -147,14 +148,38 @@ public class TinderRelocator {
 
     /**
      * Relocater class
+     * does the real relocating
      */
     public void relocate() {
         int seed = 1;
+        int relocatedPeople = 1;
         //The plan for each person is gotten from the the scenario
         for (Person person : population.getPersons().values()) {
-            Plan plan = person.getSelectedPlan();
-            changePlan(plan, seed);
-            seed++;
+            if (percentageOfPopulation(population, relocatedPeople)) {
+                System.out.println("\n\033[7mRelocating...\033[0m");
+                Plan plan = person.getSelectedPlan();
+                changePlan(plan, seed);
+                seed++;
+                relocatedPeople++;
+                System.out.println("Person_" + person.getId().toString() + " \033[4m\033[32mhas been\033[0m relocated.");
+            } else {
+                System.out.println("\nPerson_" + person.getId().toString() + " is \033[4m\033[31mnot\033[0m relocated.");
+            }
+        }
+    }
+
+    /**
+     * @param population given from the relocate class
+     * @param people     an integer which counts number of people
+     * @return either true or false stating if percentage of
+     * population has been relocated
+     */
+    public Boolean percentageOfPopulation(Population population, int people) {
+        final double percent = 1.0; //given as a decimal. eg. 0.50 is 50%
+        if (people <= percent * population.getPersons().size()) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -172,13 +197,13 @@ public class TinderRelocator {
                     activity.setCoord(coordSelector());
                     homeArea = createCircle(activity.getCoord(), randomRadius(seed));
                     home = activity;
-                    System.out.println("\nCentral home coordinates relocated successfully!");
+                    System.out.println("    Central home coordinates relocated successfully!");
                 } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
                     activity.setCoord(home.getCoord());
-                    System.out.println("Back to home.");
+                    System.out.println("    Back to home.");
                 } else {
                     activity.setCoord(coordLimiter(homeArea));
-                    System.out.println("Non-central activity coordinates relocated successfully, within radius!");
+                    System.out.println("    Non-central activity coordinates relocated successfully, within radius!");
                 }
             }
         }
@@ -186,18 +211,21 @@ public class TinderRelocator {
 
     /**
      * This generates a random radius value to be used as the homeArea radii
-     *
+     * Refer to : https://www.desmos.com/calculator/jbgvmtejrd
+     * Eqn: y = -(0.00001x+2.15)^9+(0.000001x)^-2+1000
      * @return randomRadius
      */
 
     private double randomRadius(int seed) {
-        final int weightParam = 24816;
+        final int maxWeightParam = 24816; //x-values in the graph/equation
+        final int minWeightParam = 3160; //eg. 3160 value here means approx. 100000m min radius
+
         Random ran = new Random(seed);
-        double weight = ran.nextInt(((weightParam - 1400) + 1) + 1400);
+        double weight = ran.nextInt(((maxWeightParam - minWeightParam) + 1)) + minWeightParam;
 
         double randomRadius = -Math.pow((0.00001 * weight + 2.15), 9) + Math.pow(0.000001 * weight, -2) + 1000;
 
-        System.out.println("\nRadius: " + randomRadius + " meters.");
+        System.out.println("Radius: " + randomRadius + " meters.");
 
         //Returns the double random radius which is generated from graph.
         return randomRadius;
