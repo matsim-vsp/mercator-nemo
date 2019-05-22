@@ -25,8 +25,9 @@ public class TinderRelocator {
     private Geometry outerGeometry;
     private Geometry homeArea;
     private Population population;
-    final static double relocateEverythingFraction = 0; //eg. 0.4 means 40 percent of population is moving everything
-    final static double relocateOnlyHomeFraction = 0.5; //eg. 0.3 means 30 percent of population is moving only home
+    //Summation of these two ratios must be less than or equal to 1
+    final static double relocateEverythingFraction = 0.4; //eg. 0.4 means 40 percent of population is moving everything
+    final static double relocateOnlyHomeFraction = 0.3; //eg. 0.3 means 30 percent of population is moving only home
     private static Logger logger = Logger.getLogger("TinderRelocator");
 
     /**
@@ -172,7 +173,7 @@ public class TinderRelocator {
                 relocatedHomeOnly++;
                 logger.info("Person_" + person.getId().toString() + " has relocated ONLY HOME.");
             } else {
-                logger.info("\nPerson_" + person.getId().toString() + " is NOT relocated.");
+                logger.info("Person_" + person.getId().toString() + " is NOT relocated.");
             }
         }
     }
@@ -253,7 +254,7 @@ public class TinderRelocator {
 
         double randomRadius = -Math.pow((0.00001 * weight + 2.15), 9) + Math.pow(0.000001 * weight, -2) + 1000;
 
-        //ogger.info("Home Radius: " + randomRadius + " meters."); //Displays the radius in logger statment
+        //logger.info("Home Radius: " + randomRadius + " meters."); //Displays the radius in logger statement
 
         //Returns the double random radius which is generated from graph.
         return randomRadius;

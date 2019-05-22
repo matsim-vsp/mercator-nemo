@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.matsim.api.core.v01.TransportMode.car;
 
@@ -96,7 +97,7 @@ public class TinderRelocatorTest {
                 }
             }
         }
-        System.out.println("\n---OneRelocationTestPassed.---");
+        logger.info("---OneRelocationTestPassed.---");
 
     }
 
@@ -105,7 +106,7 @@ public class TinderRelocatorTest {
      */
     @Test
     public void relocateMultiple() {
-        System.out.println("----MultipleRelocationTestBegin----");
+        logger.info("----MultipleRelocationTestBegin----");
         Coord home = new Coord(0, 0);
         Coord work = new Coord(100, 100);
 
@@ -130,7 +131,7 @@ public class TinderRelocatorTest {
         }
 
         assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 100);
-        System.out.println("\n---MultipleRelocationTestPassed.---");
+        logger.info("---MultipleRelocationTestPassed.---");
     }
 
     /**
@@ -169,7 +170,7 @@ public class TinderRelocatorTest {
         logger.info(relocatedPeople / 2 + " people were relocated.");
         assertTrue("The percentage of people relocated is incorrect.", tinderRelocator.fractionOfPopulationRelocating(population, relocatedPeople / 2, tinderRelocator.relocateEverythingFraction));
         assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 1000);
-
+        assertEquals("The relocated number of people is not equal to the ratio expected.", (float) tinderRelocator.relocateEverythingFraction, (float) (relocatedPeople / 2) / numOfPeople, 0);
         logger.info("----FractionalRelocationTestPassed.----");
     }
 
@@ -182,9 +183,10 @@ public class TinderRelocatorTest {
         Coord home = new Coord(0, 0);
         Coord work = new Coord(100, 100);
 
-        int numOfPeople = 10;
-        int sameCoordPlaces = 0;
+        int numOfPeople = 1000;
         int relocatedHomes = 0;
+        int relocatedEverything = 0;
+        int otherActivities = 0;
 
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
@@ -200,22 +202,75 @@ public class TinderRelocatorTest {
             for (PlanElement planElement : plan.getPlanElements()) {
                 if (planElement instanceof Activity) {
                     Activity activity = (Activity) planElement;
-                    if (!activity.getType().toString().contains("home") && activity.getCoord().equals(work)) {
-                        sameCoordPlaces++;
-                    }
                     if (activity.getType().toString().contains("home") && !activity.getCoord().equals(home)) {
                         relocatedHomes++;
                     }
                 }
             }
         }
+
         logger.info(relocatedHomes / 2 + " people were relocated.");
         assertTrue("The percentage of homes relocated is incorrect.", tinderRelocator.fractionOfPopulationRelocating(population, relocatedHomes / 2, tinderRelocator.relocateOnlyHomeFraction));
-        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 10);
-
+        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 1000);
+        assertEquals("The relocated number of people is not equal to the ratio expected.", (float) tinderRelocator.relocateOnlyHomeFraction, (float) (relocatedHomes / 2) / numOfPeople, 0);
         logger.info("----FractionalRelocationOfHomeOnlyTestPassed.----");
     }
 
+    /**
+     * Tests if multiple parameter changes can occur.
+     * Some people want to move everything out of the Ruhr.
+     * Some people want only to move their homes out of the Ruhr.
+     */
+    @Test
+    public void relocatePopulationWithMultipleFractionalParams() {
+        logger.info("----MultipleParameterFractionalRelocationBegin----");
+        Coord home = new Coord(0, 0);
+        Coord work = new Coord(100, 100);
+
+        int numOfPeople = 1000;
+        int relocatedHomesOnly = 0;
+        int noRelocation = 0;
+        int otherActivities = 0;
+        int relocatedEverything = 0;
+
+        Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+        TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
+
+        for (int i = 1; i <= numOfPeople; i++) {
+            population.addPerson(createPerson(population, home, work, i));
+        }
+
+        tinderRelocator.relocate();
+
+        for (Person person : population.getPersons().values()) {
+            Plan plan = person.getSelectedPlan();
+            for (PlanElement planElement : plan.getPlanElements()) {
+                if (planElement instanceof Activity) {
+                    Activity activity = (Activity) planElement;
+                    if (activity.getType().toString().contains("home") && activity.getCoord().equals(home)) {
+                        noRelocation++;
+                    }
+                    if (!activity.getType().toString().contains("home") && !activity.getCoord().equals(work)) {
+                        otherActivities++;
+                    }
+                }
+            }
+            if (otherActivities > 0) {
+                relocatedEverything++;
+            }
+            otherActivities = 0;
+        }
+        relocatedHomesOnly = numOfPeople - relocatedEverything - noRelocation / 2;
+
+        logger.info(relocatedHomesOnly + " people relocated only their homes.");
+        logger.info(relocatedEverything + " people relocated everything along with their homes.");
+        assertEquals("The relocated number of people who only relocated home is not equal to the ratio expected.",
+                (double) tinderRelocator.relocateOnlyHomeFraction, (double) (relocatedHomesOnly) / numOfPeople, 0);
+        assertEquals("The relocated number of people who relocated everything is not equal to the ratio expected.",
+                (float) tinderRelocator.relocateEverythingFraction, (float) (relocatedEverything) / numOfPeople, 0);
+        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 1000);
+        logger.info("----MultipleParameterFractionalRelocationPassed----");
+    }
     /**
      * @param population from test 2
      * @param home       from test 2
