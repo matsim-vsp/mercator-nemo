@@ -227,7 +227,7 @@ public class TinderRelocatorTest {
         Coord home = new Coord(0, 0);
         Coord work = new Coord(100, 100);
 
-        int numOfPeople = 1000;
+        int numOfPeople = 999;
         int relocatedHomesOnly = 0;
         int noRelocation = 0;
         int otherActivities = 0;
@@ -265,18 +265,18 @@ public class TinderRelocatorTest {
         logger.info(relocatedHomesOnly + " people relocated only their homes.");
         logger.info(relocatedEverything + " people relocated everything along with their homes.");
         assertEquals("The relocated number of people who only relocated home is not equal to the ratio expected.",
-                (double) tinderRelocator.relocateOnlyHomeFraction, (double) (relocatedHomesOnly) / numOfPeople, 0);
+                (double) tinderRelocator.relocateOnlyHomeFraction, (double) (relocatedHomesOnly) / numOfPeople, 0.1); //giving it a 0.1 delta enables populations such as 1001
         assertEquals("The relocated number of people who relocated everything is not equal to the ratio expected.",
-                (float) tinderRelocator.relocateEverythingFraction, (float) (relocatedEverything) / numOfPeople, 0);
-        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 1000);
+                (double) tinderRelocator.relocateEverythingFraction, (double) (relocatedEverything) / numOfPeople, 0.1);
+        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 999);
         logger.info("----MultipleParameterFractionalRelocationPassed----");
     }
     /**
-     * @param population from test 2
-     * @param home       from test 2
-     * @param work       from test 2
-     * @param counter    from test 2
-     * @return returns a person
+     * @param population from test
+     * @param home       from test
+     * @param work       from test
+     * @param counter    from test
+     * @return returns a person with a plan
      */
     private Person createPerson(Population population, Coord home, Coord work, int counter) {
         Person person = population.getFactory().createPerson(Id.createPersonId(counter));

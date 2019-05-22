@@ -27,7 +27,7 @@ public class TinderRelocator {
     private Population population;
     //Summation of these two ratios must be less than or equal to 1
     final static double relocateEverythingFraction = 0.4; //eg. 0.4 means 40 percent of population is moving everything
-    final static double relocateOnlyHomeFraction = 0.3; //eg. 0.3 means 30 percent of population is moving only home
+    final static double relocateOnlyHomeFraction = 0.2; //eg. 0.3 means 30 percent of population is moving only home
     private static Logger logger = Logger.getLogger("TinderRelocator");
 
     /**
