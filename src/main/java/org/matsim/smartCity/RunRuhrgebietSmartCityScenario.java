@@ -46,6 +46,7 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -60,8 +61,8 @@ import org.matsim.run.RunRuhrgebietScenario;
  * 
  * - The input DRT vehicles file specifies the number of vehicles and the
  * vehicle capacity (a vehicle capacity of 1 means there is no ride-sharing). -
- * The DRT service area is set to the the Ruhrgebiet area (see input
- * shape file). - Initial plans are not modified.
+ * The DRT service area is set to the the Ruhrgebiet area (see input shape
+ * file). - Initial plans are not modified.
  * 
  * @author ikaddoura
  */
@@ -99,12 +100,12 @@ public final class RunRuhrgebietSmartCityScenario {
 			this.ruhrgebiet = new RunRuhrgebietScenario(args);
 
 		} else {
-			
-			String configFileName = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet-v1.0-1pct.configDRT.xml/";
+
+			String configFileName = "C://Users//Gregor//Desktop//Input//ruhrgebiet-v1.0-1pct.configDRT.xml/";
 			//String configFileName = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet-v1.0-1pct.configDRT.xml";
 			//this.drtServiceAreaShapeFile = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet_boundary.shp";
-			this.drtServiceAreaShapeFile = "C://Users//Gregor//Desktop//RuhrScenario//ruhrgebiet_boundary.shp";
-			//this.drtServiceAreaShapeFile = DRT_SERVICE_AREA_SHAPE_FILE;
+			this.drtServiceAreaShapeFile = "C://Users//Gregor//Desktop//Input//ruhrgebiet_boundary.shp";
+			// this.drtServiceAreaShapeFile = DRT_SERVICE_AREA_SHAPE_FILE;
 			this.ruhrgebiet = new RunRuhrgebietScenario(new String[] { "--config-path", configFileName,
 					"--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile });
 		}
@@ -144,13 +145,10 @@ public final class RunRuhrgebietSmartCityScenario {
 		}
 
 		scenario = ruhrgebiet.prepareScenario();
-
 		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
 		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-
 		SmartCityShpUtils shpUtils = new SmartCityShpUtils(drtServiceAreaShapeFile);
 		new SmartCityNetworkModification(shpUtils).addSAVmode(scenario, drtNetworkMode, drtServiceAreaAttribute);
-
 		hasPreparedScenario = true;
 		return scenario;
 	}
@@ -175,7 +173,10 @@ public final class RunRuhrgebietSmartCityScenario {
 		config = ruhrgebiet.prepareConfig(modules.toArray(modulesArray));
 		config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
 		config.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
+		config.plansCalcRoute().removeModeRoutingParams(TransportMode.drt);
 		config.qsim().setNumberOfThreads(1); // drt is still single threaded!
+		//DynAgents require simulation to start from the very beginning Set 'QSim.simStarttimeInterpretation' to onlyUseStarttime
+		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
 		
 		hasPreparedConfig = true;
@@ -187,37 +188,36 @@ public final class RunRuhrgebietSmartCityScenario {
 			prepareControler();
 		}
 
-		Network network; 
+		Network network;
 		NetworkFilterManager networkFilterManager = new NetworkFilterManager(scenario.getNetwork());
 		networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
 			@Override
 			public boolean judgeLink(Link l) {
 				if (!(l.getAllowedModes().contains(TransportMode.car))) {
 					return false;
-				}
-				else {
+				} else {
 					return true;
 				}
-		}});
-		
-		//PopulationWriter popWriter = new PopulationWriter(scenario.getPopulation());
-		//popWriter.write("C://Users//Gregor//Desktop//Population.xml");
-		
-		
+			}
+		});
+
+		// PopulationWriter popWriter = new PopulationWriter(scenario.getPopulation());
+		// popWriter.write("C://Users//Gregor//Desktop//Population.xml");
+
 		network = networkFilterManager.applyFilters();
 		XY2Links xy2Links = new XY2Links(network, scenario.getActivityFacilities());
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			xy2Links.run(p);
 		}
+
+		// popWriter.write("C://Users//Gregor//Desktop//filteredPopulation.xml");
+		// NetworkWriter writer = new NetworkWriter(network);
+		// writer.write("C://Users//Gregor//Desktop//filteredNetwork.xml");
+
+		//ConfigWriter writer = new ConfigWriter(controler.getConfig());
+		//writer.writeFileV1("C://Users//Gregor//Desktop//DRTConfig.xml");
 		
-		//popWriter.write("C://Users//Gregor//Desktop//filteredPopulation.xml");
-        //NetworkWriter writer = new NetworkWriter(network);
-		//writer.write("C://Users//Gregor//Desktop//filteredNetwork.xml");
-		
-		ConfigWriter writer = new ConfigWriter(controler.getConfig());
-		writer.writeFileV2("C://Users//Gregor//Desktop//DRTConfig.xml");
-		
-		//controler.run();
+		controler.run();
 		log.info("Done.");
 	}
 }
