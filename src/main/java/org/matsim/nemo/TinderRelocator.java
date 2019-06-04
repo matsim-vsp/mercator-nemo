@@ -1,5 +1,11 @@
+/**
+ * TinderRelocator.java
+ * NEMO Scenario 3
+ */
 package org.matsim.nemo;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -14,6 +20,10 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
@@ -26,8 +36,8 @@ public class TinderRelocator {
     private Geometry homeArea;
     private Population population;
     //Summation of these two ratios must be less than or equal to 1
-    final static double relocateEverythingFraction = 0.4; //eg. 0.4 means 40 percent of population is moving everything
-    final static double relocateOnlyHomeFraction = 0.2; //eg. 0.3 means 30 percent of population is moving only home
+    final static double relocateEverythingFraction = 1; //eg. 0.4 means 40 percent of population is moving everything
+    final static double relocateOnlyHomeFraction = 0;  //eg. 0.3 means 30 percent of population is moving only home
     private static Logger logger = Logger.getLogger("TinderRelocator");
 
     /**
@@ -128,6 +138,54 @@ public class TinderRelocator {
     }
 
     /**
+     * @param relocatedCell cell where it will be going to
+     * @return
+     */
+    public Coord hardCodeCoords(int relocatedCell) {
+
+        Coord coord1 = new Coord(338142.07, 5719759.81);
+        Coord coord2 = new Coord(396731.31, 5720122.43);
+        Coord coord3 = new Coord(445799.15, 5722771.49);
+        Coord coord4 = new Coord(308462.43, 5699860.89);
+        Coord coord5 = new Coord(374311.27, 5705428.26);
+        Coord coord6 = new Coord(430345.25, 5703971.05);
+        Coord coord7 = new Coord(308979.33, 5672689.09);
+        Coord coord8 = new Coord(373932.04, 5674515.38);
+        Coord coord0 = new Coord(434569.45, 5676445.65);
+
+        if (relocatedCell == 1) {
+            logger.info("Coord1");
+            return coord1;
+        } else if (relocatedCell == 2) {
+            logger.info("Coord2");
+            return coord2;
+        } else if (relocatedCell == 3) {
+            logger.info("Coord3");
+            return coord3;
+        } else if (relocatedCell == 4) {
+            logger.info("Coord4");
+            return coord4;
+        } else if (relocatedCell == 5) {
+            logger.info("Coord5");
+            return coord5;
+        } else if (relocatedCell == 6) {
+            logger.info("Coord6");
+            return coord6;
+        } else if (relocatedCell == 7) {
+            logger.info("Coord7");
+            return coord7;
+        } else if (relocatedCell == 8) {
+            logger.info("Coord8");
+            return coord8;
+        } else if (relocatedCell == 0) {
+            logger.info("Coord0");
+            return coord0;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @return coord which are within range
      */
     private Coord coordLimiter(Geometry homeArea) {
@@ -149,6 +207,40 @@ public class TinderRelocator {
             coord = new Coord(coordX, coordY);
         }
         return coord;
+    }
+
+    /**
+     * Relocates hard coded coordinates
+     */
+    public void hardCodeRelocation() {
+        Coord oldHome = null;
+        Activity home = null;
+        int relocatedEverything = 0;
+        int counter = 0;
+        for (Person person : population.getPersons().values()) {
+            if (fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
+                Plan plan = person.getSelectedPlan();
+                for (PlanElement planElement : plan.getPlanElements()) {
+                    if (planElement instanceof Activity) {
+                        Activity activity = (Activity) planElement;
+                        if (activity.getType().toString().contains("home") && !activity.getCoord().equals(oldHome)) {
+                            activity.setCoord(hardCodeCoords(1));
+                            oldHome = activity.getCoord();
+                            home = activity;
+                            System.out.println("Relocation completed.");
+                            relocatedEverything++;
+                        } else if (activity.getType().toString().contains("home") && activity.getCoord().equals(oldHome)) {
+                            activity.setCoord(home.getCoord());
+                        } else if (activity.getType().toString().contains("work")) {
+                            activity.setCoord(home.getCoord());
+                        }
+                    }
+                }
+            } else {
+                logger.info("Person_" + person.getId().toString() + " is NOT relocated.");
+            }
+            counter++;
+        }
     }
 
     /**
@@ -189,7 +281,7 @@ public class TinderRelocator {
         if (people <= fracRelocating * population.getPersons().size()) {
             return true;
         } else {
-            return false;
+            return true;
         }
     }
 
@@ -254,10 +346,76 @@ public class TinderRelocator {
 
         double randomRadius = -Math.pow((0.00001 * weight + 2.15), 9) + Math.pow(0.000001 * weight, -2) + 1000;
 
-        //logger.info("Home Radius: " + randomRadius + " meters."); //Displays the radius in logger statement
-
         //Returns the double random radius which is generated from graph.
         return randomRadius;
     }
 
+    /**
+     * CSV Parser, parses coordinates
+     *
+     */
+
+    Coord CSVCoordinatesParser(int idnum) {
+        String x = null;
+        String y = null;
+        String id = null;
+        int counter = 0;
+        Iterable<CSVRecord> records;
+        try (Reader in = new FileReader("/Users/nanddesai/Documents/mercator-nemo/src/relocationInput.csv")) {
+            records = CSVFormat.EXCEL.parse(in);
+            for (CSVRecord record : records) {
+                if (counter - 1 <= idnum) {
+                    id = record.get(0);
+                    x = record.get(1);
+                    y = record.get(2);
+                    counter++;
+                    //If id number asked for is larger than max number in
+                    //in the list it uses the last id number in the list.
+                } else {
+                    break;
+                }
+            }
+            logger.info("CSV file has been Parsed.");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Coord coord = new Coord(Double.parseDouble(x), Double.parseDouble(y));
+        return coord;
+    }
+
+    /**
+     * This parses the probability CSV file
+     *
+     * @param row
+     * @param col
+     */
+    public double CSVProbabilityParser(int originalCell, int relocationCell) {
+        int col = relocationCell + 1;
+        int row = originalCell + 1;
+        int counter = 0;
+        String str = "";
+        double probability = 0;
+        try (Reader in = new FileReader("/Users/nanddesai/Documents/mercator-nemo/src/probabilitiesOfRelocation.csv")) {
+            Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(in);
+            for (CSVRecord record : records) {
+                if (counter <= row) {
+                    str = record.get(col);
+                    counter++;
+                } else {
+                    break;
+                }
+            }
+            probability = Double.parseDouble(str);
+            logger.info("CSV file has been Parsed.");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        hardCodeCoords(relocationCell);
+        return probability;
+    }
 }

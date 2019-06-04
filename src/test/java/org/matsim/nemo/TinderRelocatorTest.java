@@ -139,7 +139,7 @@ public class TinderRelocatorTest {
      * Population consists of moving everything home+other activities.
      */
     @Test
-    public void relocateFractionOfPopulationAll() {
+    public void relocateEverythingOfFractionOfPopulation() {
         logger.info("----FractionalRelocationTestBegin----");
         Coord home = new Coord(0, 0);
         Coord work = new Coord(100, 100);
@@ -227,7 +227,7 @@ public class TinderRelocatorTest {
         Coord home = new Coord(0, 0);
         Coord work = new Coord(100, 100);
 
-        int numOfPeople = 999;
+        int numOfPeople = 1000;
         int relocatedHomesOnly = 0;
         int noRelocation = 0;
         int otherActivities = 0;
@@ -268,7 +268,7 @@ public class TinderRelocatorTest {
                 (double) tinderRelocator.relocateOnlyHomeFraction, (double) (relocatedHomesOnly) / numOfPeople, 0.1); //giving it a 0.1 delta enables populations such as 1001
         assertEquals("The relocated number of people who relocated everything is not equal to the ratio expected.",
                 (double) tinderRelocator.relocateEverythingFraction, (double) (relocatedEverything) / numOfPeople, 0.1);
-        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 999);
+        assertTrue("AssertionFalse: " + population.getPersons().size() + " person were created. Incorrect size of population.", population.getPersons().size() == 1000);
         logger.info("----MultipleParameterFractionalRelocationPassed----");
     }
     /**
@@ -303,6 +303,23 @@ public class TinderRelocatorTest {
         person.addPlan(plan);
 
         return person;
+    }
+
+    @Test
+    public void testingParser() {
+        Coord home = new Coord(0, 0);
+        Coord work = new Coord(1, 1);
+
+        int numOfPeople = 9;
+
+        Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+        TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
+
+        for (int i = 0; i <= numOfPeople; i++) {
+            population.addPerson(createPerson(population, home, work, i));
+        }
+
+        tinderRelocator.hardCodeRelocation();
     }
 
 }
