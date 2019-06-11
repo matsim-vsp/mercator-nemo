@@ -138,51 +138,68 @@ public class TinderRelocator {
     }
 
     /**
+     * Converts the ID at the end of the activity type into an integer.
+     *
+     * @param act string that says what activity type it is
+     * @return
+     */
+    private int getId(String act) {
+        String id = act.replaceAll("[^\\d]", "");
+        int idNum = Integer.parseInt(id);
+        return idNum;
+    }
+
+    /**
      * @param relocatedCell cell where it will be going to
      * @return
      */
-    public Coord hardCodeCoords(int relocatedCell) {
+    public Coord hardCodeCoords(Activity activity) {
+        int id = getId(activity.getType());
+        Coord coord = parseCoordinatesCSVFile(id);
+        int originalCell = determineOriginalCell(activity);
 
-        Coord coord1 = new Coord(338142.07, 5719759.81);
-        Coord coord2 = new Coord(396731.31, 5720122.43);
-        Coord coord3 = new Coord(445799.15, 5722771.49);
-        Coord coord4 = new Coord(308462.43, 5699860.89);
-        Coord coord5 = new Coord(374311.27, 5705428.26);
-        Coord coord6 = new Coord(430345.25, 5703971.05);
-        Coord coord7 = new Coord(308979.33, 5672689.09);
-        Coord coord8 = new Coord(373932.04, 5674515.38);
-        Coord coord0 = new Coord(434569.45, 5676445.65);
+        return coord;
+    }
 
-        if (relocatedCell == 1) {
-            logger.info("Coord1");
-            return coord1;
-        } else if (relocatedCell == 2) {
-            logger.info("Coord2");
-            return coord2;
-        } else if (relocatedCell == 3) {
-            logger.info("Coord3");
-            return coord3;
-        } else if (relocatedCell == 4) {
-            logger.info("Coord4");
-            return coord4;
-        } else if (relocatedCell == 5) {
-            logger.info("Coord5");
-            return coord5;
-        } else if (relocatedCell == 6) {
-            logger.info("Coord6");
-            return coord6;
-        } else if (relocatedCell == 7) {
-            logger.info("Coord7");
-            return coord7;
-        } else if (relocatedCell == 8) {
-            logger.info("Coord8");
-            return coord8;
-        } else if (relocatedCell == 0) {
-            logger.info("Coord0");
-            return coord0;
+    /**
+     * Hard Coded values
+     *
+     * @param activity to see what activity is given
+     * @return the original cell number
+     */
+    private int determineOriginalCell(Activity activity) {
+        double minX = 293301;
+        double maxX = 473263;
+        double minY = 5588817;
+        double maxY = 5795742;
+
+        double y = activity.getCoord().getY();
+        double x = activity.getCoord().getX();
+
+        int sideLength = 3;
+
+        if ((maxX - minX) * 1 / sideLength >= x && minX <= x && maxY >= y && (maxY - minY) * 2 / sideLength < y) {
+            return 0;
+        } else if ((maxX - minX) * 2 / sideLength >= x && (maxX - minX) * 1 / sideLength < x && maxY >= y && (maxY - minY) * 2 / sideLength < y) {
+            return 1;
+        } else if (maxX >= x && (maxX - minX) * 2 / sideLength < x && maxY >= y && (maxY - minY) * 2 / sideLength < y) {
+            return 2;
+        } else if ((maxX - minX) * 1 / sideLength >= x && minX <= x && (maxY - minY) * 2 / sideLength >= y && (maxY - minY) * 1 / sideLength < y) {
+            return 3;
+        } else if ((maxX - minX) * 2 / sideLength >= x && (maxX - minX) * 1 / sideLength < x && (maxY - minY) * 2 / sideLength >= y && (maxY - minY) * 1 / sideLength < y) {
+            return 4;
+        } else if (maxX >= x && (maxX - minX) * 2 / sideLength < x && (maxY - minY) * 2 / sideLength >= y && (maxY - minY) * 1 / sideLength < y) {
+            return 5;
+        } else if ((maxX - minX) * 1 / sideLength >= x && minX <= x && (maxY - minY) * 1 / sideLength >= y && minY <= y) {
+            return 6;
+        } else if ((maxX - minX) * 2 / sideLength >= x && (maxX - minX) * 1 / sideLength < x && (maxY - minY) * 1 / sideLength >= y && minY <= y) {
+            return 7;
+        } else if (maxX >= x && (maxX - minX) * 2 / sideLength < x && (maxY - minY) * 1 / sideLength >= y && minY <= y) {
+            return 8;
         } else {
-            return null;
+            return -1;
         }
+
     }
 
     /**
@@ -215,23 +232,26 @@ public class TinderRelocator {
     public void hardCodeRelocation() {
         Coord oldHome = null;
         Activity home = null;
+        double probability = 0;
         int relocatedEverything = 0;
         int counter = 0;
         for (Person person : population.getPersons().values()) {
-            if (fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
+            if (fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction) && relocatedEverything / population.getPersons().size() <= probability) {
                 Plan plan = person.getSelectedPlan();
                 for (PlanElement planElement : plan.getPlanElements()) {
                     if (planElement instanceof Activity) {
                         Activity activity = (Activity) planElement;
                         if (activity.getType().toString().contains("home") && !activity.getCoord().equals(oldHome)) {
-                            activity.setCoord(hardCodeCoords(1));
+                            activity.setCoord(hardCodeCoords(activity));
+                            probability = parseProbabilitiesCSVFile(determineOriginalCell(activity), counter);
+                            counter++;
                             oldHome = activity.getCoord();
                             home = activity;
                             System.out.println("Relocation completed.");
                             relocatedEverything++;
                         } else if (activity.getType().toString().contains("home") && activity.getCoord().equals(oldHome)) {
                             activity.setCoord(home.getCoord());
-                        } else if (activity.getType().toString().contains("work")) {
+                        } else if (!activity.getType().toString().contains("home")) {
                             activity.setCoord(home.getCoord());
                         }
                     }
@@ -239,8 +259,8 @@ public class TinderRelocator {
             } else {
                 logger.info("Person_" + person.getId().toString() + " is NOT relocated.");
             }
-            counter++;
         }
+
     }
 
     /**
@@ -355,7 +375,7 @@ public class TinderRelocator {
      *
      */
 
-    Coord CSVCoordinatesParser(int idnum) {
+    Coord parseCoordinatesCSVFile(int idnum) {
         String x = null;
         String y = null;
         String id = null;
@@ -391,7 +411,7 @@ public class TinderRelocator {
      * @param row
      * @param col
      */
-    public double CSVProbabilityParser(int originalCell, int relocationCell) {
+    public double parseProbabilitiesCSVFile(int originalCell, int relocationCell) {
         int col = relocationCell + 1;
         int row = originalCell + 1;
         int counter = 0;
@@ -414,8 +434,6 @@ public class TinderRelocator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        hardCodeCoords(relocationCell);
         return probability;
     }
 }

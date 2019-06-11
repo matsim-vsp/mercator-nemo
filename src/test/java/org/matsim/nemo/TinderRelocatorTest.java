@@ -1,5 +1,7 @@
 package org.matsim.nemo;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
@@ -11,6 +13,10 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
@@ -307,19 +313,56 @@ public class TinderRelocatorTest {
 
     @Test
     public void testingParser() {
-        Coord home = new Coord(0, 0);
-        Coord work = new Coord(1, 1);
+        String x;
+        String y;
+        Coord coord;
+        boolean firstLine = false;
 
-        int numOfPeople = 9;
+        Iterable<CSVRecord> records;
+        try (Reader in = new FileReader("/Users/nanddesai/Documents/mercator-nemo/src/relocationInput.csv")) {
+            records = CSVFormat.EXCEL.parse(in);
+            for (CSVRecord record : records) {
+                if (!firstLine) {
+                    firstLine = true;
+                } else if (record.iterator().hasNext()) {
+                    x = record.get(1);
+                    y = record.get(2);
+                    coord = new Coord(Double.parseDouble(x), Double.parseDouble(y));
+                    System.out.println(coord);
+                } else {
+                    break;
+                }
+            }
+            logger.info("CSV Coordinates File has been parsed.");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    @Test
+    public void parserTester2() {
+        Coord home = new Coord(338142.07, 5719759.81);
+        Coord work = new Coord(445799.15, 5722771.49);
+        int numOfPeople = 3;
+
+        Path relocationData = Paths.get("/Users/nanddesai/Documents/mercator-nemo/src/relocationInput.csv");
+        Path shapeLimits = Paths.get("/Users/nanddesai/nemo_mercator/data/original_files/shapeFiles/sourceShape_NRW/sourceShape_NRW/dvg2bld_nw.shp");
+
+        Geometry outer = getFirstGeometryFromShapeFile(shapeLimits);
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-        TinderRelocator tinderRelocator = new TinderRelocator(population, innerGeometry, outerGeometry);
 
-        for (int i = 0; i <= numOfPeople; i++) {
+        for (int i = 0; i < numOfPeople; i++) {
             population.addPerson(createPerson(population, home, work, i));
         }
 
-        tinderRelocator.hardCodeRelocation();
+        CellRelocator cellRelocator = new CellRelocator(relocationData, population, outer);
+
+        cellRelocator.reassignActivity(cellRelocator.cells);
+
     }
+
 
 }
