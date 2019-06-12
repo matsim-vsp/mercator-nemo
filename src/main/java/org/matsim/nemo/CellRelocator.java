@@ -8,23 +8,15 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.util.GeometricShapeFactory;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,6 +29,7 @@ public class CellRelocator {
     private Population population;
     private QuadTree quadTree;
     private QuadTree.Rect bounds;
+    private int limits = 40000;
     //Summation of these two ratios must be less than or equal to 1
     final static double relocateEverythingFraction = 1; //eg. 0.4 means 40 percent of population is moving everything
     final static double relocateOnlyHomeFraction = 0;  //eg. 0.3 means 30 percent of population is moving only home
@@ -56,17 +49,6 @@ public class CellRelocator {
     }
 
     /**
-     * @param pathToFile the path to the shape file
-     * @return Geometry from path file
-     */
-    private static Geometry getFirstGeometryFromShapeFile(Path pathToFile) {
-        for (SimpleFeature feature : ShapeFileReader.getAllFeatures(pathToFile.toString())) {
-            return (Geometry) feature.getDefaultGeometry();
-        }
-        throw new RuntimeException("Runtime exception/error, geometry is broken. Unexpected Error.");
-    }
-
-    /**
      * Creates a circle shape using geotools
      * Link: http://docs.geotools.org/stable/userguide/library/jts/geometry.html
      *
@@ -80,31 +62,6 @@ public class CellRelocator {
         shapeFactory.setCentre(new Coordinate(coord.getX(), coord.getY()));
         shapeFactory.setSize(RADIUS * 2);
         return shapeFactory.createCircle();
-    }
-
-    /**
-     * Main method
-     * @param args args
-     */
-    public void main(String[] args) {
-        String inputFile = "/Users/nanddesai/Documents/NEMOProject/outputPath/nemo_baseCase_089.output_plans_reducedpopulation.xml.gz";
-        Path relocationData = Paths.get("/Users/nanddesai/Documents/mercator-nemo/src/relocationInput.csv");
-        Path shapeLimits = Paths.get("/Users/nanddesai/nemo_mercator/data/original_files/shapeFiles/sourceShape_NRW/sourceShape_NRW/dvg2bld_nw.shp");
-
-        Geometry outer = getFirstGeometryFromShapeFile(shapeLimits);
-
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-        PopulationReader reader = new PopulationReader(scenario);
-
-        reader.readFile(inputFile);
-
-        CellRelocator cellRelocator = new CellRelocator(relocationData, scenario.getPopulation(), outer);
-        cellRelocator.reassignHome(cells);
-
-        logger.info("");
-        PopulationWriter writer = new PopulationWriter(cellRelocator.getPopulation()); //Writes population
-        writer.write("/Users/nanddesai/Documents/NEMOProject/outputPath/population_relocated_to_cells.xml.gz");
     }
 
     /**
@@ -182,7 +139,7 @@ public class CellRelocator {
     private List<Plan> findPlansInRange(Coord coord) {
         List<Plan> planWithinRange = new ArrayList<>();
         //Searches the one km square area for activities
-        bounds = new QuadTree.Rect(coord.getX() - 500, coord.getY() - 500, coord.getX() + 500, coord.getY() + 500);
+        bounds = new QuadTree.Rect(coord.getX() - limits, coord.getY() - limits, coord.getX() + limits, coord.getY() + limits);
         quadTree.getRectangle(bounds, planWithinRange);
         return planWithinRange;
     }
@@ -196,7 +153,7 @@ public class CellRelocator {
     private Coord generateCoordInCell(int cellId) {
         Coord coord = cells.get(cellId);
         //Creates one km squares area to generate random coordinates
-        bounds = new QuadTree.Rect(coord.getX() - 500, coord.getY() - 500, coord.getX() + 500, coord.getY() + 500);
+        bounds = new QuadTree.Rect(coord.getX() - limits, coord.getY() - limits, coord.getX() + limits, coord.getY() + limits);
 
         double coordX = bounds.minX + (Math.random() * (bounds.maxX - bounds.minX));
         double coordY = bounds.minY + (Math.random() * (bounds.maxY - bounds.minY));
@@ -296,18 +253,6 @@ public class CellRelocator {
     public Boolean fractionOfPopulationRelocating(Population population, int people, double relocatingFrac) {
         final double fracRelocating = relocatingFrac; //given as a decimal. eg. 0.50 is 50%
         return people <= fracRelocating * population.getPersons().size();
-    }
-
-    /**
-     * Converts the ID at the end of the activity type into an integer.
-     *
-     * @param act string that says what activity type it is
-     * @return
-     */
-    private int getId(String act) {
-        String id = act.replaceAll("[^\\d]", "");
-        int idNum = Integer.parseInt(id);
-        return idNum;
     }
 
     /**
