@@ -3,19 +3,19 @@ package org.matsim.nemo;
 import com.opencsv.CSVReader;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.util.GeometricShapeFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 public class CellRelocator {
@@ -36,10 +37,13 @@ public class CellRelocator {
     private Population population;
     private QuadTree quadTree;
     private QuadTree.Rect bounds;
+    //Summation of these two ratios must be less than or equal to 1
+    final static double relocateEverythingFraction = 1; //eg. 0.4 means 40 percent of population is moving everything
+    final static double relocateOnlyHomeFraction = 0;  //eg. 0.3 means 30 percent of population is moving only home
+    private Geometry homeArea;
 
     /**
      * Constructor
-     *
      * @param relocationData Path to relocation file
      * @param population     Population population
      * @param outerGeometry  Outer geometry
@@ -63,8 +67,23 @@ public class CellRelocator {
     }
 
     /**
-     * Main method
+     * Creates a circle shape using geotools
+     * Link: http://docs.geotools.org/stable/userguide/library/jts/geometry.html
      *
+     * @param coord  coordinates of home are passed in
+     * @param RADIUS radius value is passed in meters
+     * @return Circle shape as a geometry
+     */
+    private static Geometry createCircle(Coord coord, final double RADIUS) {
+        GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
+        shapeFactory.setNumPoints(32);
+        shapeFactory.setCentre(new Coordinate(coord.getX(), coord.getY()));
+        shapeFactory.setSize(RADIUS * 2);
+        return shapeFactory.createCircle();
+    }
+
+    /**
+     * Main method
      * @param args args
      */
     public void main(String[] args) {
@@ -81,7 +100,7 @@ public class CellRelocator {
         reader.readFile(inputFile);
 
         CellRelocator cellRelocator = new CellRelocator(relocationData, scenario.getPopulation(), outer);
-        cellRelocator.reassignActivity(cells);
+        cellRelocator.reassignHome(cells);
 
         logger.info("");
         PopulationWriter writer = new PopulationWriter(cellRelocator.getPopulation()); //Writes population
@@ -90,7 +109,6 @@ public class CellRelocator {
 
     /**
      * Getter of Population
-     *
      * @return population variable
      */
     public Population getPopulation() {
@@ -138,7 +156,7 @@ public class CellRelocator {
     private void initializeSpatialIndex(Population population, Geometry outerGeometry) {
         Envelope envelope = outerGeometry.getEnvelopeInternal();
 
-        QuadTree<Activity> quadTree = new QuadTree<>(
+        QuadTree<Plan> quadTree = new QuadTree<>(
                 envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()
         );
         //For Loop: transverses persons to accumulate their plans and to put their activities
@@ -147,7 +165,7 @@ public class CellRelocator {
             for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
                 if (planElement instanceof Activity) {
                     Activity activity = (Activity) planElement;
-                    quadTree.put(activity.getCoord().getX(), activity.getCoord().getY(), activity);
+                    quadTree.put(activity.getCoord().getX(), activity.getCoord().getY(), person.getSelectedPlan());
                 }
             }
         }
@@ -161,12 +179,12 @@ public class CellRelocator {
      *              Quadtree
      * @return List of activities within the 1km^2 block
      */
-    private List<Activity> findActivitiesInRange(Coord coord) {
-        List<Activity> activitiesWithinRange = new ArrayList<>();
+    private List<Plan> findPlansInRange(Coord coord) {
+        List<Plan> planWithinRange = new ArrayList<>();
         //Searches the one km square area for activities
         bounds = new QuadTree.Rect(coord.getX() - 500, coord.getY() - 500, coord.getX() + 500, coord.getY() + 500);
-        quadTree.getRectangle(bounds, activitiesWithinRange);
-        return activitiesWithinRange;
+        quadTree.getRectangle(bounds, planWithinRange);
+        return planWithinRange;
     }
 
     /**
@@ -217,47 +235,176 @@ public class CellRelocator {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         probabilities.remove(0);
         return probabilities;
     }
 
     /**
-     * Reassign activities
+     * Generates coordinnates limited within the home area geometry
      *
-     * @param cells The list of cells
+     * @return coord which are within range
      */
-    public void reassignActivity(List<Coord> cells) {
-        List<Double> percentPopulationMoving = new ArrayList<>();
-        List<Activity> activitiesWithinCell = new ArrayList<>();
+    private Coord coordLimiter(Geometry homeArea) {
+        //Max and Min values
+        Envelope envelope = homeArea.getEnvelopeInternal();
 
+        final double maxX = envelope.getMaxX();
+        final double minX = envelope.getMinX();
+        final double maxY = envelope.getMaxY();
+        final double minY = envelope.getMinY();
+
+        double coordX = 0;
+        double coordY = 0;
+        Coord coord = new Coord(coordX, coordY);
+
+        while (!homeArea.contains(MGC.coord2Point(coord))) {
+            coordX = minX + (Math.random() * (maxX - minX)); //Random double value between min longitude value and max latitude value
+            coordY = minY + (Math.random() * (maxY - minY)); //Random double value between min latitude value and max latitude value
+            coord = new Coord(coordX, coordY);
+        }
+        return coord;
+    }
+
+    /**
+     * This generates a random radius value to be used as the homeArea radii
+     * Refer to : https://www.desmos.com/calculator/jbgvmtejrd
+     * Eqn: y = -(0.00001x+2.15)^9+(0.000001x)^-2+1000
+     *
+     * @return randomRadius
+     */
+    private double randomRadius() {
+        final int maxWeightParam = 24816; //x-values in the graph/equation
+        final int minWeightParam = 3160; //eg. 3160 value here means approx. 100000m minimum radius
+
+        Random ran = new Random();
+        double weight = ran.nextInt(((maxWeightParam - minWeightParam) + 1)) + minWeightParam;
+
+        double randomRadius = -Math.pow((0.00001 * weight + 2.15), 9) + Math.pow(0.000001 * weight, -2) + 1000;
+
+        //Returns the double random radius which is generated from graph.
+        return randomRadius;
+    }
+
+    /**
+     * @param population given from the relocate class
+     * @param people     an integer which counts number of people
+     * @return either true or false stating if percentage of
+     * <p>
+     * population has been relocated
+     */
+    public Boolean fractionOfPopulationRelocating(Population population, int people, double relocatingFrac) {
+        final double fracRelocating = relocatingFrac; //given as a decimal. eg. 0.50 is 50%
+        return people <= fracRelocating * population.getPersons().size();
+    }
+
+    /**
+     * Converts the ID at the end of the activity type into an integer.
+     *
+     * @param act string that says what activity type it is
+     * @return
+     */
+    private int getId(String act) {
+        String id = act.replaceAll("[^\\d]", "");
+        int idNum = Integer.parseInt(id);
+        return idNum;
+    }
+
+    /**
+     * All activities of the agent are relocated
+     * homes relocated using the CSV files
+     * other activities using limited radius method
+     * @param homeCoord is passed through
+     */
+    private void changeEverythingInPlan(Coord homeCoord, Plan plan) {
+        Coord oldHome = null;
+        Activity home = null;
+
+        for (PlanElement planElement : plan.getPlanElements()) {
+            if (planElement instanceof Activity) {
+                Activity activity = (Activity) planElement;
+                if (activity.getType().contains("home") && !activity.getCoord().equals(oldHome)) {
+                    oldHome = activity.getCoord();
+                    activity.setCoord(homeCoord);
+                    homeArea = createCircle(homeCoord, randomRadius());
+                    home = activity;
+                } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
+                    activity.setCoord(home.getCoord());
+                } else if (!activity.getType().contains("home")) {
+                    activity.setCoord(coordLimiter(homeArea));
+                }
+            }
+        }
+    }
+
+    /**
+     * This changes the plan if only the home is needed to be moved.
+     * Other activities kept the same
+     */
+    private void changeOnlyHomeInPlan(Coord homeCoord, Plan plan) {
+        Coord oldHome = null;
+        Activity home = null;
+
+        for (PlanElement planElement : plan.getPlanElements()) {
+            if (planElement instanceof Activity) {
+                Activity activity = (Activity) planElement;
+                if (activity.getType().contains("home") && !activity.getCoord().equals(oldHome)) {
+                    oldHome = activity.getCoord();
+                    activity.setCoord(homeCoord);
+                    home = activity;
+                } else if (activity.getType().contains("home") && activity.getCoord().equals(oldHome)) {
+                    activity.setCoord(home.getCoord());
+                }
+            }
+        }
+    }
+
+    /**
+     * Reassigns all home locations based on desired scenarios
+     *
+     * @param cells
+     */
+    public void reassignHome(List<Coord> cells) {
+        int relocatedEverything = 1;
+        int relocatedHomeOnly = 1;
+        List<Double> percentPopulationMoving = new ArrayList<>();
+        List<Plan> plansWithinCell = new ArrayList<>();
         //For Loop: transverses through one cell row
         for (int i = 0; i < cells.size(); i++) {
-            int activitiesChanged = 0;
+            int plansChanged = 0;
             //This collects all activities within a specific cell
-            activitiesWithinCell = findActivitiesInRange(cells.get(i));
+            plansWithinCell = findPlansInRange(cells.get(i));
             //This collects the percentage of population moving from the cell
             percentPopulationMoving = parseProbabilities(i);
             //For Loop: tranverses through the list of percentages of population moving
             for (int j = 0; j < percentPopulationMoving.size(); j++) {
-                int actCounter = 0;
+                int planCounter = 0;
                 //While loop: transverses through the activities within the cell to find the ones needed to move
-                while (activitiesWithinCell.size() != 0.0 &&
-                        ((double) actCounter / activitiesWithinCell.size()) < percentPopulationMoving.get(j)
+                while (plansWithinCell.size() != 0.0 &&
+                        ((double) planCounter / plansWithinCell.size()) < percentPopulationMoving.get(j)
                         && i != j && percentPopulationMoving.get(j) != 0.0) {
                     //This prevents odd number division ie. array index error is prevented
-                    if (activitiesChanged >= activitiesWithinCell.size()) {
+                    if (plansChanged >= plansWithinCell.size()) {
                         break;
                     }
-                    //Moves the activities to their new retrospective locations
-                    activitiesWithinCell.get(activitiesChanged).setCoord(generateCoordInCell(j));
+                    //Moves the homes to their new retrospective locations (relocating everything)
+                    if (fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
+                        changeEverythingInPlan(generateCoordInCell(j), plansWithinCell.get(plansChanged));
+                        relocatedEverything++;
+                    }
+                    //(relocate only homes)
+                    else if (fractionOfPopulationRelocating(population, relocatedHomeOnly, relocateOnlyHomeFraction) && !fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
+                        changeOnlyHomeInPlan(generateCoordInCell(j), plansWithinCell.get(plansChanged));
+                        relocatedHomeOnly++;
+                    }
                     //Counters to keep track of activities
-                    actCounter++;
-                    activitiesChanged++;
+                    planCounter++;
+                    plansChanged++;
                 }
             }
+            //Clears both lists for rerun
+            percentPopulationMoving.clear();
+            plansWithinCell.clear();
         }
-        //Clears both lists for rerun
-        percentPopulationMoving.clear();
-        activitiesWithinCell.clear();
     }
 }

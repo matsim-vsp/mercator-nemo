@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -346,7 +347,7 @@ public class TinderRelocatorTest {
     public void parserTester2() {
         Coord home = new Coord(338142.07, 5719759.81);
         Coord work = new Coord(445799.15, 5722771.49);
-        int numOfPeople = 3;
+        int numOfPeople = 10;
 
         Path relocationData = Paths.get("/Users/nanddesai/Documents/mercator-nemo/src/relocationInput.csv");
         Path shapeLimits = Paths.get("/Users/nanddesai/nemo_mercator/data/original_files/shapeFiles/sourceShape_NRW/sourceShape_NRW/dvg2bld_nw.shp");
@@ -359,9 +360,10 @@ public class TinderRelocatorTest {
         }
 
         CellRelocator cellRelocator = new CellRelocator(relocationData, population, outer);
+        cellRelocator.reassignHome(cellRelocator.cells);
 
-        cellRelocator.reassignActivity(cellRelocator.cells);
-
+        org.matsim.core.population.io.PopulationWriter writer = new PopulationWriter(cellRelocator.getPopulation()); //Writes population
+        writer.write("/Users/nanddesai/Documents/NEMOProject/outputPath/population_relocated_to_cells_test.xml.gz");
     }
 
 

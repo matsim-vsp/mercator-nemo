@@ -4,8 +4,6 @@
  */
 package org.matsim.nemo;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -20,10 +18,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
@@ -138,71 +132,7 @@ public class TinderRelocator {
     }
 
     /**
-     * Converts the ID at the end of the activity type into an integer.
-     *
-     * @param act string that says what activity type it is
-     * @return
-     */
-    private int getId(String act) {
-        String id = act.replaceAll("[^\\d]", "");
-        int idNum = Integer.parseInt(id);
-        return idNum;
-    }
-
-    /**
-     * @param relocatedCell cell where it will be going to
-     * @return
-     */
-    public Coord hardCodeCoords(Activity activity) {
-        int id = getId(activity.getType());
-        Coord coord = parseCoordinatesCSVFile(id);
-        int originalCell = determineOriginalCell(activity);
-
-        return coord;
-    }
-
-    /**
-     * Hard Coded values
-     *
-     * @param activity to see what activity is given
-     * @return the original cell number
-     */
-    private int determineOriginalCell(Activity activity) {
-        double minX = 293301;
-        double maxX = 473263;
-        double minY = 5588817;
-        double maxY = 5795742;
-
-        double y = activity.getCoord().getY();
-        double x = activity.getCoord().getX();
-
-        int sideLength = 3;
-
-        if ((maxX - minX) * 1 / sideLength >= x && minX <= x && maxY >= y && (maxY - minY) * 2 / sideLength < y) {
-            return 0;
-        } else if ((maxX - minX) * 2 / sideLength >= x && (maxX - minX) * 1 / sideLength < x && maxY >= y && (maxY - minY) * 2 / sideLength < y) {
-            return 1;
-        } else if (maxX >= x && (maxX - minX) * 2 / sideLength < x && maxY >= y && (maxY - minY) * 2 / sideLength < y) {
-            return 2;
-        } else if ((maxX - minX) * 1 / sideLength >= x && minX <= x && (maxY - minY) * 2 / sideLength >= y && (maxY - minY) * 1 / sideLength < y) {
-            return 3;
-        } else if ((maxX - minX) * 2 / sideLength >= x && (maxX - minX) * 1 / sideLength < x && (maxY - minY) * 2 / sideLength >= y && (maxY - minY) * 1 / sideLength < y) {
-            return 4;
-        } else if (maxX >= x && (maxX - minX) * 2 / sideLength < x && (maxY - minY) * 2 / sideLength >= y && (maxY - minY) * 1 / sideLength < y) {
-            return 5;
-        } else if ((maxX - minX) * 1 / sideLength >= x && minX <= x && (maxY - minY) * 1 / sideLength >= y && minY <= y) {
-            return 6;
-        } else if ((maxX - minX) * 2 / sideLength >= x && (maxX - minX) * 1 / sideLength < x && (maxY - minY) * 1 / sideLength >= y && minY <= y) {
-            return 7;
-        } else if (maxX >= x && (maxX - minX) * 2 / sideLength < x && (maxY - minY) * 1 / sideLength >= y && minY <= y) {
-            return 8;
-        } else {
-            return -1;
-        }
-
-    }
-
-    /**
+     * Generates coordinnates limited within the home area geometry
      * @return coord which are within range
      */
     private Coord coordLimiter(Geometry homeArea) {
@@ -224,43 +154,6 @@ public class TinderRelocator {
             coord = new Coord(coordX, coordY);
         }
         return coord;
-    }
-
-    /**
-     * Relocates hard coded coordinates
-     */
-    public void hardCodeRelocation() {
-        Coord oldHome = null;
-        Activity home = null;
-        double probability = 0;
-        int relocatedEverything = 0;
-        int counter = 0;
-        for (Person person : population.getPersons().values()) {
-            if (fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction) && relocatedEverything / population.getPersons().size() <= probability) {
-                Plan plan = person.getSelectedPlan();
-                for (PlanElement planElement : plan.getPlanElements()) {
-                    if (planElement instanceof Activity) {
-                        Activity activity = (Activity) planElement;
-                        if (activity.getType().toString().contains("home") && !activity.getCoord().equals(oldHome)) {
-                            activity.setCoord(hardCodeCoords(activity));
-                            probability = parseProbabilitiesCSVFile(determineOriginalCell(activity), counter);
-                            counter++;
-                            oldHome = activity.getCoord();
-                            home = activity;
-                            System.out.println("Relocation completed.");
-                            relocatedEverything++;
-                        } else if (activity.getType().toString().contains("home") && activity.getCoord().equals(oldHome)) {
-                            activity.setCoord(home.getCoord());
-                        } else if (!activity.getType().toString().contains("home")) {
-                            activity.setCoord(home.getCoord());
-                        }
-                    }
-                }
-            } else {
-                logger.info("Person_" + person.getId().toString() + " is NOT relocated.");
-            }
-        }
-
     }
 
     /**
@@ -307,7 +200,6 @@ public class TinderRelocator {
 
     /**
      * This changes the plan if only the home is needed to be moved.
-     *
      * @param plan for selected person is imported from the relocator method.
      */
     private void changeOnlyHomeInPlan(Plan plan) {
@@ -370,70 +262,5 @@ public class TinderRelocator {
         return randomRadius;
     }
 
-    /**
-     * CSV Parser, parses coordinates
-     *
-     */
 
-    Coord parseCoordinatesCSVFile(int idnum) {
-        String x = null;
-        String y = null;
-        String id = null;
-        int counter = 0;
-        Iterable<CSVRecord> records;
-        try (Reader in = new FileReader("/Users/nanddesai/Documents/mercator-nemo/src/relocationInput.csv")) {
-            records = CSVFormat.EXCEL.parse(in);
-            for (CSVRecord record : records) {
-                if (counter - 1 <= idnum) {
-                    id = record.get(0);
-                    x = record.get(1);
-                    y = record.get(2);
-                    counter++;
-                    //If id number asked for is larger than max number in
-                    //in the list it uses the last id number in the list.
-                } else {
-                    break;
-                }
-            }
-            logger.info("CSV file has been Parsed.");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Coord coord = new Coord(Double.parseDouble(x), Double.parseDouble(y));
-        return coord;
-    }
-
-    /**
-     * This parses the probability CSV file
-     *
-     * @param row
-     * @param col
-     */
-    public double parseProbabilitiesCSVFile(int originalCell, int relocationCell) {
-        int col = relocationCell + 1;
-        int row = originalCell + 1;
-        int counter = 0;
-        String str = "";
-        double probability = 0;
-        try (Reader in = new FileReader("/Users/nanddesai/Documents/mercator-nemo/src/probabilitiesOfRelocation.csv")) {
-            Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(in);
-            for (CSVRecord record : records) {
-                if (counter <= row) {
-                    str = record.get(col);
-                    counter++;
-                } else {
-                    break;
-                }
-            }
-            probability = Double.parseDouble(str);
-            logger.info("CSV file has been Parsed.");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return probability;
-    }
 }
