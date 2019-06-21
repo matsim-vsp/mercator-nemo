@@ -19,18 +19,12 @@
 
 package org.matsim.smartCity;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
@@ -41,9 +35,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.nemo.runners.smartCity.SmartCityShpUtils;
+
+import java.util.*;
 
 /**
  * @author ikaddoura
@@ -101,7 +96,7 @@ public class RandomTaxiVehicleCreator {
 
 			while (link == null) {
 				Point p = shpUtils.getRandomPointInServiceArea(random);
-				link = NetworkUtils.getNearestLinkExactly(((Network) scenario.getNetwork()), MGC.point2Coord(p));
+				link = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(), MGC.point2Coord(p));
 				if (shpUtils.isCoordInDrtServiceArea(link.getFromNode().getCoord())
 						&& shpUtils.isCoordInDrtServiceArea(link.getToNode().getCoord())) {
 					if (link.getAllowedModes().contains(consideredMode)) {

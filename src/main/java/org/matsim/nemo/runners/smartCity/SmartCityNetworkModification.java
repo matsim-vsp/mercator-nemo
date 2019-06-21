@@ -17,15 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.smartCity;
-
-import java.util.HashSet;
-import java.util.Set;
+package org.matsim.nemo.runners.smartCity;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ikaddoura
