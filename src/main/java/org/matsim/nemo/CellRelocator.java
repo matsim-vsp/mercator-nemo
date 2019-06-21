@@ -1,3 +1,10 @@
+/**
+ * Date: June, 2019
+ * CellRelocator class
+ * NEMO, Deurbanization Scenario (3)
+ * To run use: RunCellRelocator.java
+ * Description: Relocates people into cells read from a CSV file.
+ */
 package org.matsim.nemo;
 
 import com.opencsv.CSVReader;
@@ -310,7 +317,6 @@ public class CellRelocator {
 
     /**
      * Reassigns all home locations based on desired scenarios
-     *
      * @param cells List
      */
     public void reassignHome(List<Coord> cells) {
@@ -351,8 +357,6 @@ public class CellRelocator {
                     //Counters to keep track of activities
                     personCounter++;
                 }
-
-
             }
             //Clears both lists for rerun
             percentPopulationMoving.clear();
