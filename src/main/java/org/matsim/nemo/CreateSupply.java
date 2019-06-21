@@ -84,6 +84,8 @@ public class CreateSupply {
 				network,
 				inputParams.getInputNetworkShapeFilter(),
 				outputParams.getOutputNetworkDir());
+
+
 	}
 
 	private static void validateInput(InputArguments inputArguments) {

@@ -39,7 +39,6 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -47,9 +46,6 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.run.RunRuhrgebietScenario;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class starts a simulation run with DRT.
@@ -88,12 +84,10 @@ public final class RunRuhrgebietSmartCityScenario {
 
 	public RunRuhrgebietSmartCityScenario(String[] args) throws CommandLine.ConfigurationException {
 		if (args.length != 0) {
-			CommandLine cmd = new CommandLine.Builder(args).allowPositionalArguments(false)
-					.requireOptions(RunRuhrgebietScenario.CONFIG_PATH, DRT_SERVICE_AREA_SHAPE_FILE).build();
 
-			this.drtServiceAreaShapeFile = cmd.getOptionStrict(DRT_SERVICE_AREA_SHAPE_FILE);
-			this.ruhrgebiet = new RunRuhrgebietScenario(args);
-
+			String configFile = args[0];
+			this.drtServiceAreaShapeFile = args[1];
+			this.ruhrgebiet = new RunRuhrgebietScenario(new String[]{"--config-path", configFile});
 		} else {
 
 			String configFileName = "C://Users//Gregor//Desktop//Input//ruhrgebiet-v1.0-1pct.configDRT.xml/";
@@ -143,15 +137,15 @@ public final class RunRuhrgebietSmartCityScenario {
 		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
 		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 		SmartCityShpUtils shpUtils = new SmartCityShpUtils(drtServiceAreaShapeFile);
-		new SmartCityNetworkModification(shpUtils).addSAVmode(scenario, drtNetworkMode, drtServiceAreaAttribute);
+		//new SmartCityNetworkModification(shpUtils).addSAVmode(scenario, drtNetworkMode, drtServiceAreaAttribute);
 		hasPreparedScenario = true;
 		return scenario;
 	}
 
-	public Config prepareConfig(ConfigGroup... modulesToAdd) {
+	public Config prepareConfig() {
 
 		// dvrp, drt config groups
-		List<ConfigGroup> drtModules = new ArrayList<>();
+	/*	List<ConfigGroup> drtModules = new ArrayList<>();
 		drtModules.add(new DvrpConfigGroup());
 		drtModules.add(new DrtConfigGroup());
 		drtModules.add(new DrtFaresConfigGroup());
@@ -165,10 +159,12 @@ public final class RunRuhrgebietSmartCityScenario {
 		}
 
 		ConfigGroup[] modulesArray = new ConfigGroup[modules.size()];
-		config = ruhrgebiet.prepareConfig(modules.toArray(modulesArray));
-		config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
-		config.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
-		config.plansCalcRoute().removeModeRoutingParams(TransportMode.drt);
+
+	 */
+		config = ruhrgebiet.prepareConfig(new DvrpConfigGroup(), new DrtConfigGroup(), new DrtFaresConfigGroup());
+		// config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
+		// config.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
+		// config.plansCalcRoute().removeModeRoutingParams(TransportMode.drt);
 		config.qsim().setNumberOfThreads(1); // drt is still single threaded!
 		//DynAgents require simulation to start from the very beginning Set 'QSim.simStarttimeInterpretation' to onlyUseStarttime
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
