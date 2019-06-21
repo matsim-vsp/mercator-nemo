@@ -20,12 +20,10 @@
 package org.matsim.nemo.runners.smartCity;
 
 import org.apache.log4j.Logger;
-import org.matsim.ReducePopulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
@@ -42,14 +40,11 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.run.RunRuhrgebietScenario;
 
@@ -193,11 +188,7 @@ public final class RunRuhrgebietSmartCityScenario {
 		networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
 			@Override
 			public boolean judgeLink(Link l) {
-				if (!(l.getAllowedModes().contains(TransportMode.car))) {
-					return false;
-				} else {
-					return true;
-				}
+				return l.getAllowedModes().contains(TransportMode.car);
 			}
 		});
 

@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * to add another scenario add the name and the validation in that class as well and then put switches into the scipt
  * <p>
  * All the ouptut is written to <path-to-your-svn>/projects/nemo_mercator/data/matsim_input/supply/<scenarioName>
- *
+ * <p>
  * The program can be started with the following arguments -svnDir <path-to-your-svn> -scenario <scenarioName>
  */
 public class CreateSupply {

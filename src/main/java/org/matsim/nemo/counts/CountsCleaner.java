@@ -71,7 +71,7 @@ public class CountsCleaner {
             }
         }
 
-        countIds.forEach(e -> counts.getCounts().remove(e));
+		countIds.forEach(e -> counts.getCounts().remove(e));
 
         System.out.println("Number of count stations after cleaning are "+ counts.getCounts().size());
 

@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 class NetworkCreator {
 
     private static final double BIKE_PCU = 0.25;
-    private static Logger logger = Logger.getLogger("NetworkCreator");
+	private static Logger logger = Logger.getLogger("NetworkCreator");
 
     private final NetworkInput input;
     private final CountsInput countsInput;
@@ -94,7 +94,7 @@ class NetworkCreator {
 
         nodeIdsToKeep.forEach(id -> {
             if (!network.getNodes().containsKey(Id.createNodeId(id)))
-                logger.severe("COULD NOT FIND NODE: " + id + " IN THE NETWORK");
+				logger.severe("COULD NOT FIND NODE: " + id + " IN THE NETWORK");
         });
     }
 
@@ -174,7 +174,7 @@ class NetworkCreator {
         }
 
         /**
-         * Set osm filter other than org.matsim.nemo.FineNetworkFilter
+		 * Set osm filter other than org.matsim.nemo.FineNetworkFilter
          * @param filter only links filtered by this filter will be contained in the network
          * @return Current Builder instance
          */
@@ -224,7 +224,7 @@ class NetworkCreator {
                     new CountsInput(svnDir),
                     withBicyclePaths,
                     withRideOnCarLinks,
-                    osmFilter != null ? osmFilter : new FineNetworkFilter(input.getInputNetworkShapeFilter()),
+					osmFilter != null ? osmFilter : new FineNetworkFilter(input.getInputNetworkShapeFilter()),
                     transformation,
                     cleaningModes
             );

@@ -24,22 +24,22 @@ public class CombinedCountsWriter<T> {
             CombinedCountsWriter<Link> writer = new CombinedCountsWriter<>();
             Arrays.stream(countsMaps).forEach(map -> writer.addCounts(map.get(combination)));
             logger.info("writing counts to folder: " + directory.toString());
-            writer.write(directory.resolve("nemo_" + filenamePrefix + "_counts_" + combination + ".xml").toString());
+			writer.write(directory.resolve("nemo_" + filenamePrefix + "_counts_" + combination + ".xml").toString());
         });
     }
 
-    public void write(String filename) {
+	public void write(String filename) {
 
-        Counts<T> combinedCounts = new Counts<>();
-        countsList.forEach(counts -> counts.getCounts().forEach((id, count) -> {
-            // can't use map and flat map since 'getcounts' returns a treemap which doesn't implement streaming
-            combinedCounts.getCounts().put(id, count);
-        }));
-        CountsWriter writer = new CountsWriter(combinedCounts);
-        writer.write(filename);
-    }
+		Counts<T> combinedCounts = new Counts<>();
+		countsList.forEach(counts -> counts.getCounts().forEach((id, count) -> {
+			// can't use map and flat map since 'getcounts' returns a treemap which doesn't implement streaming
+			combinedCounts.getCounts().put(id, count);
+		}));
+		CountsWriter writer = new CountsWriter(combinedCounts);
+		writer.write(filename);
+	}
 
-    private void addCounts(Counts<T> counts) {
-        this.countsList.add(counts);
-    }
+	private void addCounts(Counts<T> counts) {
+		this.countsList.add(counts);
+	}
 }

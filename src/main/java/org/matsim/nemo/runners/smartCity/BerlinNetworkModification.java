@@ -28,8 +28,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
-* @author ikaddoura
-*/
+ * @author ikaddoura
+ */
 
 public final class BerlinNetworkModification {
 	private static final Logger log = Logger.getLogger(BerlinNetworkModification.class);
