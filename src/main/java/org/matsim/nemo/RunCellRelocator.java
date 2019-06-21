@@ -4,6 +4,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -14,7 +15,6 @@ import java.nio.file.Paths;
 public class RunCellRelocator {
     /**
      * Main method
-     *
      * @param args args
      */
     public static void main(String[] args) {
@@ -33,8 +33,8 @@ public class RunCellRelocator {
         CellRelocator cellRelocator = new CellRelocator(relocationData, scenario.getPopulation(), outer);
         cellRelocator.reassignHome(cellRelocator.cells);
 
-//        PopulationWriter writer = new PopulationWriter(cellRelocator.getPopulation()); //Writes population
-//        writer.write("/Users/nanddesai/Documents/NEMOProject/outputPath/population_relocated_to_cells.xml.gz");
+        PopulationWriter writer = new PopulationWriter(cellRelocator.getPopulation()); //Writes population
+        writer.write("/Users/nanddesai/Documents/NEMOProject/outputPath/population_relocated_to_cells.xml.gz");
     }
     /**
      * @param pathToFile the path to the shape file
