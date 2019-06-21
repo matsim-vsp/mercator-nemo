@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -57,6 +56,65 @@ public class CellRelocator {
     }
 
     /**
+     * Getter of Population
+     *
+     * @return population variable
+     */
+    public Population getPopulation() {
+        return population;
+    }
+
+    /**
+     * Reassigns all home locations based on desired scenarios
+     *
+     * @param cells List
+     */
+    public void reassignHome(List<Coord> cells) {
+        int personCounter;
+        double personsWithinCellCounter = 0;
+        List<Double> percentPopulationMoving;
+        List<Person> personsWithinCell = new ArrayList<>();
+        Id<Person> tempId = null;
+        //For Loop: transverses through one cell row
+        for (int i = 0; i < cells.size(); i++) {
+            //This collects all plans within a specific cell
+            personsWithinCell = findPersonsInRange(cells.get(i));
+
+            //This collects the percentage of population moving from the cell
+            percentPopulationMoving = parseProbabilities(i);
+            //For Loop: tranverses through the list of percentages of population moving
+            for (int j = 0; j < percentPopulationMoving.size(); j++) {
+                personCounter = 0;
+                //While loop: transverses through the activities within the cell to find the ones needed to move
+                while (personsWithinCell.size() != 0.0 &&
+                        ((double) personCounter / personsWithinCell.size()) < percentPopulationMoving.get(j)
+                        && percentPopulationMoving.get(j) != 0.0) {
+                    if (i != j) {
+                        //This prevents odd number division ie. array index error is prevented
+                        if (personCounter >= personsWithinCell.size()) {
+                            break;
+                        }
+                        /* Moves the homes to their new retrospective locations (relocating everything) according
+                        to their corresponding fractions. */
+                        if (fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
+                            changeEverythingInPlan(generateCoordInCell(j), personsWithinCell.get(personCounter).getSelectedPlan());
+                        }
+                        //(relocate only homes)
+                        else if (fractionOfPopulationRelocating(population, relocatedOnlyHome, relocateOnlyHomeFraction) && !fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
+                            changeOnlyHomeInPlan(generateCoordInCell(j), personsWithinCell.get(personCounter).getSelectedPlan());
+                        }
+                    }
+                    //Counters to keep track of activities
+                    personCounter++;
+                }
+            }
+            //Clears both lists for rerun
+            percentPopulationMoving.clear();
+
+        }
+    }
+
+    /**
      * Creates a circle shape using geotools
      * Link: http://docs.geotools.org/stable/userguide/library/jts/geometry.html
      *
@@ -73,14 +131,6 @@ public class CellRelocator {
     }
 
     /**
-     * Getter of Population
-     * @return population variable
-     */
-    public Population getPopulation() {
-        return population;
-    }
-
-    /**
      * Initializes the cells from the CSV file
      */
     private void initializeCells() {
@@ -90,7 +140,7 @@ public class CellRelocator {
         boolean firstLine = false;
 
         Iterable<CSVRecord> records;
-        try (Reader in = new FileReader("/Users/nanddesai/Documents/mercator-nemo/src/relocationInput.csv")) {
+        try (Reader in = new FileReader("/Users/nanddesai/Documents/mercator-nemo/src/relocationInput.csv")) { //Relocation coord file goes here.
             records = CSVFormat.EXCEL.parse(in);
             for (CSVRecord record : records) {
                 if (!firstLine) {
@@ -105,10 +155,9 @@ public class CellRelocator {
                 }
             }
             logger.info("CSV Coordinates File has been parsed.");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -125,8 +174,8 @@ public class CellRelocator {
         QuadTree<Person> quadTree = new QuadTree<>(
                 envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()
         );
-        //For Loop: transverses persons to accumulate their plans and to put their activities
-        //within the Quadtree.
+        /*For Loop: transverses persons to accumulate their plans and to put their activities
+          within the Quadtree.*/
         for (Person person : population.getPersons().values()) {
             for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
                 if (planElement instanceof Activity) {
@@ -188,6 +237,7 @@ public class CellRelocator {
         double tempVal;
         List<Double> probabilities = new ArrayList<>();
         try {
+            //Relocation percentage file goes here
             FileReader filereader = new FileReader("/Users/nanddesai/Documents/mercator-nemo/src/probabilitiesOfRelocation.csv");
 
             CSVReader csvReader = new CSVReader(filereader);
@@ -315,52 +365,5 @@ public class CellRelocator {
         }
     }
 
-    /**
-     * Reassigns all home locations based on desired scenarios
-     * @param cells List
-     */
-    public void reassignHome(List<Coord> cells) {
-        int personCounter;
-        double personsWithinCellCounter = 0;
-        List<Double> percentPopulationMoving;
-        List<Person> personsWithinCell = new ArrayList<>();
-        Id<Person> tempId = null;
-        //For Loop: transverses through one cell row
-        for (int i = 0; i < cells.size(); i++) {
-            //This collects all plans within a specific cell
-            personsWithinCell = findPersonsInRange(cells.get(i));
 
-            //This collects the percentage of population moving from the cell
-            percentPopulationMoving = parseProbabilities(i);
-            //For Loop: tranverses through the list of percentages of population moving
-            for (int j = 0; j < percentPopulationMoving.size(); j++) {
-                personCounter = 0;
-                //While loop: transverses through the activities within the cell to find the ones needed to move
-                while (personsWithinCell.size() != 0.0 &&
-                        ((double) personCounter / personsWithinCell.size()) < percentPopulationMoving.get(j)
-                        && percentPopulationMoving.get(j) != 0.0) {
-                    if (i != j) {
-                        //This prevents odd number division ie. array index error is prevented
-                        if (personCounter >= personsWithinCell.size()) {
-                            break;
-                        }
-                        /* Moves the homes to their new retrospective locations (relocating everything) according
-                        to their corresponding fractions. */
-                        if (fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
-                            changeEverythingInPlan(generateCoordInCell(j), personsWithinCell.get(personCounter).getSelectedPlan());
-                        }
-                        //(relocate only homes)
-                        else if (fractionOfPopulationRelocating(population, relocatedOnlyHome, relocateOnlyHomeFraction) && !fractionOfPopulationRelocating(population, relocatedEverything, relocateEverythingFraction)) {
-                            changeOnlyHomeInPlan(generateCoordInCell(j), personsWithinCell.get(personCounter).getSelectedPlan());
-                        }
-                    }
-                    //Counters to keep track of activities
-                    personCounter++;
-                }
-            }
-            //Clears both lists for rerun
-            percentPopulationMoving.clear();
-
-        }
-    }
 }
