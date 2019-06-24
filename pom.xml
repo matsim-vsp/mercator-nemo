@@ -56,6 +56,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
             <groupId>org.matsim</groupId>
             <artifactId>matsim</artifactId>
             <version>${matsim.version}</version>
@@ -124,7 +134,7 @@
         <dependency>
             <groupId>com.github.matsim-org</groupId>
             <artifactId>GTFS2MATSim</artifactId>
-            <version>-SNAPSHOT</version>
+            <version>-8e93fe00aa-1</version>
         </dependency>
         <dependency>
             <groupId>com.github.SchweizerischeBundesbahnen</groupId>
