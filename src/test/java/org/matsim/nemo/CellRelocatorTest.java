@@ -3,7 +3,6 @@ package org.matsim.nemo;
 import com.opencsv.CSVReader;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -16,8 +15,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -39,31 +36,9 @@ import static org.matsim.api.core.v01.TransportMode.car;
 
 public class CellRelocatorTest {
     private static Logger logger = Logger.getLogger("CellRelocatorTest");
-    private static Geometry outerGeometry;
     private Population population;
     private double limits = 5;
     private QuadTree quadTree;
-
-
-    /**
-     * @param pathToFile the path to the shape file
-     * @return Geometry from path file
-     */
-    private static Geometry getFirstGeometryFromShapeFile(Path pathToFile) {
-        for (SimpleFeature feature : ShapeFileReader.getAllFeatures(pathToFile.toString())) {
-            return (Geometry) feature.getDefaultGeometry();
-        }
-        throw new RuntimeException("Runtime exception/error, geometry is broken. Unexpected Error.");
-    }
-
-    @BeforeClass
-    public static void setupClass() {
-        Path shapeLimits = Paths.get("/Users/nanddesai/nemo_mercator/data/original_files/shapeFiles/sourceShape_NRW/sourceShape_NRW/dvg2bld_nw.shp");
-
-        Geometry outer = getFirstGeometryFromShapeFile(shapeLimits);
-
-        outerGeometry = outer;
-    }
 
     /**
      * Creates a circle shape using geotools
@@ -87,20 +62,6 @@ public class CellRelocatorTest {
         QuadTree<Person> quadTree = new QuadTree<>(
                 -20, -20, 20, 20
         );
-        /*
-        //For Loop: transverses persons to accumulate their plans and to put their activities within the Quadtree.
-        for (Person person : population.getPersons().values()) {
-            for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
-                if (planElement instanceof Activity) {
-                    Activity activity = (Activity) planElement;
-                    if(activity.getType().contains("home") && !activity.getCoord().equals(oldHome)) {
-                        oldHome = activity.getCoord();
-                        quadTree.put(activity.getCoord().getX(), activity.getCoord().getY(), person);
-                    }
-                }
-            }
-        }
-         */
         this.quadTree = quadTree;
     }
 
