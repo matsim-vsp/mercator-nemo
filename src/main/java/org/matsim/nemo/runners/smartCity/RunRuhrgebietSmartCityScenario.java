@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*cd 
+ * project: org.matsim.*cd
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,8 @@
 package org.matsim.nemo.runners.smartCity;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
@@ -37,174 +36,94 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.core.config.CommandLine;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
-import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.run.RunRuhrgebietScenario;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * This class starts a simulation run with DRT.
- * 
- * - The input DRT vehicles file specifies the number of vehicles and the
- * vehicle capacity (a vehicle capacity of 1 means there is no ride-sharing). -
+ * <p>
  * The DRT service area is set to the the Ruhrgebiet area (see input shape
  * file). - Initial plans are not modified.
- * 
- * @author ikaddoura
+ * </p>
+ *
+ * @author jlaudan
  */
 
 public final class RunRuhrgebietSmartCityScenario {
 
-	private static final Logger log = Logger.getLogger(RunRuhrgebietSmartCityScenario.class);
+    private static final Logger log = Logger.getLogger(RunRuhrgebietSmartCityScenario.class);
+    private static final String drtServiceAreaAttribute = "drtServiceArea";
 
-	public static final String DRT_SERVICE_AREA_SHAPE_FILE = "ruhrgebiet_boundary";
+    public static void main(String[] args) {
 
-	public static final String drtServiceAreaAttribute = "drtServiceArea";
-	private final String drtNetworkMode = TransportMode.car;
+        if (args.length != 2)
+            throw new RuntimeException("two arguments are required: path/to/config path/to/service/area/shape/file");
 
-	private final String drtServiceAreaShapeFile;
+        String configFile = args[0]; // path to config file
+        Path serviceAreaShapeFile = Paths.get(args[1]); // path to shape file
+        RunRuhrgebietScenario ruhrgebiet = new RunRuhrgebietScenario(new String[]{"--config-path", configFile});
 
-	private Config config;
-	private Scenario scenario;
-	private Controler controler;
-	private RunRuhrgebietScenario ruhrgebiet;
+        run(ruhrgebiet, serviceAreaShapeFile);
+    }
 
-	private boolean hasPreparedConfig = false;
-	private boolean hasPreparedScenario = false;
-	private boolean hasPreparedControler = false;
+    private static void run(RunRuhrgebietScenario ruhrgebiet, Path serviceAreaShape) {
 
-	public static void main(String[] args) throws CommandLine.ConfigurationException {
-		new RunRuhrgebietSmartCityScenario(args).run();
-	}
+        Controler controler = ruhrgebiet.prepareControler();
 
-	public RunRuhrgebietSmartCityScenario(String[] args) throws CommandLine.ConfigurationException {
-		if (args.length != 0) {
+        // add drt config groups
+        controler.getConfig().addModule(new DvrpConfigGroup());
+        controler.getConfig().addModule(new DrtConfigGroup());
+        controler.getConfig().addModule(new DrtFaresConfigGroup());
+        DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(controler.getConfig()), controler.getConfig().planCalcScore());
 
-			String configFile = args[0];
-			this.drtServiceAreaShapeFile = args[1];
-			this.ruhrgebiet = new RunRuhrgebietScenario(new String[]{"--config-path", configFile});
-		} else {
+        // adjust qsim for drt
+        controler.getConfig().qsim().setNumberOfThreads(1);
+        controler.getConfig().qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 
-			String configFileName = "C://Users//Gregor//Desktop//Input//ruhrgebiet-v1.0-1pct.configDRT.xml/";
-			//String configFileName = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet-v1.0-1pct.configDRT.xml";
-			//this.drtServiceAreaShapeFile = "/net/homes/ils/rybczak/NemoSmartCity/Input/ruhrgebiet_boundary.shp";
-			this.drtServiceAreaShapeFile = "C://Users//Gregor//Desktop//Input//ruhrgebiet_boundary.shp";
-			// this.drtServiceAreaShapeFile = DRT_SERVICE_AREA_SHAPE_FILE;
-			this.ruhrgebiet = new RunRuhrgebietScenario(new String[] { "--config-path", configFileName,
-					"--" + DRT_SERVICE_AREA_SHAPE_FILE, drtServiceAreaShapeFile });
-		}
-	}
+        // adjust route factory for drt
+        controler.getScenario().getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 
-	public Controler prepareControler() {
-		if (!hasPreparedScenario) {
-			prepareScenario();
-		}
+        // add drt modules to controler
+        controler.addOverridingModule(new DrtModule());
+        controler.addOverridingModule(new DvrpModule());
+        controler.addOverridingModule(new DrtFareModule());
+        controler.configureQSimComponents(
+                DvrpQSimComponents.activateModes(DrtConfigGroup.get(controler.getConfig()).getMode()));
 
-		controler = ruhrgebiet.prepareControler();
+        // reject drt requests outside the service area
+        controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(DrtConfigGroup.get(controler.getConfig()).getMode()) {
+            @Override
+            protected void configureQSim() {
+                bindModal(PassengerRequestValidator.class)
+                        .toInstance(new ServiceAreaRequestValidator(drtServiceAreaAttribute));
+            }
+        });
 
-		// drt + dvrp module
-		controler.addOverridingModule(new DrtModule());
-		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(DrtConfigGroup.get(controler.getConfig()).getMode()));
+        // adjust the network, to contain drtServiceAreaAttribute used by above RequestValidator
+        Collection<Geometry> serviceArea = ShapeFileReader.getAllFeatures(serviceAreaShape.toString()).stream()
+                .map(simpleFeature -> (Geometry) simpleFeature.getDefaultGeometry())
+                .collect(Collectors.toSet());
+        SmartCityNetworkModification.addSAVmode(controler.getScenario(), serviceArea, TransportMode.car, drtServiceAreaAttribute);
 
-		// reject drt requests outside the service area
-		controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(DrtConfigGroup.get(config).getMode()) {
-			@Override
-			protected void configureQSim() {
-				bindModal(PassengerRequestValidator.class)
-						.toInstance(new ServiceAreaRequestValidator(drtServiceAreaAttribute));
-			}
-		});
+        // make people live on links that are car accessible, otherwise the drt module crashes
+        NetworkFilterManager networkFilterManager = new NetworkFilterManager(controler.getScenario().getNetwork());
+        networkFilterManager.addLinkFilter(l -> l.getAllowedModes().contains(TransportMode.car));
+        Network network = networkFilterManager.applyFilters();
+        XY2Links xy2Links = new XY2Links(network, controler.getScenario().getActivityFacilities());
+        for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
+            xy2Links.run(p);
+        }
 
-		// Add drt-specific fare module
-		controler.addOverridingModule(new DrtFareModule());
-		hasPreparedControler = true;
-		return controler;
-	}
-
-	public Scenario prepareScenario() {
-		if (!hasPreparedConfig) {
-			prepareConfig();
-		}
-
-		scenario = ruhrgebiet.prepareScenario();
-		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
-		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-		SmartCityShpUtils shpUtils = new SmartCityShpUtils(drtServiceAreaShapeFile);
-		//new SmartCityNetworkModification(shpUtils).addSAVmode(scenario, drtNetworkMode, drtServiceAreaAttribute);
-		hasPreparedScenario = true;
-		return scenario;
-	}
-
-	public Config prepareConfig() {
-
-		// dvrp, drt config groups
-	/*	List<ConfigGroup> drtModules = new ArrayList<>();
-		drtModules.add(new DvrpConfigGroup());
-		drtModules.add(new DrtConfigGroup());
-		drtModules.add(new DrtFaresConfigGroup());
-
-		List<ConfigGroup> modules = new ArrayList<>();
-		for (ConfigGroup module : drtModules) {
-			modules.add(module);
-		}
-		for (ConfigGroup module : modulesToAdd) {
-			modules.add(module);
-		}
-
-		ConfigGroup[] modulesArray = new ConfigGroup[modules.size()];
-
-	 */
-		config = ruhrgebiet.prepareConfig(new DvrpConfigGroup(), new DrtConfigGroup(), new DrtFaresConfigGroup());
-		// config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
-		// config.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
-		// config.plansCalcRoute().removeModeRoutingParams(TransportMode.drt);
-		config.qsim().setNumberOfThreads(1); // drt is still single threaded!
-		//DynAgents require simulation to start from the very beginning Set 'QSim.simStarttimeInterpretation' to onlyUseStarttime
-		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
-		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
-		
-		hasPreparedConfig = true;
-		return config;
-	}
-
-	public void run() {
-		if (!hasPreparedControler) {
-			prepareControler();
-		}
-
-		Network network;
-		NetworkFilterManager networkFilterManager = new NetworkFilterManager(scenario.getNetwork());
-		networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
-			@Override
-			public boolean judgeLink(Link l) {
-				return l.getAllowedModes().contains(TransportMode.car);
-			}
-		});
-
-		// PopulationWriter popWriter = new PopulationWriter(scenario.getPopulation());
-		// popWriter.write("C://Users//Gregor//Desktop//Population.xml");
-
-		network = networkFilterManager.applyFilters();
-		XY2Links xy2Links = new XY2Links(network, scenario.getActivityFacilities());
-		for (Person p : scenario.getPopulation().getPersons().values()) {
-			xy2Links.run(p);
-		}
-
-		// popWriter.write("C://Users//Gregor//Desktop//filteredPopulation.xml");
-		// NetworkWriter writer = new NetworkWriter(network);
-		// writer.write("C://Users//Gregor//Desktop//filteredNetwork.xml");
-
-		//ConfigWriter writer = new ConfigWriter(controler.getConfig());
-		//writer.writeFileV1("C://Users//Gregor//Desktop//DRTConfig.xml");
-		
-		controler.run();
-		log.info("Done.");
-	}
+        controler.run();
+        log.info("Done.");
+    }
 }

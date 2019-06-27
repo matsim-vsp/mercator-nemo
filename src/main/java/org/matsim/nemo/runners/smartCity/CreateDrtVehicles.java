@@ -11,21 +11,23 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,16 +51,19 @@ public class CreateDrtVehicles {
 	private final Collection<Geometry> serviceArea;
 	private final Path output;
 
-	public CreateDrtVehicles(Network network, Collection<Geometry> geometries, Path output) {
+    private CreateDrtVehicles(Network network, Collection<Geometry> geometries, Path output) {
 		this.network = network;
 		this.serviceArea = geometries;
 		this.output = output;
 	}
 
-	public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
 		InputArguments arguments = new InputArguments();
 		JCommander.newBuilder().addObject(arguments).build().parse(args);
+
+        //create output directory if necessary
+        Files.createDirectories(Paths.get(arguments.svnDir).resolve(outputPath).getParent());
 
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(
 				Paths.get(arguments.svnDir).resolve(shapeFilePath).toString());
@@ -74,23 +79,20 @@ public class CreateDrtVehicles {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		final int[] i = {0};
-		Stream<DvrpVehicleSpecification> vehicleSpecificationStream = network.getLinks().entrySet().stream()
-				.filter(entry -> {
-					return entry.getValue().getAllowedModes().contains(TransportMode.car);
-				})// drt can only start on links with Transport mode 'car'
+        Stream<DvrpVehicleSpecification> vehicleSpecificationStream = network.getLinks().entrySet().parallelStream()
+                .filter(entry -> entry.getValue().getAllowedModes().contains(TransportMode.car))// drt can only start on links with Transport mode 'car'
 				.filter(entry -> isInServiceArea(entry.getValue()))
 				.sorted((e1, e2) -> (random.nextInt(2) - 1)) // shuffle links
 				.limit(numberOfVehicles) // select the first *numberOfVehicles* links
 				.map(entry -> ImmutableDvrpVehicleSpecification.newBuilder()
-						.id(Id.create("drt_" + i[0]++, DvrpVehicle.class))
+                        .id(Id.create("drt_" + random.nextInt(), DvrpVehicle.class))
 						.startLinkId(entry.getKey())
 						.capacity(seatsPerVehicle)
 						.serviceBeginTime(operationStartTime)
 						.serviceEndTime(operationEndTime)
 						.build());
 
-		new FleetWriter(vehicleSpecificationStream).write(output.toString());
+        new ConcurrentFleetWriter(vehicleSpecificationStream).write(output.toString());
 	}
 
 	private boolean isInServiceArea(Link link) {
@@ -105,4 +107,30 @@ public class CreateDrtVehicles {
 		@Parameter(names = "-svnDir", required = true)
 		private String svnDir;
 	}
+}
+
+/**
+ * Same as FleetWriter from dvrp package but allows parallel Streams
+ */
+class ConcurrentFleetWriter extends MatsimXmlWriter {
+
+    private Stream<? extends DvrpVehicleSpecification> vehicleSpecifications;
+
+    ConcurrentFleetWriter(Stream<? extends DvrpVehicleSpecification> vehicleSpecifications) {
+        this.vehicleSpecifications = vehicleSpecifications;
+    }
+
+    public void write(String file) {
+        this.openFile(file);
+        this.writeDoctype("vehicles", "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd");
+        this.writeStartTag("vehicles", Collections.emptyList());
+        this.vehicleSpecifications.forEach(this::writeVehicle);
+        this.writeEndTag("vehicles");
+        this.close();
+    }
+
+    private synchronized void writeVehicle(DvrpVehicleSpecification vehicle) {
+        List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", vehicle.getId().toString()), Tuple.of("start_link", vehicle.getStartLinkId() + ""), Tuple.of("t_0", vehicle.getServiceBeginTime() + ""), Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("capacity", vehicle.getCapacity() + ""));
+        this.writeStartTag("vehicle", atts, true);
+    }
 }

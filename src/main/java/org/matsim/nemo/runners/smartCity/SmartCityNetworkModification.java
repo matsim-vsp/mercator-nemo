@@ -20,9 +20,15 @@
 package org.matsim.nemo.runners.smartCity;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,67 +37,38 @@ import java.util.Set;
  */
 
 public final class SmartCityNetworkModification {
-	private static final Logger log = Logger.getLogger(SmartCityNetworkModification.class);
-	private final SmartCityShpUtils shpUtils;
+    private static final Logger log = Logger.getLogger(SmartCityNetworkModification.class);
 
-	public SmartCityNetworkModification(SmartCityShpUtils shpUtils) {
-		this.shpUtils = shpUtils;
-	}
+    static void addSAVmode(Scenario scenario, Collection<Geometry> serviceArea, String taxiNetworkMode, String serviceAreaAttribute) {
 
-	public void addSAVmode(Scenario scenario, String taxiNetworkMode, String serviceAreaAttribute) {
+        log.info("Add taxi mode to allowed modes where car and ride is allowed. If in service area add service area attribute to link");
+        scenario.getNetwork().getLinks().values().parallelStream()
+                .filter(link -> link.getAllowedModes().contains(TransportMode.car) && link.getAllowedModes().contains(TransportMode.ride))
+                .forEach(link -> {
 
-	scenario.getNetwork().getLinks().values().parallelStream()
-				.filter(link -> link.getAllowedModes().contains(TransportMode.car) && link.getAllowedModes().contains(TransportMode.ride))
-				.forEach(link -> {
-					Set<String> allowedModes = new HashSet<>();
-					allowedModes.add(TransportMode.car);
-					// allowedModes.add("freight");
-					allowedModes.add(TransportMode.ride);
-					allowedModes.add(taxiNetworkMode);
-					link.setAllowedModes(allowedModes);
+                    // copy all previous modes and add taxiNetworkMode
+                    Set<String> modes = link.getAllowedModes();
+                    Set<String> newModes = new HashSet<>(modes);
+                    newModes.add(taxiNetworkMode);
+                    link.setAllowedModes(newModes);
 
-					if (shpUtils.isCoordInDrtServiceArea(link.getFromNode().getCoord())
-							|| shpUtils.isCoordInDrtServiceArea(link.getToNode().getCoord())) {
-						link.getAttributes().putAttribute(serviceAreaAttribute, true);
-					} else {
-						link.getAttributes().putAttribute(serviceAreaAttribute, false);
-					}
-				});
+                    // mark link to be in service area
+                    addServiceAreaAttribute(link, serviceArea, serviceAreaAttribute);
+                });
+        log.info("Added drt mode to allowed modes and marked links with service area attribute");
+    }
 
-		log.info("Adjusting network...");
+    private static void addServiceAreaAttribute(Link link, Collection<Geometry> serviceArea, String attributeKey) {
 
-		/*		int counter = 0;
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			if (counter % 10000 == 0)
-				log.info("link #" + counter);
-			counter++;
-			if (link.getAllowedModes().contains(TransportMode.car)
-					&& link.getAllowedModes().contains(TransportMode.ride)) {
-				Set<String> allowedModes = new HashSet<>();
-				allowedModes.add(TransportMode.car);
-				// allowedModes.add("freight");
-				allowedModes.add(TransportMode.ride);
-				allowedModes.add(taxiNetworkMode);
-				link.setAllowedModes(allowedModes);
+        if (isInGeometry(link.getCoord(), serviceArea))
+            link.getAttributes().putAttribute(attributeKey, true);
+        else
+            link.getAttributes().putAttribute(attributeKey, false);
+    }
 
-				if (shpUtils.isCoordInDrtServiceArea(link.getFromNode().getCoord())
-						|| shpUtils.isCoordInDrtServiceArea(link.getToNode().getCoord())) {
-					link.getAttributes().putAttribute(serviceAreaAttribute, true);
-				} else {
-					link.getAttributes().putAttribute(serviceAreaAttribute, false);
-				}
+    private static boolean isInGeometry(Coord coord, Collection<Geometry> geometry) {
 
-			} else if (link.getAllowedModes().contains(TransportMode.pt)) {
-				// skip pt links
-			} else if (link.getAllowedModes().contains(TransportMode.bike)) {
-
-
-			} else {
-				throw new RuntimeException("Aborting...");
-			}
-		} */
-		log.info("Done");
-	}
-
-
+        Point point = MGC.coord2Point(coord);
+        return geometry.stream().anyMatch(geometry1 -> geometry1.contains(point));
+    }
 }
