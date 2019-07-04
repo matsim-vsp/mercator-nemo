@@ -89,27 +89,27 @@
             <artifactId>bicycle</artifactId>
             <version>${matsim.version}</version>
         </dependency>
-        
+
         <dependency>
-        		<groupId>org.matsim.contrib</groupId>
- 		       	<artifactId>drt</artifactId>
-        		<version>${matsim.version}</version>
-       			<scope>compile</scope>
-     		</dependency>
-     		
-     		 <dependency>
-        		<groupId>org.matsim.contrib</groupId>
-        		<artifactId>av</artifactId>
-        		<version>${matsim.version}</version>
-        		<scope>compile</scope>
-     	 	</dependency>
-     	 	
-     	 	<dependency>
-        		<groupId>org.matsim.contrib</groupId>
-        		<artifactId>dvrp</artifactId>
-        		<version>${matsim.version}</version>
-        		<scope>compile</scope>
-      		</dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>drt</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>av</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>dvrp</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.matsim.vsp.vsp-playgrounds</groupId>
@@ -146,13 +146,20 @@
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
         </dependency>
-        
+
+        <!-- I don't like this dependency. we should think of getting rid of it -->
         <dependency>
-	    		<groupId>com.github.matsim-vsp</groupId>
-	    		<artifactId>matsim-ruhrgebiet</artifactId>
-				<version>1.0</version>
-			</dependency>
-        
+            <groupId>com.github.matsim-vsp</groupId>
+            <artifactId>matsim-ruhrgebiet</artifactId>
+            <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.matsim</groupId>
+                    <artifactId>matsim</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
     </dependencies>
 
     <build>
