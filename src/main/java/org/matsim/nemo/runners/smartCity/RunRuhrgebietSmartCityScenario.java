@@ -79,6 +79,10 @@ public final class RunRuhrgebietSmartCityScenario {
 
         Controler controler = ruhrgebiet.prepareControler();
 
+        // remove bike and ride from teleported modes
+        controler.getConfig().plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
+        controler.getConfig().plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
+
         // add drt config groups
         controler.getConfig().addModule(new DvrpConfigGroup());
         controler.getConfig().addModule(new DrtConfigGroup());
