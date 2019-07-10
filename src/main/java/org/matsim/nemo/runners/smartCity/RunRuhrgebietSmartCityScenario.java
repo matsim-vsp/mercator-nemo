@@ -23,7 +23,8 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
@@ -123,11 +124,21 @@ public final class RunRuhrgebietSmartCityScenario {
         networkFilterManager.addLinkFilter(l -> l.getAllowedModes().contains(TransportMode.car));
         Network network = networkFilterManager.applyFilters();
         XY2Links xy2Links = new XY2Links(network, controler.getScenario().getActivityFacilities());
-        for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
-            xy2Links.run(p);
-        }
 
-        controler.run();
+		controler.getScenario().getPopulation().getPersons().values().parallelStream()
+				// make people live on links that are car accessible, otherwise the drt module crashes
+				.peek(xy2Links::run)
+				.flatMap(person -> person.getPlans().parallelStream())
+				.flatMap(plan -> plan.getPlanElements().parallelStream())
+				// get all legs
+				.filter(element -> element instanceof Leg)
+				.map(element -> (Leg) element)
+				.filter(leg -> leg.getMode().equals("access_walk") || leg.getMode().equals("egress_walk"))
+				// change all access egress walks to non_network_walk, to reflect changes in the newest matsim version
+				.forEach(leg -> leg.setMode(TransportMode.non_network_walk));
+
+		new PopulationWriter(controler.getScenario().getPopulation()).write(Paths.get("C:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\matsim_input\\smartCity\\population-with-non-network-mode.xml.gz").toString());
+		//controler.run();
         log.info("Done.");
     }
 }
