@@ -21,10 +21,10 @@ package org.matsim.nemo.runners.smartCity;
 
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
@@ -37,6 +37,10 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -63,8 +67,9 @@ public final class RunRuhrgebietSmartCityScenario {
 
     private static final Logger log = Logger.getLogger(RunRuhrgebietSmartCityScenario.class);
     private static final String drtServiceAreaAttribute = "drtServiceArea";
+	private static final RunType runType = RunType.reduced;
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
         if (args.length != 2)
             throw new RuntimeException("two arguments are required: path/to/config path/to/service/area/shape/file");
@@ -78,7 +83,44 @@ public final class RunRuhrgebietSmartCityScenario {
 
     private static void run(RunRuhrgebietScenario ruhrgebiet, Path serviceAreaShape) {
 
+
+		Config config = ruhrgebiet.prepareConfig();
+		NemoConfigGroup abc = ConfigUtils.addOrGetModule(config, NemoConfigGroup.class);
+		abc.setServiceAreaShapeFile(serviceAreaShape.toString());
+
+
+		Scenario scenario = ruhrgebiet.prepareScenario();
+
+		if (runType == RunType.reduced) {
+			scenario.getPopulation().getPersons().entrySet().removeIf(person -> Math.random() < 0.1);
+		}
+
         Controler controler = ruhrgebiet.prepareControler();
+
+		controler.getConfig().controler().setWritePlansUntilIteration(5);
+		PlansCalcRouteConfigGroup pcr = controler.getConfig().plansCalcRoute();
+
+		pcr.addModeRoutingParams(new PlansCalcRouteConfigGroup.ModeRoutingParams("access_walk")
+				.setTeleportedModeSpeed(pcr.getModeRoutingParams().get(TransportMode.walk).getTeleportedModeSpeed())
+				.setBeelineDistanceFactor(pcr.getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor())
+		);
+
+		pcr.addModeRoutingParams(new PlansCalcRouteConfigGroup.ModeRoutingParams("egress_walk")
+				.setTeleportedModeSpeed(pcr.getModeRoutingParams().get(TransportMode.walk).getTeleportedModeSpeed())
+				.setBeelineDistanceFactor(pcr.getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor())
+		);
+
+		PlanCalcScoreConfigGroup scoring = controler.getConfig().planCalcScore();
+		scoring.addModeParams(new PlanCalcScoreConfigGroup.ModeParams("access_walk")
+				.setMarginalUtilityOfTraveling(scoring.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()));
+
+		scoring.addModeParams(new PlanCalcScoreConfigGroup.ModeParams("egress_walk")
+				.setMarginalUtilityOfTraveling(scoring.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()));
+
+		final PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("drt interaction");
+		params.setTypicalDuration(0);
+		params.setScoringThisActivityAtAll(false);
+		scoring.addActivityParams(params);
 
         // remove bike and ride from teleported modes
         controler.getConfig().plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
@@ -137,8 +179,9 @@ public final class RunRuhrgebietSmartCityScenario {
 				// change all access egress walks to non_network_walk, to reflect changes in the newest matsim version
 				.forEach(leg -> leg.setMode(TransportMode.non_network_walk));
 
-		new PopulationWriter(controler.getScenario().getPopulation()).write(Paths.get("C:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\matsim_input\\smartCity\\population-with-non-network-mode.xml.gz").toString());
-		//controler.run();
+		controler.run();
         log.info("Done.");
     }
+
+	private enum RunType {onePercent, reduced}
 }
