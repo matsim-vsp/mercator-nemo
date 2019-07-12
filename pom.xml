@@ -135,18 +135,6 @@
             <version>1.72</version>
         </dependency>
         
-        <dependency>
-	    	<groupId>com.github.matsim-vsp</groupId>
-    		<artifactId>matsim-ruhrgebiet</artifactId>
-			<version>1.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>					
-					<artifactId>*</artifactId> 
-				</exclusion>
-			</exclusions>
-		</dependency>
-        
     </dependencies>
 
     <build>

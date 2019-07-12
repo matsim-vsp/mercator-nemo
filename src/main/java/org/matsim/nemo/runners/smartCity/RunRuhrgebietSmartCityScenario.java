@@ -19,6 +19,9 @@
 
 package org.matsim.nemo.runners.smartCity;
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Scenario;
@@ -37,16 +40,22 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.population.algorithms.XY2Links;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.run.RunRuhrgebietScenario;
+import org.matsim.nemo.runners.BikeLinkSpeedCalculator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,7 +76,7 @@ public final class RunRuhrgebietSmartCityScenario {
 
     private static final Logger log = Logger.getLogger(RunRuhrgebietSmartCityScenario.class);
     private static final String drtServiceAreaAttribute = "drtServiceArea";
-	private static final RunType runType = RunType.reduced;
+	private static final RunType runType = RunType.onePercent;
 
 	public static void main(String[] args) {
 
@@ -76,26 +85,66 @@ public final class RunRuhrgebietSmartCityScenario {
 
         String configFile = args[0]; // path to config file
         Path serviceAreaShapeFile = Paths.get(args[1]); // path to shape file
-        RunRuhrgebietScenario ruhrgebiet = new RunRuhrgebietScenario(new String[]{"--config-path", configFile});
 
-        run(ruhrgebiet, serviceAreaShapeFile);
+		run(configFile, serviceAreaShapeFile);
     }
 
-    private static void run(RunRuhrgebietScenario ruhrgebiet, Path serviceAreaShape) {
+	private static void run(String configFileName, Path serviceAreaShape) {
 
+		Config config = ConfigUtils.loadConfig(configFileName);
 
-		Config config = ruhrgebiet.prepareConfig();
-		NemoConfigGroup abc = ConfigUtils.addOrGetModule(config, NemoConfigGroup.class);
-		abc.setServiceAreaShapeFile(serviceAreaShape.toString());
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.qsim().setUsingTravelTimeCheckInTeleportation(true);
+		config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
 
+		final long minDuration = 600;
+		final long maxDuration = 3600 * 27;
+		final long difference = 600;
+		addTypicalDurations(config, "home", minDuration, maxDuration, difference);
+		addTypicalDurations(config, "work", minDuration, maxDuration, difference);
+		addTypicalDurations(config, "education", minDuration, maxDuration, difference);
+		addTypicalDurations(config, "leisure", minDuration, maxDuration, difference);
+		addTypicalDurations(config, "shopping", minDuration, maxDuration, difference);
+		addTypicalDurations(config, "other", minDuration, maxDuration, difference);
 
-		Scenario scenario = ruhrgebiet.prepareScenario();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		if (runType == RunType.reduced) {
 			scenario.getPopulation().getPersons().entrySet().removeIf(person -> Math.random() < 0.1);
 		}
 
-        Controler controler = ruhrgebiet.prepareControler();
+		Controler controler = new Controler(scenario);
+
+		// add raptor router
+		controler.addOverridingModule(new SwissRailRaptorModule());
+
+		// use the (congested) car travel time for the teleported ride mode
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding(TransportMode.ride).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());
+			}
+		});
+
+		// set different speed levels for bike highways
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+
+			@Override
+			protected void configureQSim() {
+				bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+					@Inject
+					private EventsManager events;
+
+					@Override
+					public QNetworkFactory get() {
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+						factory.setLinkSpeedCalculator(new BikeLinkSpeedCalculator());
+						return factory;
+					}
+				});
+			}
+		});
 
 		controler.getConfig().controler().setWritePlansUntilIteration(5);
 		PlansCalcRouteConfigGroup pcr = controler.getConfig().plansCalcRoute();
@@ -182,6 +231,15 @@ public final class RunRuhrgebietSmartCityScenario {
 		controler.run();
         log.info("Done.");
     }
+
+	private static void addTypicalDurations(Config config, String type, long minDurationInSeconds, long maxDurationInSeconds, long durationDifferenceInSeconds) {
+
+		for (long duration = minDurationInSeconds; duration <= maxDurationInSeconds; duration += durationDifferenceInSeconds) {
+			final PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams(type + "_" + duration + ".0");
+			params.setTypicalDuration(duration);
+			config.planCalcScore().addActivityParams(params);
+		}
+	}
 
 	private enum RunType {onePercent, reduced}
 }
