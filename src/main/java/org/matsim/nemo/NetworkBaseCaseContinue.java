@@ -15,6 +15,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import networkProcessing.NetworkBaseCaseContinue.Attributes;
+
 public class NetworkBaseCaseContinue {
 
 	public static void main(String[] args) {
@@ -30,13 +32,14 @@ public class NetworkBaseCaseContinue {
 			link.setNumberOfLanes(attr.numberOfLanes);
 			link.setCapacity(attr.capacity);
 		}
-		new NetworkWriter(scenario.getNetwork()).write("C:/Users/Gregor/Desktop/testModification123.xml"); ;
+		new NetworkWriter(scenario.getNetwork()).write("C:/Users/Gregor/Desktop/testModification123.xml");
+		;
 	}
 
 	private static List<Attributes> fillList() {
 		List<Attributes> LinkList = new ArrayList<>();
-		
-		//NW	A001	AS Münster-M	AK Lotte/Osnabrück	E6 
+
+		// NW A001 AS Münster-M AK Lotte/Osnabrück E6
 		LinkList.add(new Attributes("454963", 3, 6000));
 		LinkList.add(new Attributes("300431", 3, 6000));
 		LinkList.add(new Attributes("300476", 3, 6000));
@@ -139,6 +142,174 @@ public class NetworkBaseCaseContinue {
 		LinkList.add(new Attributes("462022", 3, 6000));
 		LinkList.add(new Attributes("226041", 3, 6000));
 		LinkList.add(new Attributes("134825", 3, 6000));
+		//
+		LinkList.add(new Attributes("225966", 3, 6000));
+		LinkList.add(new Attributes("462030", 3, 6000));
+		LinkList.add(new Attributes("462018", 3, 6000));
+		LinkList.add(new Attributes("462029", 3, 6000));
+		LinkList.add(new Attributes("462021", 3, 6000));
+		LinkList.add(new Attributes("186856", 3, 6000));
+		LinkList.add(new Attributes("186860", 3, 6000));
+		LinkList.add(new Attributes("186855", 3, 6000));
+		LinkList.add(new Attributes("186857", 3, 6000));
+		LinkList.add(new Attributes("86928", 3, 6000));
+		LinkList.add(new Attributes("86929", 3, 6000));
+		LinkList.add(new Attributes("86875", 3, 6000));
+		LinkList.add(new Attributes("86888", 3, 6000));
+		LinkList.add(new Attributes("460066", 3, 6000));
+		LinkList.add(new Attributes("460072", 3, 6000));
+		LinkList.add(new Attributes("460075", 3, 6000));
+		LinkList.add(new Attributes("460067", 3, 6000));
+		LinkList.add(new Attributes("169874", 3, 6000));
+		LinkList.add(new Attributes("188729", 3, 6000));
+		LinkList.add(new Attributes("188719", 3, 6000));
+		LinkList.add(new Attributes("170006", 3, 6000));
+		LinkList.add(new Attributes("169986", 3, 6000));
+		LinkList.add(new Attributes("169993", 3, 6000));
+		LinkList.add(new Attributes("183105", 3, 6000));
+		LinkList.add(new Attributes("183110", 3, 6000));
+		LinkList.add(new Attributes("467283", 3, 6000));
+		LinkList.add(new Attributes("467286", 3, 6000));
+		LinkList.add(new Attributes("253653", 3, 6000));
+		LinkList.add(new Attributes("253654", 3, 6000));
+		LinkList.add(new Attributes("226052", 3, 6000));
+		LinkList.add(new Attributes("226055", 3, 6000));
+		LinkList.add(new Attributes("226059", 3, 6000));
+		LinkList.add(new Attributes("226018", 3, 6000));
+		LinkList.add(new Attributes("226061", 3, 6000));
+		LinkList.add(new Attributes("226038", 3, 6000));
+		LinkList.add(new Attributes("350289", 3, 6000));
+		LinkList.add(new Attributes("350292", 3, 6000));
+		LinkList.add(new Attributes("350298", 3, 6000));
+		LinkList.add(new Attributes("85776", 3, 6000));
+		LinkList.add(new Attributes("85777", 3, 6000));
+		LinkList.add(new Attributes("183108", 3, 6000));
+		LinkList.add(new Attributes("183219", 3, 6000));
+		LinkList.add(new Attributes("169845", 3, 6000));
+		LinkList.add(new Attributes("289354", 3, 6000));
+		LinkList.add(new Attributes("169904", 3, 6000));
+		LinkList.add(new Attributes("169904", 3, 6000));
+		LinkList.add(new Attributes("170005", 3, 6000));
+		LinkList.add(new Attributes("301472", 3, 6000));
+		LinkList.add(new Attributes("301462", 3, 6000));
+		LinkList.add(new Attributes("59691", 3, 6000));
+		LinkList.add(new Attributes("59693", 3, 6000));
+		LinkList.add(new Attributes("264363", 3, 6000));
+		LinkList.add(new Attributes("264358", 3, 6000));
+		LinkList.add(new Attributes("169934", 3, 6000));
+		LinkList.add(new Attributes("169915", 3, 6000));
+		LinkList.add(new Attributes("169920", 3, 6000));
+		LinkList.add(new Attributes("169945", 3, 6000));
+		LinkList.add(new Attributes("169945", 3, 6000));
+		LinkList.add(new Attributes("215747", 3, 6000));
+		LinkList.add(new Attributes("215750", 3, 6000));
+		LinkList.add(new Attributes("169869", 3, 6000));
+		LinkList.add(new Attributes("170001", 3, 6000));
+		LinkList.add(new Attributes("169946", 3, 6000));
+		LinkList.add(new Attributes("169977", 3, 6000));
+		LinkList.add(new Attributes("262238", 3, 6000));
+		LinkList.add(new Attributes("262267", 3, 6000));
+		LinkList.add(new Attributes("262270", 3, 6000));
+		LinkList.add(new Attributes("262259", 3, 6000));
+		LinkList.add(new Attributes("274097", 3, 6000));
+		LinkList.add(new Attributes("169950", 3, 6000));
+		LinkList.add(new Attributes("170010", 3, 6000));
+		LinkList.add(new Attributes("169881", 3, 6000));
+		LinkList.add(new Attributes("180759", 3, 6000));
+		LinkList.add(new Attributes("180767", 3, 6000));
+		LinkList.add(new Attributes("130110", 3, 6000));
+		LinkList.add(new Attributes("53713", 3, 6000));
+		LinkList.add(new Attributes("301913", 3, 6000));
+		LinkList.add(new Attributes("301912", 3, 6000));
+		LinkList.add(new Attributes("53702", 3, 6000));
+		LinkList.add(new Attributes("168170", 3, 6000));
+		LinkList.add(new Attributes("168169", 3, 6000));
+		LinkList.add(new Attributes("168148", 3, 6000));
+		LinkList.add(new Attributes("168145", 3, 6000));
+		LinkList.add(new Attributes("169922", 3, 6000));
+		LinkList.add(new Attributes("169875", 3, 6000));
+		LinkList.add(new Attributes("60537", 3, 6000));
+		LinkList.add(new Attributes("168156", 3, 6000));
+		LinkList.add(new Attributes("168168", 3, 6000));
+		LinkList.add(new Attributes("83657", 3, 6000));
+		LinkList.add(new Attributes("83662", 3, 6000));
+		LinkList.add(new Attributes("302737", 3, 6000));
+		LinkList.add(new Attributes("302734", 3, 6000));
+		LinkList.add(new Attributes("501808", 3, 6000));
+		LinkList.add(new Attributes("48647", 3, 6000));
+		LinkList.add(new Attributes("463679", 3, 6000));
+		LinkList.add(new Attributes("48654", 3, 6000));
+		LinkList.add(new Attributes("300520", 3, 6000));
+		LinkList.add(new Attributes("300513", 3, 6000));
+		LinkList.add(new Attributes("136090", 3, 6000));
+		LinkList.add(new Attributes("136084", 3, 6000));
+		LinkList.add(new Attributes("136091", 3, 6000));
+		LinkList.add(new Attributes("136083", 3, 6000));
+		LinkList.add(new Attributes("300494", 3, 6000));
+		LinkList.add(new Attributes("300493", 3, 6000));
+		LinkList.add(new Attributes("300437", 3, 6000));
+		LinkList.add(new Attributes("300436", 3, 6000));
+		LinkList.add(new Attributes("454982", 3, 6000));
+		LinkList.add(new Attributes("501901", 3, 6000));
+		LinkList.add(new Attributes("21295", 3, 6000));
+
+		// NW A001 Köln / Niehl AK Leverkusen E 8
+		LinkList.add(new Attributes("161255", 4, 8000));
+		LinkList.add(new Attributes("203991", 4, 8000));
+		LinkList.add(new Attributes("161224", 4, 8000));
+		LinkList.add(new Attributes("150239", 4, 8000));
+		LinkList.add(new Attributes("188379", 4, 8000));
+		LinkList.add(new Attributes("150242", 4, 8000));
+		LinkList.add(new Attributes("161252", 4, 8000));
+		LinkList.add(new Attributes("161214", 4, 8000));
+		LinkList.add(new Attributes("161228", 4, 8000));
+		LinkList.add(new Attributes("66148", 4, 8000));
+		LinkList.add(new Attributes("66140", 4, 8000));
+		LinkList.add(new Attributes("34919", 4, 8000));
+		LinkList.add(new Attributes("67855", 4, 8000));
+		LinkList.add(new Attributes("202837", 4, 8000));
+		LinkList.add(new Attributes("67851", 4, 8000));
+		LinkList.add(new Attributes("34922", 4, 8000));
+		LinkList.add(new Attributes("67867", 4, 8000));
+		LinkList.add(new Attributes("494291", 4, 8000));
+		LinkList.add(new Attributes("34918", 4, 8000));
+		LinkList.add(new Attributes("223459", 4, 8000));
+		LinkList.add(new Attributes("161477", 4, 8000));
+		LinkList.add(new Attributes("67868", 4, 8000));
+		LinkList.add(new Attributes("177877", 4, 8000));
+		LinkList.add(new Attributes("248088", 4, 8000));
+		LinkList.add(new Attributes("248087", 4, 8000));
+		LinkList.add(new Attributes("98901", 4, 8000));
+		LinkList.add(new Attributes("153757", 4, 8000));
+		LinkList.add(new Attributes("12115", 4, 8000));
+		LinkList.add(new Attributes("80177", 4, 8000));
+		LinkList.add(new Attributes("253341", 4, 8000));
+		LinkList.add(new Attributes("248086", 4, 8000));
+		LinkList.add(new Attributes("391240", 4, 8000));
+		LinkList.add(new Attributes("67870", 4, 8000));
+		LinkList.add(new Attributes("139704", 4, 8000));
+		LinkList.add(new Attributes("223461", 4, 8000));
+		LinkList.add(new Attributes("223460", 4, 8000));
+		LinkList.add(new Attributes("67865", 4, 8000));
+		LinkList.add(new Attributes("150195", 4, 8000));
+		LinkList.add(new Attributes("67858", 4, 8000));
+		LinkList.add(new Attributes("67823", 4, 8000));
+		LinkList.add(new Attributes("139695", 4, 8000));
+		LinkList.add(new Attributes("34914", 4, 8000));
+		LinkList.add(new Attributes("66116", 4, 8000));
+		LinkList.add(new Attributes("351956", 4, 8000));
+		LinkList.add(new Attributes("66144", 4, 8000));
+		LinkList.add(new Attributes("149575", 4, 8000));
+		LinkList.add(new Attributes("341111", 4, 8000));
+		LinkList.add(new Attributes("161229", 4, 8000));
+		LinkList.add(new Attributes("341112", 4, 8000));
+		LinkList.add(new Attributes("341113", 4, 8000));
+		LinkList.add(new Attributes("161223", 4, 8000));
+		LinkList.add(new Attributes("150698", 4, 8000));
+		LinkList.add(new Attributes("66172", 4, 8000));
+		LinkList.add(new Attributes("505869", 4, 8000));
+		LinkList.add(new Attributes("449211", 4, 8000));
+
 		return LinkList;
 	}
 
@@ -146,12 +317,13 @@ public class NetworkBaseCaseContinue {
 		private String linkId;
 		private int numberOfLanes;
 		private int capacity;
+
 		Attributes(String linkId, int numberOfLanes, int capacity) {
 			this.linkId = linkId;
 			this.numberOfLanes = numberOfLanes;
 			this.capacity = capacity;
 		}
-		
+
 	}
-	
+
 }
