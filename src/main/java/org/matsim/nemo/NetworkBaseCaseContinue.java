@@ -310,6 +310,65 @@ public class NetworkBaseCaseContinue {
 		LinkList.add(new Attributes("505869", 4, 8000));
 		LinkList.add(new Attributes("449211", 4, 8000));
 
+		// NW A001 AS Wermelskirchen T+R-Anlage Remscheid E6
+		//
+
+		// NW A 003 AS Köln / Mülheim AK Leverkusen (incl.) E 8
+		LinkList.add(new Attributes("61355", 4, 8000));
+		LinkList.add(new Attributes("478238", 4, 8000));
+		LinkList.add(new Attributes("478241", 4, 8000));
+		LinkList.add(new Attributes("148327", 4, 8000));
+		LinkList.add(new Attributes("151277", 4, 8000));
+		LinkList.add(new Attributes("394559", 4, 8000));
+		LinkList.add(new Attributes("332372", 4, 8000));
+		LinkList.add(new Attributes("148090", 4, 8000));
+		LinkList.add(new Attributes("192406", 4, 8000));
+		LinkList.add(new Attributes("148328", 4, 8000));
+		LinkList.add(new Attributes("219204", 4, 8000));
+		LinkList.add(new Attributes("148089", 4, 8000));
+		LinkList.add(new Attributes("148330", 4, 8000));
+		LinkList.add(new Attributes("255701", 4, 8000));
+		LinkList.add(new Attributes("476668", 4, 8000));
+		LinkList.add(new Attributes("370863", 4, 8000));
+		LinkList.add(new Attributes("255706", 4, 8000));
+		LinkList.add(new Attributes("230110", 4, 8000));
+		LinkList.add(new Attributes("422336", 4, 8000));
+		//
+
+		LinkList.add(new Attributes("230093", 4, 8000));
+		LinkList.add(new Attributes("230105", 4, 8000));
+		LinkList.add(new Attributes("65320", 4, 8000));
+		LinkList.add(new Attributes("65320", 4, 8000));
+		LinkList.add(new Attributes("255703", 4, 8000));
+		LinkList.add(new Attributes("476656", 4, 8000));
+		LinkList.add(new Attributes("184840", 4, 8000));
+		LinkList.add(new Attributes("52502", 4, 8000));
+		LinkList.add(new Attributes("65323", 4, 8000));
+		LinkList.add(new Attributes("431516", 4, 8000));
+		LinkList.add(new Attributes("152764", 4, 8000));
+		LinkList.add(new Attributes("65343", 4, 8000));
+		LinkList.add(new Attributes("332373", 4, 8000));
+		LinkList.add(new Attributes("332376", 4, 8000));
+		LinkList.add(new Attributes("152643", 4, 8000));
+		LinkList.add(new Attributes("151289", 4, 8000));
+		LinkList.add(new Attributes("61359", 4, 8000));
+		LinkList.add(new Attributes("61358", 4, 8000));
+		LinkList.add(new Attributes("61333", 4, 8000));
+
+		// NW A 045 AK Hagen (A 45) AK Westhofen (A 1) E 6
+		LinkList.add(new Attributes("494734", 3, 6000));
+		LinkList.add(new Attributes("245830", 3, 6000));
+		LinkList.add(new Attributes("245831", 3, 6000));
+		LinkList.add(new Attributes("356898", 3, 6000));
+		LinkList.add(new Attributes("74360", 3, 6000));
+		LinkList.add(new Attributes("45244", 3, 6000));
+		LinkList.add(new Attributes("435518", 3, 6000));
+		LinkList.add(new Attributes("435524", 3, 6000));
+		LinkList.add(new Attributes("48134", 3, 6000));
+		LinkList.add(new Attributes("266683", 3, 6000));
+		LinkList.add(new Attributes("145835", 3, 6000));
+		LinkList.add(new Attributes("353300", 3, 6000));
+
 		return LinkList;
 	}
 
