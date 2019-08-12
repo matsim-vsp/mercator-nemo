@@ -15,8 +15,6 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import networkProcessing.NetworkBaseCaseContinue.Attributes;
-
 public class NetworkBaseCaseContinue {
 
 	public static void main(String[] args) {
@@ -334,7 +332,6 @@ public class NetworkBaseCaseContinue {
 		LinkList.add(new Attributes("230110", 4, 8000));
 		LinkList.add(new Attributes("422336", 4, 8000));
 		//
-
 		LinkList.add(new Attributes("230093", 4, 8000));
 		LinkList.add(new Attributes("230105", 4, 8000));
 		LinkList.add(new Attributes("65320", 4, 8000));
@@ -368,6 +365,91 @@ public class NetworkBaseCaseContinue {
 		LinkList.add(new Attributes("266683", 3, 6000));
 		LinkList.add(new Attributes("145835", 3, 6000));
 		LinkList.add(new Attributes("353300", 3, 6000));
+		LinkList.add(new Attributes("353311", 3, 6000));
+		LinkList.add(new Attributes("353297", 3, 6000));
+		LinkList.add(new Attributes("256269", 3, 6000));
+		LinkList.add(new Attributes("353310", 3, 6000));
+		LinkList.add(new Attributes("349977", 3, 6000));
+		LinkList.add(new Attributes("349982", 3, 6000));
+		LinkList.add(new Attributes("73172", 3, 6000));
+		LinkList.add(new Attributes("73171", 3, 6000));
+		LinkList.add(new Attributes("73175", 3, 6000));
+		LinkList.add(new Attributes("201441", 3, 6000));
+		LinkList.add(new Attributes("86044", 3, 6000));
+		LinkList.add(new Attributes("86054", 3, 6000));
+		LinkList.add(new Attributes("85883", 3, 6000));
+		LinkList.add(new Attributes("86056", 3, 6000));
+		LinkList.add(new Attributes("35175", 3, 6000));
+		LinkList.add(new Attributes("63830", 3, 6000));
+		LinkList.add(new Attributes("63829", 3, 6000));
+		//
+		LinkList.add(new Attributes("356581", 3, 6000));
+		LinkList.add(new Attributes("356574", 3, 6000));
+		LinkList.add(new Attributes("86039", 3, 6000));
+		LinkList.add(new Attributes("86046", 3, 6000));
+		LinkList.add(new Attributes("86047", 3, 6000));
+		LinkList.add(new Attributes("129462", 3, 6000));
+		LinkList.add(new Attributes("129474", 3, 6000));
+		LinkList.add(new Attributes("129465", 3, 6000));
+		LinkList.add(new Attributes("161769", 3, 6000));
+		LinkList.add(new Attributes("161784", 3, 6000));
+		LinkList.add(new Attributes("460598", 3, 6000));
+		LinkList.add(new Attributes("460599", 3, 6000));
+		LinkList.add(new Attributes("349989", 3, 6000));
+		LinkList.add(new Attributes("353298", 3, 6000));
+		LinkList.add(new Attributes("353296", 3, 6000));
+		LinkList.add(new Attributes("256230", 3, 6000));
+		LinkList.add(new Attributes("353299", 3, 6000));
+		LinkList.add(new Attributes("145830", 3, 6000));
+		LinkList.add(new Attributes("145834", 3, 6000));
+		LinkList.add(new Attributes("145840", 3, 6000));
+		LinkList.add(new Attributes("435521", 3, 6000));
+		LinkList.add(new Attributes("189992", 3, 6000));
+		LinkList.add(new Attributes("435525", 3, 6000));
+		LinkList.add(new Attributes("396642", 3, 6000));
+		LinkList.add(new Attributes("412071", 3, 6000));
+		LinkList.add(new Attributes("356913", 3, 6000));
+		LinkList.add(new Attributes("245918", 3, 6000));
+		LinkList.add(new Attributes("245919", 3, 6000));
+		LinkList.add(new Attributes("190768", 3, 6000));
+		LinkList.add(new Attributes("387646", 3, 6000));
+		LinkList.add(new Attributes("387651", 3, 6000));
+
+		// NW A 046 Westring AK Sonnborn (L 418) E 6
+		LinkList.add(new Attributes("45323", 3, 6000));
+		LinkList.add(new Attributes("45341", 3, 6000));
+		LinkList.add(new Attributes("92013", 3, 6000));
+		LinkList.add(new Attributes("293605", 3, 6000));
+		LinkList.add(new Attributes("478154", 3, 6000));
+		LinkList.add(new Attributes("194808", 3, 6000));
+		LinkList.add(new Attributes("293602", 3, 6000));
+		LinkList.add(new Attributes("270096", 3, 6000));
+		//
+		LinkList.add(new Attributes("241734", 3, 6000));
+		LinkList.add(new Attributes("266985", 3, 6000));
+		LinkList.add(new Attributes("252862", 3, 6000));
+		LinkList.add(new Attributes("478147", 3, 6000));
+		LinkList.add(new Attributes("293616", 3, 6000));
+		LinkList.add(new Attributes("247872", 3, 6000));
+		LinkList.add(new Attributes("328728", 3, 6000));
+		LinkList.add(new Attributes("45325", 3, 6000));
+
+		// NW A 524 Duisburg / Serm (B 8) AS Duisburg / Rahm mit B 8 OU Düsseldorf /
+		// Wittlaer (1.BA) E4
+		LinkList.add(new Attributes("241734", 2, 4000));
+		LinkList.add(new Attributes("233393", 2, 4000));
+		LinkList.add(new Attributes("305378", 2, 4000));
+		LinkList.add(new Attributes("331781", 2, 4000));
+		LinkList.add(new Attributes("79278", 2, 4000));
+		LinkList.add(new Attributes("85068", 2, 4000));
+		LinkList.add(new Attributes("85067", 2, 4000));
+		LinkList.add(new Attributes("239049", 2, 4000));
+		//
+		LinkList.add(new Attributes("331776", 2, 4000));
+		LinkList.add(new Attributes("331777", 2, 4000));
+		LinkList.add(new Attributes("331778", 2, 4000));
+		LinkList.add(new Attributes("79280", 2, 4000));
+		LinkList.add(new Attributes("233336", 2, 4000));
 
 		return LinkList;
 	}
