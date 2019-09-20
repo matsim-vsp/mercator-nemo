@@ -90,9 +90,10 @@ public class CreatePtScheduleAndVehiclesFromOsm {
 		type.setLength(100.);
 		type.setEgressTime(0.);
 		type.setAccessTime(0.);
-		VehicleCapacity capacity = scenario.getTransitVehicles().getFactory().createVehicleCapacity();
-		capacity.setSeats(500);
-		type.setCapacity(capacity);
+//		VehicleCapacity capacity = scenario.getTransitVehicles().getFactory().createVehicleCapacity();
+//		capacity.setSeats(500);
+//		type.setCapacity(capacity);
+		// TODO: set the capacity somewhere else?!
 		type.setPcuEquivalents(0);
 		scenario.getTransitVehicles().addVehicleType(type);
 		
