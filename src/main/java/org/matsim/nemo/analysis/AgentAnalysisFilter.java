@@ -107,16 +107,16 @@ public class AgentAnalysisFilter implements AgentFilter {
 
 		// subpopulation
 		if (this.subpopulation != null) {
-			if (this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") != null) {
+		/*	if (this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") != null) {
 				String subPopulationName = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation");
 				if (!subPopulationName.equals(this.subpopulation)) {
 					return false;
 				}
-			}
+			}*/
 		}
 
 		if (this.personAttributeName != null && this.personAttribute != null) {
-			if (this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), personAttributeName) != null) {
+			/*if (this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), personAttributeName) != null) {
 				String homeZoneName = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), personAttributeName);
 				if (!homeZoneName.equals(this.personAttribute)) {
 					return false;
@@ -124,6 +124,8 @@ public class AgentAnalysisFilter implements AgentFilter {
 			} else {
 				return false;
 			}
+			*/
+
 		}
 
 		if (this.zoneFile != null && this.relevantActivityTypePrefix != null) {

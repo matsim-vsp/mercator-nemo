@@ -122,7 +122,7 @@
         <dependency>
             <groupId>com.github.matsim-org</groupId>
             <artifactId>GTFS2MATSim</artifactId>
-            <version>-SNAPSHOT</version>
+            <version>11.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.SchweizerischeBundesbahnen</groupId>

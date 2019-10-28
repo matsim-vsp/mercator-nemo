@@ -19,49 +19,6 @@
 
 package org.matsim.nemo.runners.smartCity;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import org.apache.log4j.Logger;
-import org.locationtech.jts.geom.Geometry;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
-import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
-import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.routing.DrtRouteFactory;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtConfigs;
-import org.matsim.contrib.drt.run.DrtModule;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.population.algorithms.XY2Links;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.nemo.runners.BikeLinkSpeedCalculator;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 /**
  * This class starts a simulation run with DRT.
  * <p>
@@ -73,6 +30,9 @@ import java.util.stream.Collectors;
  */
 
 public final class RunRuhrgebietSmartCityScenario {
+
+	//TODO If one wants to simulate this scenario have a look at the matsim-berlin scenario for the configuration of a drt set up
+	/*
 
     private static final Logger log = Logger.getLogger(RunRuhrgebietSmartCityScenario.class);
     private static final String drtServiceAreaAttribute = "drtServiceArea";
@@ -204,6 +164,13 @@ public final class RunRuhrgebietSmartCityScenario {
             }
         });
 
+        controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(MainModeIdentifier.class).to(InteractionMainModeIdentifier.class);
+			}
+		});
+
         // adjust the network, to contain drtServiceAreaAttribute used by above RequestValidator
         Collection<Geometry> serviceArea = ShapeFileReader.getAllFeatures(serviceAreaShape.toString()).stream()
                 .map(simpleFeature -> (Geometry) simpleFeature.getDefaultGeometry())
@@ -228,6 +195,12 @@ public final class RunRuhrgebietSmartCityScenario {
 				// change all access egress walks to non_network_walk, to reflect changes in the newest matsim version
 				.forEach(leg -> leg.setMode(TransportMode.non_network_walk));
 
+		/*controler.getScenario().getPopulation().getPersons().values().parallelStream()
+				.flatMap(person -> ((Person) person).getPlans().stream())
+				.flatMap(plan -> TripStructureUtils.getTrips(plan, new StageActivityTypesImpl(" interaction")).stream())
+				.flatMap(trip -> TripStructureUtils.
+*/
+	/*
 		controler.run();
         log.info("Done.");
     }
@@ -242,4 +215,6 @@ public final class RunRuhrgebietSmartCityScenario {
 	}
 
 	private enum RunType {onePercent, reduced}
+
+	*/
 }
