@@ -102,9 +102,9 @@
       		</dependency>
 
         <dependency>
-            <groupId>org.matsim.contrib</groupId>
+            <groupId>org.matsim.vsp.vsp-playgrounds</groupId>
             <artifactId>vsp</artifactId>
-            <version>${matsim.version}</version>
+            <version>0.11.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Include the JUnit testing library -->
