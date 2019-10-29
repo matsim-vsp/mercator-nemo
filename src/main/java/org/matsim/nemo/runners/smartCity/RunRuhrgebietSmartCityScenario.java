@@ -19,31 +19,6 @@
 
 package org.matsim.nemo.runners.smartCity;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
-import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
-import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.routing.DrtRouteFactory;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtConfigs;
-import org.matsim.contrib.drt.run.DrtModule;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.core.config.CommandLine;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.run.RunRuhrgebietScenario;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class starts a simulation run with DRT.
  * 
@@ -55,7 +30,7 @@ import java.util.List;
  */
 
 public final class RunRuhrgebietSmartCityScenario {
-
+/*
 	private static final Logger log = Logger.getLogger(RunRuhrgebietSmartCityScenario.class);
 
 	public static final String DRT_SERVICE_AREA_SHAPE_FILE = "drt-service-area-shape-file";
@@ -176,5 +151,7 @@ public final class RunRuhrgebietSmartCityScenario {
 		controler.run();
 		log.info("Done.");
 	}
+	*/
+
 }
 

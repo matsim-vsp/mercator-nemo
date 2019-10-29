@@ -102,9 +102,9 @@
       		</dependency>
 
         <dependency>
-            <groupId>org.matsim.vsp.vsp-playgrounds</groupId>
+            <groupId>org.matsim.contrib</groupId>
             <artifactId>vsp</artifactId>
-            <version>0.11.0-SNAPSHOT</version>
+            <version>${matsim.version}</version>
         </dependency>
 
         <!-- Include the JUnit testing library -->
@@ -124,7 +124,7 @@
         <dependency>
             <groupId>com.github.matsim-org</groupId>
             <artifactId>GTFS2MATSim</artifactId>
-            <version>-SNAPSHOT</version>
+            <version>11.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.SchweizerischeBundesbahnen</groupId>

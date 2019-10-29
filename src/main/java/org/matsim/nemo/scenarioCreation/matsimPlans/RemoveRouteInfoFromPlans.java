@@ -24,14 +24,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
 * @author ikaddoura
@@ -83,20 +78,13 @@ public class RemoveRouteInfoFromPlans {
 			for (String attribute : attributes) {
 				personNew.getAttributes().putAttribute(attribute, p.getAttributes().getAttribute(attribute));
 			}
-			
-			List<String> types = new ArrayList<>();
-			types.add("car interaction");
-			types.add("pt interaction");
-			types.add("bike interaction");
-			types.add("ride interaction");
 
 			Plan plan = factory.createPlan();
 			
 			Activity firstAct = (Activity) selectedPlan.getPlanElements().get(0);
 			plan.addActivity(firstAct);
-	
-			StageActivityTypes stageActivities = new StageActivityTypesImpl(types);
-			for (Trip trip : TripStructureUtils.getTrips(selectedPlan, stageActivities)) {			
+
+			for (Trip trip : TripStructureUtils.getTrips(selectedPlan)) {
 				MainModeIdentifierOnlyTransitWalkImpl modeIdentifier = new MainModeIdentifierOnlyTransitWalkImpl();
 				String mode = modeIdentifier.identifyMainMode(trip.getTripElements());			
 				plan.addLeg(factory.createLeg(mode));

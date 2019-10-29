@@ -2,6 +2,7 @@ package org.matsim.nemo.runners;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -25,10 +26,9 @@ import org.matsim.nemo.RuhrAgentsFilter;
 import org.matsim.nemo.util.NEMOUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.cadyts.marginals.AgentFilter;
+import playground.vsp.cadyts.marginals.DistanceDistribution;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
-import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
-import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
 import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 
 import javax.inject.Inject;
@@ -100,17 +100,16 @@ public class NemoModeLocationChoiceCalibratorV2 {
         });
 
         // marginal cadyts
-        DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistributionFromMiD(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
-
+        DistanceDistribution distanceDistribution = createDistanceDistribution(0.01);
         RuhrAgentsFilter filter = new RuhrAgentsFilter(scenario, inputDir + "/ruhrgebiet_boundary.shp");
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bind(AgentFilter.class).toProvider(() -> filter);
+                bind(AgentFilter.class).toInstance(filter);
+                bind(DistanceDistribution.class).toInstance(distanceDistribution);
             }
         });
-        controler.addOverridingModule(new ModalDistanceCadytsModule(distanceDistribution));
-
+        controler.addOverridingModule(new ModalDistanceCadytsModule());
 
         // counts cadyts
         controler.addOverridingModule(new CadytsCarModule());
@@ -143,7 +142,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
                 sumScoringFunction.addScoringFunction(scoringFunctionCounts);
 
 
-                final CadytsScoring<ModalDistanceBinIdentifier> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
+                final CadytsScoring<Id<DistanceDistribution.DistanceBin>> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
                         config,
                         marginalCadytsContext);
 
@@ -152,9 +151,6 @@ public class NemoModeLocationChoiceCalibratorV2 {
                 return sumScoringFunction;
             }
         });
-
-        // analyses
-        controler.addOverridingModule(NEMOUtils.createModalShareAnalysis());
         return controler;
     }
 
@@ -186,6 +182,8 @@ public class NemoModeLocationChoiceCalibratorV2 {
         result.controler().setRunId(runId);
         result.controler().setOutputDirectory(outputDirectory);
         result.plansCalcRoute().setInsertingAccessEgressWalk(true);
+        result.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
+
         result.qsim().setUsingTravelTimeCheckInTeleportation(true);
         result.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
         result.strategy().setMaxAgentPlanMemorySize(15);
@@ -206,6 +204,42 @@ public class NemoModeLocationChoiceCalibratorV2 {
         NEMOUtils.createTypicalDurations("other", minDuration, maxDuration, difference).forEach(params -> result.planCalcScore().addActivityParams(params));
 
         return result;
+    }
+
+    private DistanceDistribution createDistanceDistribution(double scalingFactor) {
+
+        DistanceDistribution distanceDistribution = new DistanceDistribution(scalingFactor);
+        distanceDistribution.add(TransportMode.car, 0, 1000, 10000, 357488);
+        distanceDistribution.add(TransportMode.pt, 0, 1000, 10000, 28540);
+        distanceDistribution.add(TransportMode.bike, 0.0, 1000, 10000, 212908);
+        distanceDistribution.add(TransportMode.walk, 0.0, 1000, 10000, 1842358);
+        distanceDistribution.add(TransportMode.ride, 0.0, 1000, 1000, 124379);
+
+        distanceDistribution.add(TransportMode.car, 1000.0, 3000, 10000, 1213004);
+        distanceDistribution.add(TransportMode.pt, 1000.0, 3000, 10000, 437762);
+        distanceDistribution.add(TransportMode.bike, 1000.0, 3000, 10000, 541548);
+        distanceDistribution.add(TransportMode.walk, 1000.0, 3000, 10000, 832557);
+        distanceDistribution.add(TransportMode.ride, 1000.0, 3000, 1000, 483180);
+
+        distanceDistribution.add(TransportMode.car, 3000.0, 5000, 10000, 842537);
+        distanceDistribution.add(TransportMode.pt, 3000.0, 5000, 10000, 323085);
+        distanceDistribution.add(TransportMode.bike, 3000.0, 5000, 10000, 328707);
+        distanceDistribution.add(TransportMode.walk, 3000.0, 5000, 10000, 132547);
+        distanceDistribution.add(TransportMode.ride, 3000.0, 5000, 1000, 232588);
+
+        distanceDistribution.add(TransportMode.car, 5000.0, 10000, 10000, 1274829);
+        distanceDistribution.add(TransportMode.pt, 5000.0, 10000, 10000, 326567);
+        distanceDistribution.add(TransportMode.bike, 5000.0, 10000, 10000, 99804);
+        distanceDistribution.add(TransportMode.walk, 5000.0, 10000, 10000, 68559);
+        distanceDistribution.add(TransportMode.ride, 5000.0, 10000, 1000, 325927);
+
+        distanceDistribution.add(TransportMode.car, 10000.0, 1000000, 10000, 1979366);
+        distanceDistribution.add(TransportMode.pt, 10000.0, 1000000, 10000, 456848);
+        distanceDistribution.add(TransportMode.bike, 10000.0, 1000000, 10000, 63259);
+        distanceDistribution.add(TransportMode.walk, 10000.0, 1000000, 10000, 33138);
+        distanceDistribution.add(TransportMode.ride, 10000.0, 1000000, 1000, 322899);
+
+        return distanceDistribution;
     }
 
     private static class LocationChoiceArguments {
