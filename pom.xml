@@ -126,11 +126,6 @@
             <version>11.1</version>
         </dependency>
         <dependency>
-            <groupId>com.github.SchweizerischeBundesbahnen</groupId>
-            <artifactId>matsim-sbb-extensions</artifactId>
-            <version>0.10.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
