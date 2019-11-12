@@ -7,7 +7,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -146,37 +145,11 @@ public class ModalDistanceAnalysis {
 		return (mode == 0) ? Double.compare(bin1.getDistanceRange().getLowerLimit(), bin2.getDistanceRange().getLowerLimit()) : mode;
 	}
 
-	private String convertDistanceDistributionToString(DistanceDistribution input) {
-		return input.getDistanceBins().stream()
-				.sorted((bin1, bin2) -> {
-					int mode = bin1.getMode().compareTo(bin2.getMode());
-					return (mode == 0) ? Double.compare(bin1.getDistanceRange().getLowerLimit(), bin2.getDistanceRange().getLowerLimit()) : mode;
-				})
-				.map(bin -> " " + bin.getMode() + " " + bin.getValue())
-				.reduce(String::concat)
-				.orElseThrow(() -> new RuntimeException("error0"));
-	}
-
-	private DefaultCategoryDataset createDataset(Collection<NamedDistanceDistribution> distanceDistributions) {
-
-		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-		for (NamedDistanceDistribution ndd : distanceDistributions) {
-
-			DistanceDistribution distribution = ndd.distanceDistribution;
-
-			for (DistanceDistribution.DistanceBin distanceBin : ndd.distanceDistribution.getDistanceBins()) {
-				dataset.addValue(distanceBin.getValue(), ndd.name, distanceBin.getMode());
-			}
-		}
-		return dataset;
-
-	}
-
 	private NamedDistanceDistribution parseEventFile(Path file, DistanceDistribution expectedDistribution) {
 
 		EventsManager manager = EventsUtils.createEventsManager();
 		TripEventHandler tripEventHandler = new TripEventHandler();
+
 		manager.addHandler(tripEventHandler);
 		new MatsimEventsReader(manager).readFile(file.toString());
 
