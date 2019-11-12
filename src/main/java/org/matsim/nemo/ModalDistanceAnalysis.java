@@ -26,11 +26,11 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.nemo.runners.NemoModeLocationChoiceMainModeIdentifier;
 import org.matsim.nemo.util.ExpectedModalDistanceDistribution;
 import playground.vsp.cadyts.marginals.DistanceDistribution;
 
@@ -213,7 +213,7 @@ public class ModalDistanceAnalysis {
 		private final Set<Id<Person>> transitDrivers = new HashSet<>();
 		private final Map<Id<Person>, List<Trip>> personTrips = new HashMap<>();
 		private final Set<Id<Person>> stuckPersons = new HashSet<>();
-		private final MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+		private final MainModeIdentifier mainModeIdentifier = new NemoModeLocationChoiceMainModeIdentifier();
 
 		TripEventHandler(Predicate<Id<Person>> agentFilter) {
 			this.agentFilter = agentFilter;

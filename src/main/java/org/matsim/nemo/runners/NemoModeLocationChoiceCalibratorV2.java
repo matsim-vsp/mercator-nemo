@@ -17,6 +17,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -110,6 +111,8 @@ public class NemoModeLocationChoiceCalibratorV2 {
             public void install() {
                 bind(AgentFilter.class).toInstance(filter);
                 bind(DistanceDistribution.class).toInstance(distanceDistribution);
+                // we use our own main mode identifier
+                bind(MainModeIdentifier.class).to(NemoModeLocationChoiceMainModeIdentifier.class);
             }
         });
         controler.addOverridingModule(new ModalDistanceCadytsModule());
