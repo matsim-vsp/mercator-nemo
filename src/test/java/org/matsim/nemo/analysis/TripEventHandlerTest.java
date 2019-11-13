@@ -11,6 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -18,7 +19,6 @@ import playground.vsp.cadyts.marginals.AgentFilter;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -38,11 +38,10 @@ public class TripEventHandlerTest {
 	 * <p>
 	 * Also one agent is excluded from the recording, to test, whether the agent filter works correctly.
 	 *
-	 * @throws URISyntaxException    stupid api
 	 * @throws MalformedURLException another stupid api
 	 */
 	@Test
-	public void test() throws URISyntaxException, MalformedURLException {
+    public void test() throws MalformedURLException {
 
 		// url is such a weird api
 		URL ptTutorial = URI.create(ExamplesUtils.getTestScenarioURL("pt-tutorial").toString() + "0.config.xml").toURL();
@@ -58,7 +57,7 @@ public class TripEventHandlerTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// this is our test object
-		TripEventHandler objectUnderTest = new TripEventHandler();
+        TripEventHandler objectUnderTest = new TripEventHandler(new MainModeIdentifierImpl(), id -> true);
 
 		// create a controler and bind the event handler to be executed during qsim
 		Controler controler = new Controler(scenario);

@@ -1,6 +1,5 @@
 package org.matsim.nemo.analysis;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
@@ -12,20 +11,24 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.facilities.ActivityFacility;
-import playground.vsp.cadyts.marginals.AgentFilter;
 
 import java.util.*;
+import java.util.function.Predicate;
 
-class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, TransitDriverStartsEventHandler {
+public class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, TransitDriverStartsEventHandler {
 
 	private final Set<Id<Person>> drivers = new HashSet<>();
 	private final Map<Id<Person>, List<TripEventHandler.Trip>> tripToPerson = new HashMap<>();
-	@Inject
-	private MainModeIdentifier mainModeIdentifier;
-	@Inject(optional = true)
-	private AgentFilter agentFilter = id -> true; // by default include all agents
+	private final MainModeIdentifier mainModeIdentifier;
+	private final Predicate<Id<Person>> agentFilter;
 
-	Map<Id<Person>, List<TripEventHandler.Trip>> getTrips() {
+	public TripEventHandler(MainModeIdentifier mainModeIdentifier, Predicate<Id<Person>> agentFilter) {
+
+		this.mainModeIdentifier = mainModeIdentifier;
+		this.agentFilter = agentFilter;
+	}
+
+	public Map<Id<Person>, List<TripEventHandler.Trip>> getTrips() {
 		return new HashMap<>(tripToPerson);
 	}
 
@@ -37,7 +40,7 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (StageActivityTypeIdentifier.isStageActivity(event.getActType()) || drivers.contains(event.getPersonId()) || !agentFilter.includeAgent(event.getPersonId()))
+		if (StageActivityTypeIdentifier.isStageActivity(event.getActType()) || drivers.contains(event.getPersonId()) || !agentFilter.test(event.getPersonId()))
 			return;
 
 		// maybe handle drt? Drt drivers have their own activities
@@ -117,7 +120,7 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 		return trips.get(trips.size() - 1);
 	}
 
-	static class Trip {
+	public static class Trip {
 		private Id<Link> departureLink;
 		private Id<Link> arrivalLink;
 		private double departureTime;
@@ -128,11 +131,11 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 
 		private List<Leg> legs = new ArrayList<>();
 
-		Id<Link> getDepartureLink() {
+		public Id<Link> getDepartureLink() {
 			return departureLink;
 		}
 
-		Id<Link> getArrivalLink() {
+		public Id<Link> getArrivalLink() {
 			return arrivalLink;
 		}
 
@@ -144,11 +147,11 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 			return arrivalTime;
 		}
 
-		Id<ActivityFacility> getDepartureFacility() {
+		public Id<ActivityFacility> getDepartureFacility() {
 			return departureFacility;
 		}
 
-		Id<ActivityFacility> getArrivalFacility() {
+		public Id<ActivityFacility> getArrivalFacility() {
 			return arrivalFacility;
 		}
 

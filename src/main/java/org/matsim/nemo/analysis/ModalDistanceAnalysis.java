@@ -1,34 +1,25 @@
-package org.matsim.nemo;
+package org.matsim.nemo.analysis;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.nemo.RuhrAgentsFilter;
 import org.matsim.nemo.runners.NemoModeLocationChoiceMainModeIdentifier;
 import org.matsim.nemo.util.ExpectedModalDistanceDistribution;
 import playground.vsp.cadyts.marginals.DistanceDistribution;
@@ -39,7 +30,6 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ModalDistanceAnalysis {
@@ -57,6 +47,12 @@ public class ModalDistanceAnalysis {
 
 	@Parameter(names = {"-scalingFactor", "-sf"})
 	private double scalingFactor = 100;
+
+    @Parameter(names = {"-ruhrShape", "-rs"})
+    private String ruhrShapeFile;
+
+    @Parameter(names = {"-outputFile", "-of"})
+    private String outputFile;
 
 	private Scenario scenario;
 	private Network network;
@@ -77,15 +73,16 @@ public class ModalDistanceAnalysis {
 		new MatsimNetworkReader(network).readFile(networkFile);
 
 		DistanceDistribution expectedDistanceDistribution = ExpectedModalDistanceDistribution.create();
+        RuhrAgentsFilter agentsFilter = new RuhrAgentsFilter(this.scenario, this.ruhrShapeFile);
 
 		List<NamedDistanceDistribution> result = eventFiles.parallelStream()
-				.map(eventFile -> parseEventFile(Paths.get(eventFile), expectedDistanceDistribution))
+                .map(eventFile -> parseEventFile(Paths.get(eventFile), expectedDistanceDistribution, agentsFilter))
 				.collect(Collectors.toList());
 
 		// write results to an excel file
-		Workbook wb = new XSSFWorkbook();
+        XSSFWorkbook wb = new XSSFWorkbook();
 
-		Sheet sheet = wb.createSheet("cadytsV3");
+        Sheet sheet = wb.createSheet("modal-distance-split");
 		Row titleRow = sheet.createRow(0);
 		titleRow.createCell(0).setCellValue("mode");
 		titleRow.createCell(1).setCellValue("lower limit");
@@ -134,8 +131,63 @@ public class ModalDistanceAnalysis {
 			cellIndex++;
 		}
 
+        // create second sheet with general modal split
+        Sheet modalSplitSheet = wb.createSheet("modal-split");
+        Row modalTitleRow = modalSplitSheet.createRow(0);
+        modalTitleRow.createCell(0).setCellValue("mode");
+        modalTitleRow.createCell(1).setCellValue("expected count");
 
-		try (OutputStream fileOut = new FileOutputStream("C:\\Users\\Janek\\Desktop\\test.xlsx")) {
+        cellIndex = 2;
+        for (NamedDistanceDistribution namedDistanceDistribution : result) {
+            modalTitleRow.createCell(cellIndex).setCellValue(namedDistanceDistribution.name);
+            cellIndex++;
+        }
+
+        // now calculate expected modal split
+        Map<String, Double> expectedShare = new HashMap<>();
+        for (DistanceDistribution.DistanceBin distanceBin : expectedDistanceDistribution.getDistanceBins()) {
+            expectedShare.merge(distanceBin.getMode(), distanceBin.getValue(), Double::sum);
+        }
+
+        Collection<ModeShare> expectedModeShares = expectedShare.entrySet().stream()
+                .map(share -> new ModeShare(share.getKey(), share.getValue()))
+                .sorted(Comparator.comparing(share -> share.name))
+                .collect(Collectors.toList());
+
+
+        rowIndex = 1;
+        for (ModeShare share : expectedModeShares) {
+
+            Row row = modalSplitSheet.createRow(rowIndex);
+            row.createCell(0).setCellValue(share.name);
+            row.createCell(1).setCellValue(share.value);
+            rowIndex++;
+        }
+
+        rowIndex = 1;
+        cellIndex = 2;
+
+        // now caluculate modal share of event files
+
+        for (NamedDistanceDistribution namedDistanceDistribution : result) {
+
+            Map<String, Double> simulatedShare = new HashMap<>();
+            for (DistanceDistribution.DistanceBin distanceBin : namedDistanceDistribution.distanceDistribution.getDistanceBins()) {
+                simulatedShare.merge(distanceBin.getMode(), distanceBin.getValue(), Double::sum);
+            }
+            Collection<ModeShare> simulatedModeShares = simulatedShare.entrySet().stream()
+                    .map(share -> new ModeShare(share.getKey(), share.getValue()))
+                    .sorted(Comparator.comparing(share -> share.name))
+                    .collect(Collectors.toList());
+            for (ModeShare simulatedModeShare : simulatedModeShares) {
+                modalSplitSheet.getRow(rowIndex).createCell(cellIndex).setCellValue(simulatedModeShare.value * scalingFactor);
+                rowIndex++;
+            }
+            rowIndex = 1;
+            cellIndex++;
+        }
+
+        try (OutputStream fileOut = new FileOutputStream(outputFile)) {
 			wb.write(fileOut);
 		}
 	}
@@ -145,20 +197,21 @@ public class ModalDistanceAnalysis {
 		return (mode == 0) ? Double.compare(bin1.getDistanceRange().getLowerLimit(), bin2.getDistanceRange().getLowerLimit()) : mode;
 	}
 
-	private NamedDistanceDistribution parseEventFile(Path file, DistanceDistribution expectedDistribution) {
+    private NamedDistanceDistribution parseEventFile(Path file, DistanceDistribution expectedDistribution, RuhrAgentsFilter agentsFilter) {
 
 		EventsManager manager = EventsUtils.createEventsManager();
-		TripEventHandler tripEventHandler = new TripEventHandler();
+
+        TripEventHandler tripEventHandler = new TripEventHandler(new NemoModeLocationChoiceMainModeIdentifier(), agentsFilter::includeAgent);
 
 		manager.addHandler(tripEventHandler);
 		new MatsimEventsReader(manager).readFile(file.toString());
 
 		DistanceDistribution simulatedDistribution = expectedDistribution.copyWithEmptyBins();
 
-		tripEventHandler.personTrips.entrySet().parallelStream().flatMap(entry -> entry.getValue().stream())
+        tripEventHandler.getTrips().entrySet().parallelStream().flatMap(entry -> entry.getValue().stream())
 				.forEach(trip -> {
 					double distance = calculateBeelineDistance(trip);
-					simulatedDistribution.increaseCountByOne(trip.mainMode, distance);
+                    simulatedDistribution.increaseCountByOne(trip.getMainMode(), distance);
 				});
 
 		String runId = file.getFileName().toString().split("[.]")[0];
@@ -167,128 +220,16 @@ public class ModalDistanceAnalysis {
 
 	private double calculateBeelineDistance(TripEventHandler.Trip trip) {
 
-		if (scenario.getActivityFacilities().getFacilities().containsKey(trip.departureFacility) ||
-				scenario.getActivityFacilities().getFacilities().containsKey(trip.arrivalFacility)
+        if (scenario.getActivityFacilities().getFacilities().containsKey(trip.getDepartureFacility()) ||
+                scenario.getActivityFacilities().getFacilities().containsKey(trip.getArrivalFacility())
 		) {
-			ActivityFacility departureFacility = scenario.getActivityFacilities().getFacilities().get(trip.departureFacility);
-			ActivityFacility arrivalFacility = scenario.getActivityFacilities().getFacilities().get(trip.arrivalFacility);
+            ActivityFacility departureFacility = scenario.getActivityFacilities().getFacilities().get(trip.getDepartureFacility());
+            ActivityFacility arrivalFacility = scenario.getActivityFacilities().getFacilities().get(trip.getArrivalFacility());
 			return CoordUtils.calcEuclideanDistance(departureFacility.getCoord(), arrivalFacility.getCoord());
 		} else {
-			Link departureLink = network.getLinks().get(trip.departureLink);
-			Link arrivalLink = network.getLinks().get(trip.arrivalLink);
+            Link departureLink = network.getLinks().get(trip.getDepartureLink());
+            Link arrivalLink = network.getLinks().get(trip.getArrivalLink());
 			return CoordUtils.calcEuclideanDistance(departureLink.getToNode().getCoord(), arrivalLink.getToNode().getCoord());
-		}
-	}
-
-	private static class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, TransitDriverStartsEventHandler {
-
-		private final Predicate<Id<Person>> agentFilter;
-		private final Set<Id<Person>> transitDrivers = new HashSet<>();
-		private final Map<Id<Person>, List<Trip>> personTrips = new HashMap<>();
-		private final Set<Id<Person>> stuckPersons = new HashSet<>();
-		private final MainModeIdentifier mainModeIdentifier = new NemoModeLocationChoiceMainModeIdentifier();
-
-		TripEventHandler(Predicate<Id<Person>> agentFilter) {
-			this.agentFilter = agentFilter;
-		}
-
-		TripEventHandler() {
-			this(id -> true);
-		}
-
-		@Override
-		public void handleEvent(ActivityEndEvent activityEndEvent) {
-
-			if (StageActivityTypeIdentifier.isStageActivity(activityEndEvent.getActType())
-					|| transitDrivers.contains(activityEndEvent.getPersonId())
-					|| !agentFilter.test(activityEndEvent.getPersonId()))
-				return;
-
-			if (!personTrips.containsKey(activityEndEvent.getPersonId())) {
-				List<Trip> trips = new ArrayList<>();
-				personTrips.put(activityEndEvent.getPersonId(), trips);
-			}
-
-			Trip trip = new Trip();
-			trip.departureTime = activityEndEvent.getTime();
-			trip.departureLink = activityEndEvent.getLinkId();
-			trip.departureFacility = activityEndEvent.getFacilityId();
-
-			personTrips.get(activityEndEvent.getPersonId()).add(trip);
-		}
-
-		@Override
-		public void handleEvent(ActivityStartEvent activityStartEvent) {
-
-			if (StageActivityTypeIdentifier.isStageActivity(activityStartEvent.getActType()) || !personTrips.containsKey(activityStartEvent.getPersonId()))
-				return;
-
-			Trip trip = getCurrentTrip(activityStartEvent.getPersonId());
-			trip.arrivalTime = activityStartEvent.getTime();
-			trip.arrivalLink = activityStartEvent.getLinkId();
-			trip.arrivalFacility = activityStartEvent.getFacilityId();
-
-			try {
-				trip.mainMode = mainModeIdentifier.identifyMainMode(trip.legs);
-			} catch (Exception e) {
-				// the default main mode identifier can't handle non-network-walk only
-				trip.mainMode = TransportMode.non_network_walk;
-			}
-		}
-
-		@Override
-		public void handleEvent(PersonArrivalEvent personArrivalEvent) {
-
-			if (!personTrips.containsKey(personArrivalEvent.getPersonId()))
-				return;
-
-			Trip trip = getCurrentTrip(personArrivalEvent.getPersonId());
-			Leg leg = trip.legs.get(trip.legs.size() - 1);
-			leg.setTravelTime(personArrivalEvent.getTime() - leg.getDepartureTime());
-		}
-
-		@Override
-		public void handleEvent(PersonDepartureEvent personDepartureEvent) {
-			if (!personTrips.containsKey(personDepartureEvent.getPersonId()))
-				return;
-
-			Leg leg = PopulationUtils.createLeg(personDepartureEvent.getLegMode());
-			leg.setDepartureTime(personDepartureEvent.getTime());
-			leg.setMode(personDepartureEvent.getLegMode());
-			Trip trip = getCurrentTrip(personDepartureEvent.getPersonId());
-			trip.legs.add(leg);
-		}
-
-		@Override
-		public void handleEvent(PersonStuckEvent personStuckEvent) {
-
-			personTrips.remove(personStuckEvent.getPersonId());
-			stuckPersons.add(personStuckEvent.getPersonId());
-		}
-
-		@Override
-		public void handleEvent(TransitDriverStartsEvent transitDriverStartsEvent) {
-			transitDrivers.add(transitDriverStartsEvent.getDriverId());
-		}
-
-		private Trip getCurrentTrip(Id<Person> personId) {
-
-			List<Trip> trips = personTrips.get(personId);
-			return trips.get(trips.size() - 1);
-		}
-
-		private static class Trip {
-
-			private Id<Link> departureLink;
-			private Id<Link> arrivalLink;
-			private double departureTime;
-			private double arrivalTime;
-			private Id<ActivityFacility> departureFacility;
-			private Id<ActivityFacility> arrivalFacility;
-			private String mainMode = TransportMode.other;
-
-			private List<Leg> legs = new ArrayList<>();
-
 		}
 	}
 
@@ -301,4 +242,14 @@ public class ModalDistanceAnalysis {
 			this.distanceDistribution = distanceDistribution;
 		}
 	}
+
+    private static class ModeShare {
+        private String name;
+        private double value;
+
+        ModeShare(String name, double value) {
+            this.name = name;
+            this.value = value;
+        }
+    }
 }

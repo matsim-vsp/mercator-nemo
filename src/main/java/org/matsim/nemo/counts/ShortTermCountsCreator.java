@@ -27,6 +27,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.CellType;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -211,10 +212,10 @@ public class ShortTermCountsCreator extends LongTermCountsCreator {
 				
 				cell = row.getCell(4);
 				boolean isValidData = false;
-				if(cell.getCellType() == 0){
+				if (cell.getCellType() == CellType.NUMERIC) {
 //					System.out.println("cell type is numeric: value=" + cell.getNumericCellValue());
-					
-				} else if(cell.getCellType() == 1){
+
+				} else if (cell.getCellType() == CellType.STRING) {
 					if(cell.getStringCellValue().equals("-")){
 						isValidData = true;
 					}
@@ -273,7 +274,7 @@ public class ShortTermCountsCreator extends LongTermCountsCreator {
 		
 	}
 	int getIntegerValue (HSSFCell cell){
-		if(cell.getCellType() == 0){
+		if (cell.getCellType() == CellType.NUMERIC) {
 			return (int) cell.getNumericCellValue();
 		}else{
 			return Integer.parseInt(cell.getStringCellValue());
