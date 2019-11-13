@@ -60,6 +60,13 @@
             <artifactId>matsim</artifactId>
             <version>${matsim.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.matsim</groupId>
+            <artifactId>matsim</artifactId>
+            <version>${matsim.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Include some MATSim extensions -->
         <dependency>
@@ -79,31 +86,48 @@
             <artifactId>bicycle</artifactId>
             <version>${matsim.version}</version>
         </dependency>
-        
+
         <dependency>
-        		<groupId>org.matsim.contrib</groupId>
- 		       	<artifactId>drt</artifactId>
-        		<version>${matsim.version}</version>
-       			<scope>compile</scope>
-     		</dependency>
-     		
-     		 <dependency>
-        		<groupId>org.matsim.contrib</groupId>
-        		<artifactId>av</artifactId>
-        		<version>${matsim.version}</version>
-        		<scope>compile</scope>
-     	 	</dependency>
-     	 	
-     	 	<dependency>
-        		<groupId>org.matsim.contrib</groupId>
-        		<artifactId>dvrp</artifactId>
-        		<version>${matsim.version}</version>
-        		<scope>compile</scope>
-      		</dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>drt</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>av</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>dvrp</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>vsp</artifactId>
             <version>12.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.matsim</groupId>
+            <artifactId>matsim-examples</artifactId>
+            <version>${matsim.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.1</version>
         </dependency>
 
         <!-- Include the JUnit testing library -->
@@ -112,12 +136,6 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.12</version>
         </dependency>
 
         <dependency>
@@ -130,13 +148,13 @@
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
         </dependency>
-        
+
         <dependency>
-	    		<groupId>com.github.matsim-vsp</groupId>
-	    		<artifactId>matsim-ruhrgebiet</artifactId>
-				<version>1.0</version>
-			</dependency>
-        
+            <groupId>com.github.matsim-vsp</groupId>
+            <artifactId>matsim-ruhrgebiet</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

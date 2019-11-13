@@ -17,12 +17,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import org.matsim.nemo.RuhrAgentsFilter;
+import org.matsim.nemo.util.ExpectedModalDistanceDistribution;
 import org.matsim.nemo.util.NEMOUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.cadyts.marginals.AgentFilter;
@@ -102,13 +104,15 @@ public class NemoModeLocationChoiceCalibratorV2 {
         });
 
         // marginal cadyts
-		DistanceDistribution distanceDistribution = createDistanceDistribution(this.sampleSize);
+		DistanceDistribution distanceDistribution = ExpectedModalDistanceDistribution.create();
         RuhrAgentsFilter filter = new RuhrAgentsFilter(scenario, inputDir + "/ruhrgebiet_boundary.shp");
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bind(AgentFilter.class).toInstance(filter);
                 bind(DistanceDistribution.class).toInstance(distanceDistribution);
+                // we use our own main mode identifier
+                bind(MainModeIdentifier.class).to(NemoModeLocationChoiceMainModeIdentifier.class);
             }
         });
         controler.addOverridingModule(new ModalDistanceCadytsModule());
@@ -206,42 +210,6 @@ public class NemoModeLocationChoiceCalibratorV2 {
         NEMOUtils.createTypicalDurations("other", minDuration, maxDuration, difference).forEach(params -> result.planCalcScore().addActivityParams(params));
 
         return result;
-    }
-
-    private DistanceDistribution createDistanceDistribution(double scalingFactor) {
-
-        DistanceDistribution distanceDistribution = new DistanceDistribution(scalingFactor);
-        distanceDistribution.add(TransportMode.car, 0, 1000, 10000, 357488);
-        distanceDistribution.add(TransportMode.pt, 0, 1000, 10000, 28540);
-        distanceDistribution.add(TransportMode.bike, 0.0, 1000, 10000, 212908);
-        distanceDistribution.add(TransportMode.walk, 0.0, 1000, 10000, 1842358);
-        distanceDistribution.add(TransportMode.ride, 0.0, 1000, 1000, 124379);
-
-        distanceDistribution.add(TransportMode.car, 1000.0, 3000, 10000, 1213004);
-        distanceDistribution.add(TransportMode.pt, 1000.0, 3000, 10000, 437762);
-        distanceDistribution.add(TransportMode.bike, 1000.0, 3000, 10000, 541548);
-        distanceDistribution.add(TransportMode.walk, 1000.0, 3000, 10000, 832557);
-        distanceDistribution.add(TransportMode.ride, 1000.0, 3000, 1000, 483180);
-
-        distanceDistribution.add(TransportMode.car, 3000.0, 5000, 10000, 842537);
-        distanceDistribution.add(TransportMode.pt, 3000.0, 5000, 10000, 323085);
-        distanceDistribution.add(TransportMode.bike, 3000.0, 5000, 10000, 328707);
-        distanceDistribution.add(TransportMode.walk, 3000.0, 5000, 10000, 132547);
-        distanceDistribution.add(TransportMode.ride, 3000.0, 5000, 1000, 232588);
-
-        distanceDistribution.add(TransportMode.car, 5000.0, 10000, 10000, 1274829);
-        distanceDistribution.add(TransportMode.pt, 5000.0, 10000, 10000, 326567);
-        distanceDistribution.add(TransportMode.bike, 5000.0, 10000, 10000, 99804);
-        distanceDistribution.add(TransportMode.walk, 5000.0, 10000, 10000, 68559);
-        distanceDistribution.add(TransportMode.ride, 5000.0, 10000, 1000, 325927);
-
-        distanceDistribution.add(TransportMode.car, 10000.0, 1000000, 10000, 1979366);
-        distanceDistribution.add(TransportMode.pt, 10000.0, 1000000, 10000, 456848);
-        distanceDistribution.add(TransportMode.bike, 10000.0, 1000000, 10000, 63259);
-        distanceDistribution.add(TransportMode.walk, 10000.0, 1000000, 10000, 33138);
-        distanceDistribution.add(TransportMode.ride, 10000.0, 1000000, 1000, 322899);
-
-        return distanceDistribution;
     }
 
     private static class LocationChoiceArguments {
