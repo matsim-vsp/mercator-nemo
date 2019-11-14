@@ -104,6 +104,7 @@ public class ModalDistanceAnalysis {
 				.collect(Collectors.toList());
 
 		int rowIndex = 1; // start with one, since we used 0 for header
+        int expectedSum = 0;
 		for (DistanceDistribution.DistanceBin expectedBin : expectedBins) {
 
 			Row row = sheet.createRow(rowIndex);
@@ -111,8 +112,13 @@ public class ModalDistanceAnalysis {
 			row.createCell(1).setCellValue(expectedBin.getDistanceRange().getLowerLimit());
 			row.createCell(2).setCellValue(expectedBin.getDistanceRange().getUpperLimit());
 			row.createCell(3).setCellValue(expectedBin.getValue());
+            expectedSum += expectedBin.getValue();
 			rowIndex++;
 		}
+        Row expectedSumRow = sheet.createRow(rowIndex);
+        expectedSumRow.createCell(0).setCellValue("sum");
+        expectedSumRow.createCell(3).setCellValue(expectedSum);
+
 
 		// now write values of simulated
 		rowIndex = 1;
@@ -124,11 +130,15 @@ public class ModalDistanceAnalysis {
 					.sorted(this::compareBinsByModeAndDistanceRange)
 					.collect(Collectors.toList());
 
+            int distributionSum = 0;
 			for (DistanceDistribution.DistanceBin bin : bins) {
 
 				sheet.getRow(rowIndex).createCell(cellIndex).setCellValue(bin.getValue() * scalingFactor);
+                distributionSum += bin.getValue() * scalingFactor;
 				rowIndex++;
 			}
+            sheet.getRow(rowIndex).createCell(cellIndex).setCellValue(distributionSum);
+
 			rowIndex = 1;
 			cellIndex++;
 		}
@@ -158,13 +168,18 @@ public class ModalDistanceAnalysis {
 
 
         rowIndex = 1;
+        expectedSum = 0;
         for (ModeShare share : expectedModeShares) {
 
             Row row = modalSplitSheet.createRow(rowIndex);
             row.createCell(0).setCellValue(share.name);
             row.createCell(1).setCellValue(share.value);
+            expectedSum += share.value;
             rowIndex++;
         }
+        modalSplitSheet.createRow(rowIndex).createCell(0).setCellValue("sum");
+        modalSplitSheet.getRow(rowIndex).createCell(1).setCellValue(expectedSum);
+
 
         rowIndex = 1;
         cellIndex = 2;
@@ -173,6 +188,7 @@ public class ModalDistanceAnalysis {
 
         for (NamedDistanceDistribution namedDistanceDistribution : result) {
 
+            int simulatedSum = 0;
             Map<String, Double> simulatedShare = new HashMap<>();
             for (DistanceDistribution.DistanceBin distanceBin : namedDistanceDistribution.distanceDistribution.getDistanceBins()) {
                 simulatedShare.merge(distanceBin.getMode(), distanceBin.getValue(), Double::sum);
@@ -181,10 +197,13 @@ public class ModalDistanceAnalysis {
                     .map(share -> new ModeShare(share.getKey(), share.getValue()))
                     .sorted(Comparator.comparing(share -> share.name))
                     .collect(Collectors.toList());
+
             for (ModeShare simulatedModeShare : simulatedModeShares) {
                 modalSplitSheet.getRow(rowIndex).createCell(cellIndex).setCellValue(simulatedModeShare.value * scalingFactor);
+                simulatedSum += simulatedModeShare.value * scalingFactor;
                 rowIndex++;
             }
+            modalSplitSheet.getRow(rowIndex).createCell(cellIndex).setCellValue(simulatedSum);
             rowIndex = 1;
             cellIndex++;
         }

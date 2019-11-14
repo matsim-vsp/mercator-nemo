@@ -48,7 +48,7 @@ public class RuhrAgentsFilter implements AgentFilter {
 
     public RuhrAgentsFilter(Scenario scenario, Collection<SimpleFeature> shape) {
 
-        logger.info("creating RuhrAgentsFilter. Start with reading shape file");
+        final Function<Activity, Coord> coordProvider = getCoordProvider(scenario);
 
         logger.info("testing for all agents whether they have their home coord within the supplied shape");
         // go for the giant stream statement here, since the isInside shape test is expensive and we can parallelize this way
@@ -58,10 +58,10 @@ public class RuhrAgentsFilter implements AgentFilter {
                 .filter(person -> (person.getSelectedPlan().getPlanElements().get(0) instanceof Activity))
                 .map(person -> Tuple.of(person.getId(), (Activity) person.getSelectedPlan().getPlanElements().get(0)))
                 .filter(personActivity -> personActivity.getSecond().getType().startsWith("home"))
-                .collect(Collectors.toMap(Tuple::getFirst, personActivity -> isActivityInside(getCoordProvider(scenario).apply(personActivity.getSecond()), shape)));
+                .collect(Collectors.toMap(Tuple::getFirst, personActivity -> isActivityInside(coordProvider.apply(personActivity.getSecond()), shape)));
     }
 
-    private Function<Activity, Coord> getCoordProvider(Scenario scenario) {
+    private static Function<Activity, Coord> getCoordProvider(Scenario scenario) {
 
         if (scenario.getActivityFacilities().getFacilities().isEmpty()) {
             return Activity::getCoord;
@@ -70,7 +70,7 @@ public class RuhrAgentsFilter implements AgentFilter {
         }
     }
 
-    private boolean isActivityInside(Coord coord, Collection<? extends SimpleFeature> features) {
+    private static boolean isActivityInside(Coord coord, Collection<? extends SimpleFeature> features) {
 
         return features.stream()
                 .map(feature -> (Geometry) feature.getDefaultGeometry())

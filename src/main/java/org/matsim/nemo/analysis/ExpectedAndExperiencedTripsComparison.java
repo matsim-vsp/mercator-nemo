@@ -27,9 +27,11 @@ import playground.vsp.cadyts.marginals.DistanceDistribution;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ExpectedAndExperiencedTripsComparison {
 
@@ -63,6 +65,7 @@ public class ExpectedAndExperiencedTripsComparison {
         new PopulationReader(scenario).readFile(populationFile);
         RuhrAgentsFilter agentsFilter = new RuhrAgentsFilter(this.scenario, ShapeFileReader.getAllFeatures(this.ruhrShapeFile));
 
+
         network = NetworkUtils.createNetwork();
         new MatsimNetworkReader(network).readFile(networkFile);
 
@@ -82,7 +85,19 @@ public class ExpectedAndExperiencedTripsComparison {
             expectedTrips.put(value.getId(), trips);
         }
 
+        int personsWithinShape = 0;
+        Map<Id<Person>, Person> excluded = new HashMap<>();
+        for (Person person : scenario.getPopulation().getPersons().values()) {
+            if (agentsFilter.includeAgent(person.getId())) personsWithinShape++;
+            else excluded.put(person.getId(), person);
+        }
+
         // assert that the correct amount of trips was counted
+        Map<Id<Person>, List<TripEventHandler.Trip>> observedTrips = tripEventHandler.getTrips();
+        List<TripEventHandler.Trip> flattenedObservedTrips = observedTrips.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+
+
+
         for (Map.Entry<Id<Person>, List<TripEventHandler.Trip>> idListEntry : tripEventHandler.getTrips().entrySet()) {
             List<TripStructureUtils.Trip> tripsFromPlan = expectedTrips.get(idListEntry.getKey());
             assert idListEntry.getValue().size() == tripsFromPlan.size();
