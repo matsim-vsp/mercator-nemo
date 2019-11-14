@@ -44,7 +44,6 @@ public class NemoModeLocationChoiceCalibratorV2 {
     private final String outputDirectory;
     private final double cadytsCountsWeight;
     private final double cadytsMarginalsWeight;
-	private final double sampleSize;
     private Config config;
     private Scenario scenario;
     private Controler controler;
@@ -59,7 +58,6 @@ public class NemoModeLocationChoiceCalibratorV2 {
         this.outputDirectory = arguments.outputDir;
         this.cadytsCountsWeight = arguments.countsWeight;
         this.cadytsMarginalsWeight = arguments.marginalsWeight;
-		this.sampleSize = arguments.sampleSize;
     }
 
     public static void main(String[] args) {
@@ -228,8 +226,5 @@ public class NemoModeLocationChoiceCalibratorV2 {
 
         @Parameter(names = "-marginalsWeight")
         double marginalsWeight = 5.0;
-
-		@Parameter(names = "-sampleSize")
-		double sampleSize = 0.01;
     }
 }
