@@ -12,14 +12,15 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.vsp.cadyts.marginals.AgentFilter;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +57,16 @@ public class TripEventHandlerTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+        Map<Id<Person>, List<TripStructureUtils.Trip>> expectedTrips = new HashMap<>();
+
+        for (Person value : scenario.getPopulation().getPersons().values()) {
+            List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(value.getSelectedPlan());
+            expectedTrips.put(value.getId(), trips);
+        }
+
 		// this is our test object
-        TripEventHandler objectUnderTest = new TripEventHandler(new MainModeIdentifierImpl(), id -> true);
+        // exclude agent with id -> 876
+        TripEventHandler objectUnderTest = new TripEventHandler(new MainModeIdentifierImpl(), id -> !id.equals(Id.createPersonId("876")));
 
 		// create a controler and bind the event handler to be executed during qsim
 		Controler controler = new Controler(scenario);
@@ -65,8 +74,6 @@ public class TripEventHandlerTest {
 			@Override
 			public void install() {
 				addEventHandlerBinding().toInstance(objectUnderTest);
-				// exclude agent with id -> 876
-				bind(AgentFilter.class).toInstance(id -> !id.equals(Id.createPersonId("876")));
 			}
 		});
 		controler.run();
@@ -77,6 +84,12 @@ public class TripEventHandlerTest {
 		// assert that every person was recorded except agent-876
 		assertEquals(scenario.getPopulation().getPersons().size() - 1, personTrips.size());
 		assertFalse(personTrips.containsKey(Id.createPersonId("876")));
+
+        // assert that the correct amount of trips was counted
+        for (Map.Entry<Id<Person>, List<TripEventHandler.Trip>> idListEntry : personTrips.entrySet()) {
+            List<TripStructureUtils.Trip> tripsFromPlan = expectedTrips.get(idListEntry.getKey());
+            assertEquals(tripsFromPlan.size(), idListEntry.getValue().size());
+        }
 
 		// assert a certain person has done a car trip
 		List<TripEventHandler.Trip> tripsOfPerson101 = personTrips.get(Id.createPersonId("101"));

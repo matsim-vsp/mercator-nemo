@@ -23,6 +23,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.nemo.RuhrAgentsFilter;
 import org.matsim.nemo.util.ExpectedModalDistanceDistribution;
 import org.matsim.nemo.util.NEMOUtils;
@@ -103,7 +104,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
 
         // marginal cadyts
 		DistanceDistribution distanceDistribution = ExpectedModalDistanceDistribution.create();
-        RuhrAgentsFilter filter = new RuhrAgentsFilter(scenario, inputDir + "/ruhrgebiet_boundary.shp");
+        RuhrAgentsFilter filter = new RuhrAgentsFilter(scenario, ShapeFileReader.getAllFeatures(inputDir + "/ruhrgebiet_boundary.shp"));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

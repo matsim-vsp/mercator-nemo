@@ -18,6 +18,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.nemo.RuhrAgentsFilter;
 import org.matsim.nemo.runners.NemoModeLocationChoiceMainModeIdentifier;
@@ -68,12 +69,13 @@ public class ModalDistanceAnalysis {
 
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenario).readFile(populationFile);
+        RuhrAgentsFilter agentsFilter = new RuhrAgentsFilter(this.scenario, ShapeFileReader.getAllFeatures(this.ruhrShapeFile));
 
 		network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 
 		DistanceDistribution expectedDistanceDistribution = ExpectedModalDistanceDistribution.create();
-        RuhrAgentsFilter agentsFilter = new RuhrAgentsFilter(this.scenario, this.ruhrShapeFile);
+
 
 		List<NamedDistanceDistribution> result = eventFiles.parallelStream()
                 .map(eventFile -> parseEventFile(Paths.get(eventFile), expectedDistanceDistribution, agentsFilter))
@@ -190,6 +192,8 @@ public class ModalDistanceAnalysis {
         try (OutputStream fileOut = new FileOutputStream(outputFile)) {
 			wb.write(fileOut);
 		}
+
+        logger.info("Finished writing analysis to: " + outputFile);
 	}
 
 	private int compareBinsByModeAndDistanceRange(DistanceDistribution.DistanceBin bin1, DistanceDistribution.DistanceBin bin2) {
@@ -215,6 +219,11 @@ public class ModalDistanceAnalysis {
 				});
 
 		String runId = file.getFileName().toString().split("[.]")[0];
+
+        if (tripEventHandler.getStuckPersons().size() > 0) {
+            logger.warn("Run: " + runId + " had " + tripEventHandler.getStuckPersons().size() + " stuck agents.");
+        }
+
 		return new NamedDistanceDistribution(runId, simulatedDistribution);
 	}
 

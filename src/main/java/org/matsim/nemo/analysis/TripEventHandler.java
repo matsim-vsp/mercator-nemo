@@ -21,6 +21,7 @@ public class TripEventHandler implements ActivityEndEventHandler, ActivityStartE
 	private final Map<Id<Person>, List<TripEventHandler.Trip>> tripToPerson = new HashMap<>();
 	private final MainModeIdentifier mainModeIdentifier;
 	private final Predicate<Id<Person>> agentFilter;
+    private Set<Id<Person>> stuck = new HashSet<>();
 
 	public TripEventHandler(MainModeIdentifier mainModeIdentifier, Predicate<Id<Person>> agentFilter) {
 
@@ -31,6 +32,10 @@ public class TripEventHandler implements ActivityEndEventHandler, ActivityStartE
 	public Map<Id<Person>, List<TripEventHandler.Trip>> getTrips() {
 		return new HashMap<>(tripToPerson);
 	}
+
+    public Set<Id<Person>> getStuckPersons() {
+        return new HashSet<>(stuck);
+    }
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -107,6 +112,7 @@ public class TripEventHandler implements ActivityEndEventHandler, ActivityStartE
 	public void handleEvent(PersonStuckEvent event) {
 
 		tripToPerson.remove(event.getPersonId());
+        stuck.add(event.getPersonId());
 	}
 
 	@Override
