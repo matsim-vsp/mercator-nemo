@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
@@ -167,6 +168,14 @@ public class NemoModeLocationChoiceCalibratorV2 {
 
         // add stay home plan if it does not exists
         for (Person person : result.getPopulation().getPersons().values()) {
+
+			// use pt as starting mode, because it is teleported and safes runtime
+			person.getPlans().stream()
+					.flatMap(plan -> plan.getPlanElements().stream())
+					.filter(element -> element instanceof Leg)
+					.map(element -> (Leg) element)
+					.forEach(leg -> leg.setMode(TransportMode.pt));
+
             if (person.getPlans().stream().noneMatch(pl -> pl.getPlanElements().size() == 1)) {
 
                 Plan stayHome = result.getPopulation().getFactory().createPlan();
