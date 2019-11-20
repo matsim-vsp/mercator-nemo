@@ -7,18 +7,17 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class UnZipFile {
+class UnZipFile {
 	
 	Logger log = Logger.getLogger(UnZipFile.class);
 
-	public File unZipFile(File src) throws IOException {
+	File unZipFile(File src) throws IOException {
 //	 log.info("trying to unzip file " + src.getName());
-	  String newPath = "";
-	  String filePath = src.getAbsolutePath();
+		String filePath = src.getAbsolutePath();
 	  ZipFile zFile = new ZipFile(src);
 	  File unzippedFolder = new File(filePath.substring(0, filePath.lastIndexOf('.')));
 	  unzippedFolder.mkdir();
-	  newPath = filePath.substring(0,filePath.lastIndexOf('.'));
+		String newPath = filePath.substring(0, filePath.lastIndexOf('.'));
 	  
 	  Enumeration<? extends ZipEntry> entries = zFile.entries();
 	  boolean hasUnzippedOneTextFile = false;
@@ -41,11 +40,10 @@ public class UnZipFile {
  private void saveEntry(ZipFile zFile, ZipEntry anEntry, String newPath) throws IOException {
 	  InputStream in = null;
 	  BufferedOutputStream fos = null;
-	   
-	  File aFile = null;
-	  try{
-		   aFile = new File(newPath +"/" + anEntry.getName());
-		   aFile.getParentFile().mkdirs();
+
+	 try {
+		 File aFile = new File(newPath + "/" + anEntry.getName());
+		 aFile.getParentFile().mkdirs();
 		   in = zFile.getInputStream(anEntry);
 		   fos = new BufferedOutputStream(new FileOutputStream(aFile));
 		   byte[] buffer = new byte[1024];

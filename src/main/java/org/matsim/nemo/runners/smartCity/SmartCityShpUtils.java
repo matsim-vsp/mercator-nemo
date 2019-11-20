@@ -38,60 +38,27 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * @author ikaddoura
- */
+* @author ikaddoura
+*/
 
-public final class BerlinShpUtils {
+public final class SmartCityShpUtils {
 
 	private Map<Integer, Geometry> carRestrictedAreaGeometries;
 	private Map<Integer, Geometry> serviceAreaGeometries;
 
-	public BerlinShpUtils(String carRestrictedAreaShpFile, String drtServiceAreaShapeFile) {
-
-		if (carRestrictedAreaShpFile != null && carRestrictedAreaShpFile != "" && carRestrictedAreaShpFile != "null") {
+	public SmartCityShpUtils(String carRestrictedAreaShpFile, String drtServiceAreaShapeFile) {
+		
+		if (carRestrictedAreaShpFile != null && carRestrictedAreaShpFile != "" && carRestrictedAreaShpFile != "null" ) {
 			this.carRestrictedAreaGeometries = loadShapeFile(carRestrictedAreaShpFile);
 		}
-
-		if (drtServiceAreaShapeFile != null && drtServiceAreaShapeFile != "" && drtServiceAreaShapeFile != "null") {
+		
+		if (drtServiceAreaShapeFile != null && drtServiceAreaShapeFile != "" && drtServiceAreaShapeFile != "null" ) {
 			this.serviceAreaGeometries = loadShapeFile(drtServiceAreaShapeFile);
 		}
 	}
 
-	public BerlinShpUtils(String serviceAreaShapeFile) {
+	public SmartCityShpUtils(String serviceAreaShapeFile) {
 		this(null, serviceAreaShapeFile);
-	}
-
-	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
-		try {
-			FileDataStore store = FileDataStoreFinder.getDataStore(url);
-			SimpleFeatureSource featureSource = store.getFeatureSource();
-
-			SimpleFeatureIterator it = featureSource.getFeatures().features();
-			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
-			while (it.hasNext()) {
-				SimpleFeature ft = it.next();
-				featureSet.add(ft);
-			}
-			it.close();
-			store.dispose();
-			return featureSet;
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	private static Point getRandomPointInFeature(Random rnd, Geometry g) {
-		Point p = null;
-		double x, y;
-		do {
-			x = g.getEnvelopeInternal().getMinX() + rnd.nextDouble()
-					* (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
-			y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble()
-					* (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
-			p = MGC.xy2Point(x, y);
-		}
-		while (!g.contains(p));
-		return p;
 	}
 
 	private Map<Integer, Geometry> loadShapeFile(String shapeFile) {
@@ -99,7 +66,7 @@ public final class BerlinShpUtils {
 
 		Collection<SimpleFeature> features = null;
 		if (new File(shapeFile).exists()) {
-			features = ShapeFileReader.getAllFeatures(shapeFile);
+			features = ShapeFileReader.getAllFeatures(shapeFile);	
 		} else {
 			try {
 				features = getAllFeatures(new URL(shapeFile));
@@ -135,10 +102,44 @@ public final class BerlinShpUtils {
 		}
 		return coordInArea;
 	}
+	
+	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
+		try {
+			FileDataStore store = FileDataStoreFinder.getDataStore(url);
+			SimpleFeatureSource featureSource = store.getFeatureSource();
 
+			SimpleFeatureIterator it = featureSource.getFeatures().features();
+			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
+			while (it.hasNext()) {
+				SimpleFeature ft = it.next();
+				featureSet.add(ft);
+			}
+			it.close();
+			store.dispose();
+			return featureSet;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+	
 	public Point getRandomPointInServiceArea(Random random) {
 		return getRandomPointInFeature(random, serviceAreaGeometries.get(random.nextInt(serviceAreaGeometries.size())));
 	}
-
+	
+	private static Point getRandomPointInFeature(Random rnd, Geometry g)
+    {
+        Point p = null;
+        double x, y;
+        do {
+            x = g.getEnvelopeInternal().getMinX() + rnd.nextDouble()
+                    * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
+            y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble()
+                    * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
+            p = MGC.xy2Point(x, y);
+        }
+        while (!g.contains(p));
+        return p;
+    }
+	
 }
 

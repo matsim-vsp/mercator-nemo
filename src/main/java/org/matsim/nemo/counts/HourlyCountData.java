@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package org.matsim.nemo.counts;
 
 import java.util.HashMap;
@@ -19,21 +17,21 @@ public class HourlyCountData{
 	private HashMap<Integer,Double> R1VolumesPerHour;
 	private HashMap<Integer,Double> R2VolumesPerHour;
 
-	
-	public HourlyCountData(String id, Day representedDay){
+
+	HourlyCountData(String id, Day representedDay) {
 		this.id = id;
 		this.representedDay = representedDay;
-		this.R1VolumesPerHour = new HashMap<Integer, Double>();
-		this.R2VolumesPerHour = new HashMap<Integer, Double>();
-		this.R1Divisors = new HashMap<Integer,Integer>();
-		this.R2Divisors = new HashMap<Integer,Integer>();
+		this.R1VolumesPerHour = new HashMap<>();
+		this.R2VolumesPerHour = new HashMap<>();
+		this.R1Divisors = new HashMap<>();
+		this.R2Divisors = new HashMap<>();
 	}
-	
-	public Map<Integer,Double> getR1Values(){
+
+	Map<Integer, Double> getR1Values() {
 		return this.R1VolumesPerHour;
 	}
-	
-	public Map<Integer,Double> getR2Values(){
+
+	Map<Integer, Double> getR2Values() {
 		return this.R2VolumesPerHour;
 	}
 	
@@ -45,8 +43,8 @@ public class HourlyCountData{
 	public Day getRepresentedDay() {
 		return representedDay;
 	}
-	
-	public void computeAndSetVolume(boolean direction1, int hour, double value){
+
+	void computeAndSetVolume(boolean direction1, int hour, double value) {
 		if(direction1){
 			Integer divisor = this.R1Divisors.get(hour); 
 			if(divisor != null){
@@ -84,15 +82,15 @@ public class HourlyCountData{
 	
 	@Override
 	public String toString(){
-		String str = "Zählstelle:\t" + this.id + "\n - RICHTUNG 1 - : \n";
+		StringBuilder str = new StringBuilder("Zählstelle:\t" + this.id + "\n - RICHTUNG 1 - : \n");
 		for(Integer hour : this.R1VolumesPerHour.keySet()){
-			str += "Std " + hour + "\t" + this.R1VolumesPerHour.get(hour) + "\n";
+			str.append("Std ").append(hour).append("\t").append(this.R1VolumesPerHour.get(hour)).append("\n");
 		}
-		str += "\n -RICHTUNG 2 : \n";
+		str.append("\n -RICHTUNG 2 : \n");
 		for(Integer hour : this.R2VolumesPerHour.keySet()){
-			str += "Std " + hour + "\t" + this.R2VolumesPerHour.get(hour) + "\n";
+			str.append("Std ").append(hour).append("\t").append(this.R2VolumesPerHour.get(hour)).append("\n");
 		}
-		return str;
+		return str.toString();
 	}
 	
 	

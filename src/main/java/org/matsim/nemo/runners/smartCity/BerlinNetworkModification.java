@@ -28,8 +28,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
-* @author ikaddoura
-*/
+ * @author ikaddoura
+ */
 
 public final class BerlinNetworkModification {
 	private static final Logger log = Logger.getLogger(BerlinNetworkModification.class);
@@ -38,9 +38,9 @@ public final class BerlinNetworkModification {
 	public BerlinNetworkModification(BerlinShpUtils shpUtils) {
 		this.shpUtils = shpUtils;
 	}
-	
+
 	public void addSAVmode(Scenario scenario, String taxiNetworkMode, String serviceAreaAttribute) {
-		
+
 		log.info("Adjusting network...");
 
 		int counter = 0;

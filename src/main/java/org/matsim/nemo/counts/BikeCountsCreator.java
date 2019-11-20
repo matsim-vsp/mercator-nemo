@@ -16,9 +16,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.nemo.counts;
 
 import org.matsim.api.core.v01.Id;
@@ -68,13 +65,13 @@ public class BikeCountsCreator {
 	private File countDataFile;
 	private File countLocalisationFile;
 	private final Network network;
-	private Map<String,HourlyCountData> countDataMap = new HashMap<String,HourlyCountData>();
-	private Map<String,Id<Link>> linkIDsOfCounts = new HashMap<String,Id<Link>>();
+	private Map<String, HourlyCountData> countDataMap = new HashMap<>();
+	private Map<String, Id<Link>> linkIDsOfCounts = new HashMap<>();
 	private String output;
 	/**
 	 * 
 	 */
-	BikeCountsCreator(String inputDataFile, String inputLocalisationFile, String outputPath) {
+	private BikeCountsCreator(String inputDataFile, String inputLocalisationFile, String outputPath) {
 		countDataFile = new File(inputDataFile);
 		countLocalisationFile = new File(inputLocalisationFile);
 		if(!countDataFile.exists() || !countLocalisationFile.exists()){
@@ -89,9 +86,6 @@ public class BikeCountsCreator {
 		this.output = outputDir.getAbsolutePath() + "/";
 	}
 
-	/**
-	 * @param networkFile
-	 */
 	private void readNetwork(String networkFile) {
 		log.info("Start reading the network...");
 		MatsimNetworkReader reader = new MatsimNetworkReader(network);
@@ -115,8 +109,8 @@ public class BikeCountsCreator {
 		Counts container = new Counts();
 		container.setDescription(description);
 		container.setYear(LocalDate.now().getYear());
-		
-		List<String> allDataStations = new ArrayList<String>();
+
+		List<String> allDataStations = new ArrayList<>();
 		allDataStations.addAll(this.countDataMap.keySet());
 		int cnt = 0;
 		for(String stationID : this.countDataMap.keySet()){
