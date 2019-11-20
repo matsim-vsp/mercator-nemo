@@ -2,10 +2,12 @@ package org.matsim.nemo.runners;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
@@ -16,19 +18,21 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.nemo.RuhrAgentsFilter;
+import org.matsim.nemo.util.ExpectedModalDistanceDistribution;
 import org.matsim.nemo.util.NEMOUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import playground.vsp.cadyts.marginals.AgentFilter;
+import playground.vsp.cadyts.marginals.DistanceDistribution;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
 import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
-import playground.vsp.cadyts.marginals.prep.DistanceDistribution;
-import playground.vsp.cadyts.marginals.prep.ModalDistanceBinIdentifier;
 import playground.vsp.planselectors.InitialPlanKeeperPlanRemoval;
 
 import javax.inject.Inject;
@@ -100,17 +104,18 @@ public class NemoModeLocationChoiceCalibratorV2 {
         });
 
         // marginal cadyts
-        DistanceDistribution distanceDistribution = NEMOUtils.getDistanceDistributionFromMiD(scenario.getConfig().counts().getCountsScaleFactor(), scenario.getConfig().plansCalcRoute());
-
-        RuhrAgentsFilter filter = new RuhrAgentsFilter(scenario, inputDir + "/ruhrgebiet_boundary.shp");
+		DistanceDistribution distanceDistribution = ExpectedModalDistanceDistribution.create();
+        RuhrAgentsFilter filter = new RuhrAgentsFilter(scenario, ShapeFileReader.getAllFeatures(inputDir + "/ruhrgebiet_boundary.shp"));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bind(AgentFilter.class).toProvider(() -> filter);
+                bind(AgentFilter.class).toInstance(filter);
+                bind(DistanceDistribution.class).toInstance(distanceDistribution);
+                // we use our own main mode identifier
+                bind(MainModeIdentifier.class).to(NemoModeLocationChoiceMainModeIdentifier.class);
             }
         });
-        controler.addOverridingModule(new ModalDistanceCadytsModule(distanceDistribution));
-
+        controler.addOverridingModule(new ModalDistanceCadytsModule());
 
         // counts cadyts
         controler.addOverridingModule(new CadytsCarModule());
@@ -143,7 +148,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
                 sumScoringFunction.addScoringFunction(scoringFunctionCounts);
 
 
-                final CadytsScoring<ModalDistanceBinIdentifier> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
+                final CadytsScoring<Id<DistanceDistribution.DistanceBin>> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
                         config,
                         marginalCadytsContext);
 
@@ -152,9 +157,6 @@ public class NemoModeLocationChoiceCalibratorV2 {
                 return sumScoringFunction;
             }
         });
-
-        // analyses
-        controler.addOverridingModule(NEMOUtils.createModalShareAnalysis());
         return controler;
     }
 
@@ -166,6 +168,14 @@ public class NemoModeLocationChoiceCalibratorV2 {
 
         // add stay home plan if it does not exists
         for (Person person : result.getPopulation().getPersons().values()) {
+
+			// use pt as starting mode, because it is teleported and safes runtime
+			person.getPlans().stream()
+					.flatMap(plan -> plan.getPlanElements().stream())
+					.filter(element -> element instanceof Leg)
+					.map(element -> (Leg) element)
+					.forEach(leg -> leg.setMode(TransportMode.pt));
+
             if (person.getPlans().stream().noneMatch(pl -> pl.getPlanElements().size() == 1)) {
 
                 Plan stayHome = result.getPopulation().getFactory().createPlan();
@@ -186,6 +196,8 @@ public class NemoModeLocationChoiceCalibratorV2 {
         result.controler().setRunId(runId);
         result.controler().setOutputDirectory(outputDirectory);
         result.plansCalcRoute().setInsertingAccessEgressWalk(true);
+        result.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
+
         result.qsim().setUsingTravelTimeCheckInTeleportation(true);
         result.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
         result.strategy().setMaxAgentPlanMemorySize(15);

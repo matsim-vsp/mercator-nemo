@@ -37,7 +37,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.nemo.util.NEMOUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -87,12 +86,12 @@ public class CreatePtScheduleAndVehiclesFromOsm {
 		
 		// create transit vehicle type
 		VehicleType type = scenario.getTransitVehicles().getFactory().createVehicleType(Id.create("default-train", VehicleType.class));
+		type.getCapacity().setSeats(250);
+		type.getCapacity().setStandingRoom(250);
 		type.setLength(100.);
 		type.setEgressTime(0.);
 		type.setAccessTime(0.);
-		VehicleCapacity capacity = scenario.getTransitVehicles().getFactory().createVehicleCapacity();
-		capacity.setSeats(500);
-		type.setCapacity(capacity);
+
 		type.setPcuEquivalents(0);
 		scenario.getTransitVehicles().addVehicleType(type);
 		

@@ -15,7 +15,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <matsim.version>12.0-SNAPSHOT</matsim.version>
-        <!-- matsim.version>12.0-SNAPSHOT</matsim.version -->
     </properties>
 
     <repositories>
@@ -82,27 +81,46 @@
         </dependency>
         
         <dependency>
-        		<groupId>org.matsim.contrib</groupId>
- 		       	<artifactId>drt</artifactId>
-        		<version>${matsim.version}</version>
-     		</dependency>
-     		
-     		 <dependency>
-        		<groupId>org.matsim.contrib</groupId>
-        		<artifactId>av</artifactId>
-        		<version>${matsim.version}</version>
-     	 	</dependency>
-     	 	
-     	 	<dependency>
-        		<groupId>org.matsim.contrib</groupId>
-        		<artifactId>dvrp</artifactId>
-        		<version>${matsim.version}</version>
-      		</dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>drt</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
-            <groupId>org.matsim.vsp.vsp-playgrounds</groupId>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>av</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>dvrp</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
             <artifactId>vsp</artifactId>
-            <version>0.11.0-SNAPSHOT</version>
+            <version>12.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.matsim</groupId>
+            <artifactId>matsim-examples</artifactId>
+            <version>${matsim.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.1</version>
         </dependency>
 
         <!-- Include the JUnit testing library -->
@@ -125,16 +143,11 @@
             <version>11.1</version>
         </dependency>
         <dependency>
-            <groupId>com.github.SchweizerischeBundesbahnen</groupId>
-            <artifactId>matsim-sbb-extensions</artifactId>
-            <version>0.10.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
         </dependency>
-        
+
     </dependencies>
 
     <build>

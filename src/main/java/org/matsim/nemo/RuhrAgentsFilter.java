@@ -27,17 +27,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.facilities.ActivityFacilities;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.vsp.cadyts.marginals.AgentFilter;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by amit on 28.05.18.
@@ -45,47 +43,42 @@ import java.util.Map;
 
 public class RuhrAgentsFilter implements AgentFilter {
 
-    public static final String ruhr_boundary_shape = "ruhr_boundary_shape";
+    private static final Logger logger = Logger.getLogger(RuhrAgentsFilter.class);
+    private final Map<Id<Person>, Boolean> personIdMap;
 
-    private static final Logger LOG = Logger.getLogger(RuhrAgentsFilter.class);
+    public RuhrAgentsFilter(Scenario scenario, Collection<SimpleFeature> shape) {
 
-    private final Collection<SimpleFeature> features ;
+        final Function<Activity, Coord> coordProvider = getCoordProvider(scenario);
 
-    private final Map<Id<Person>,Boolean> personIdMap  = new HashMap<>();
+        logger.info("testing for all agents whether they have their home coord within the supplied shape");
+        // go for the giant stream statement here, since the isInside shape test is expensive and we can parallelize this way
+        personIdMap = scenario.getPopulation().getPersons().values().parallelStream()
+                .filter(person -> person.getSelectedPlan() != null)
+                .filter(person -> !person.getSelectedPlan().getPlanElements().isEmpty())
+                .filter(person -> (person.getSelectedPlan().getPlanElements().get(0) instanceof Activity))
+                .map(person -> Tuple.of(person.getId(), (Activity) person.getSelectedPlan().getPlanElements().get(0)))
+                .filter(personActivity -> personActivity.getSecond().getType().startsWith("home"))
+                .collect(Collectors.toMap(Tuple::getFirst, personActivity -> isActivityInside(coordProvider.apply(personActivity.getSecond()), shape)));
+    }
 
-    @Inject
-    public RuhrAgentsFilter(Scenario scenario, @Named(RuhrAgentsFilter.ruhr_boundary_shape) String shapeFile) {
-        this.features = ShapeFileReader.getAllFeatures(shapeFile);
-        ActivityFacilities activityFacilities = scenario.getActivityFacilities();
-        for (Person person : scenario.getPopulation().getPersons().values()) {
-            Activity activity = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-            if (! activity.getType().startsWith("home")) {
-                LOG.warn("First activity is not type home. Excluding such agents...");
-                this.personIdMap.put(person.getId(), false);
-            }
-            if (activityFacilities.getFacilities().isEmpty()) {
-                this.personIdMap.put(person.getId(), isActivityInside(activity.getCoord()));
-            } else {
-                this.personIdMap.put(person.getId(), isActivityInside( activityFacilities.getFacilities().get(activity.getFacilityId()).getCoord() ));
-            }
+    private static Function<Activity, Coord> getCoordProvider(Scenario scenario) {
+
+        if (scenario.getActivityFacilities().getFacilities().isEmpty()) {
+            return Activity::getCoord;
+        } else {
+            return activity -> scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
         }
     }
 
-    private boolean isActivityInside(Coord coord){
-        for (SimpleFeature feature : features) {
-            if ( ((Geometry)feature.getDefaultGeometry()).contains(MGC.coord2Point(coord))  ) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean isActivityInside(Coord coord, Collection<? extends SimpleFeature> features) {
+
+        return features.stream()
+                .map(feature -> (Geometry) feature.getDefaultGeometry())
+                .anyMatch(geometry -> geometry.contains(MGC.coord2Point(coord)));
     }
 
     @Override
     public boolean includeAgent(Id<Person> id) {
-        // check for every agent gain and again is very very expensive and unnecessary
-        if (this.personIdMap.containsKey(id)) {
-            return this.personIdMap.get(id);
-        }
-        return false;
+        return personIdMap.getOrDefault(id, false);
     }
 }
