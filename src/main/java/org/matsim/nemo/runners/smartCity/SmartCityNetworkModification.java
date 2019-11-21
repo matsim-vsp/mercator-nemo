@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import java.util.Collection;
@@ -39,10 +39,10 @@ import java.util.Set;
 public final class SmartCityNetworkModification {
     private static final Logger log = Logger.getLogger(SmartCityNetworkModification.class);
 
-    static void addSAVmode(Scenario scenario, Collection<Geometry> serviceArea, String taxiNetworkMode, String serviceAreaAttribute) {
+    public static void addDrtModeAndMarkServiceArea(Network network, Collection<Geometry> serviceArea, String taxiNetworkMode, String serviceAreaAttribute) {
 
         log.info("Add taxi mode to allowed modes where car and ride is allowed. If in service area add service area attribute to link");
-        scenario.getNetwork().getLinks().values().parallelStream()
+        network.getLinks().values().parallelStream()
                 .filter(link -> link.getAllowedModes().contains(TransportMode.car) && link.getAllowedModes().contains(TransportMode.ride))
                 .forEach(link -> {
 

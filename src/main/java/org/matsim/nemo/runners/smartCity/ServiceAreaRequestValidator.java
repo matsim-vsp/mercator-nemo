@@ -24,7 +24,6 @@ import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -33,10 +32,10 @@ import java.util.Set;
 
 public final class ServiceAreaRequestValidator implements PassengerRequestValidator {
 
-	public static final String FROM_LINK_NOT_IN_SERVICE_AREA_CAUSE = "from_link_not_in_service_area";
-	public static final String TO_LINK_NOT_IN_SERVICE_AREA_CAUSE = "to_link_not_in_service_area";
+	private static final String FROM_LINK_NOT_IN_SERVICE_AREA_CAUSE = "from_link_not_in_service_area";
+	private static final String TO_LINK_NOT_IN_SERVICE_AREA_CAUSE = "to_link_not_in_service_area";
 
-	private final DefaultPassengerRequestValidator delegate = new DefaultPassengerRequestValidator();
+	private final DefaultPassengerRequestValidator defaultValidator = new DefaultPassengerRequestValidator();
 
 	private final String serviceAreaAttribute;
 
@@ -47,9 +46,7 @@ public final class ServiceAreaRequestValidator implements PassengerRequestValida
 	@Override
 	public Set<String> validateRequest(PassengerRequest request) {
 
-		Set<String> invalidRequestCauses = new HashSet<>();
-
-		invalidRequestCauses.addAll(this.delegate.validateRequest(request));
+		Set<String> invalidRequestCauses = defaultValidator.validateRequest(request);
 
 		boolean fromLinkInServiceArea = (boolean)request.getFromLink()
 				.getAttributes()
