@@ -3,7 +3,9 @@ package org.matsim.nemo;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.bicycle.network.BicycleOsmNetworkReaderV2;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -16,7 +18,9 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.nemo.counts.CountsInput;
-import org.matsim.nemo.runners.BikeLinkSpeedCalculator;
+import org.matsim.osmNetworkReader.LinkProperties;
+import org.matsim.osmNetworkReader.OsmTags;
+import org.matsim.osmNetworkReader.SupersonicOsmNetworkReader;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
 class NetworkCreator {
 
     private static final double BIKE_PCU = 0.25;
+    private Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList("motorway", "motorway_link", "trunk", "trunk_link"));
 	private static Logger logger = Logger.getLogger("NetworkCreator");
 
     private final NetworkInput input;
@@ -51,8 +56,11 @@ class NetworkCreator {
 
         Network network = createEmptyNetwork();
         Set<Long> nodeIdsToKeep = readNodeIds(Arrays.asList(countsInput.getInputLongtermCountNodesMapping(), countsInput.getInputShorttermCountMapping()));
-        OsmNetworkReader networkReader = createNetworkReader(network, nodeIdsToKeep);
-        networkReader.parse(input.getInputOsmFile());
+        // OsmNetworkReader networkReader = createNetworkReader(network, nodeIdsToKeep);
+        // networkReader.parse(input.getInputOsmFile());
+
+        SupersonicOsmNetworkReader networkReader = createSupersonicReader(network, nodeIdsToKeep);
+        networkReader.read(input.getInputOsmFile());
 
         logger.info("validate network before cleaning");
         validateParsedNetwork(network, nodeIdsToKeep);
@@ -61,11 +69,6 @@ class NetworkCreator {
         logger.info("validate network after cleaning");
         validateParsedNetwork(network, nodeIdsToKeep);
 
-        if (withRideOnCarLinks) {
-            addRideOnCarLinks(network);
-        }
-
-        addBikeSpeedFactor(network);
         return network;
     }
 
@@ -73,6 +76,61 @@ class NetworkCreator {
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
         return scenario.getNetwork();
+    }
+
+    private SupersonicOsmNetworkReader createSupersonicReader(Network network, Set<Long> nodeIdsToKeep) {
+
+        return SupersonicOsmNetworkReader.builder()
+                .network(network)
+                .coordinateTransformation(this.transformation)
+                .linkFilter(osmFilter::coordInFilter)
+                .preserveNodeWithId(nodeIdsToKeep::contains)
+                .overridingLinkProperties(createBicycleLinkProperties())
+                .afterLinkCreated(this::addBicyclePropertiesAndRideToLink)
+                .build();
+
+    }
+
+    private void addBicyclePropertiesAndRideToLink(Link link, Map<String, String> tags, boolean isInverse) {
+
+        // add bike mode to most streets
+        String highwayType = tags.get(OsmTags.HIGHWAY);
+        if (!bicycleNotAllowed.contains(highwayType)) {
+            HashSet<String> allowedModes = new HashSet<>(link.getAllowedModes());
+            allowedModes.add(TransportMode.bike);
+            allowedModes.add(TransportMode.ride);
+            link.setAllowedModes(allowedModes);
+        }
+
+        //do surface
+        if (tags.containsKey(BicycleUtils.SURFACE)) {
+            link.getAttributes().putAttribute(BicycleUtils.SURFACE, tags.get(BicycleUtils.SURFACE));
+        } else if (highwayType.equals("primary") || highwayType.equals("primary_link") || highwayType.equals("secondary") || highwayType.equals("secondary_link")) {
+            link.getAttributes().putAttribute(BicycleUtils.SURFACE, "asphalt");
+        }
+
+        // do smoothness
+        if (tags.containsKey(BicycleUtils.SMOOTHNESS)) {
+            link.getAttributes().putAttribute(BicycleUtils.SMOOTHNESS, tags.get(BicycleUtils.SMOOTHNESS));
+        }
+
+        // do infrastructure factor
+        link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5);
+
+        //TODO add reverse direction for bicylces if street is only one way. Not sure how to fit that into the model of the reader
+    }
+
+    private Map<String, LinkProperties> createBicycleLinkProperties() {
+
+        Map<String, LinkProperties> result = new HashMap<>();
+        result.put("track", new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false));
+        result.put("cycleway", new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false));
+        result.put("service", new LinkProperties(9, 1, 10 / 3.6, 100 * BIKE_PCU, false));
+        result.put("footway", new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false));
+        result.put("pedestrian", new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false));
+        result.put("path", new LinkProperties(10, 1, 20 / 3.6, 600 * BIKE_PCU, false));
+        result.put("steps", new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false));
+        return result;
     }
 
     private OsmNetworkReader createNetworkReader(Network network, Set<Long> nodeIdsToKeep) {
@@ -104,24 +162,6 @@ class NetworkCreator {
         else {
             cleaningModes.forEach(mode -> new MultimodalNetworkCleaner(network).run(new HashSet<>(Collections.singletonList(mode))));
         }
-    }
-
-    private void addRideOnCarLinks(Network network) {
-
-        network.getLinks().values().stream().filter(link -> link.getAllowedModes().contains(TransportMode.car))
-                .forEach(link -> {
-                    Set<String> modes = new HashSet<>(link.getAllowedModes());
-                    modes.add(TransportMode.ride);
-                    link.setAllowedModes(modes);
-                });
-    }
-
-    private void addBikeSpeedFactor(Network network) {
-        // we assume that bikes can only reach 0.5 of their max velocity on regular streets
-        // they're able to go 1.0 on bike highways
-        network.getLinks().forEach((id, link) -> link.getAttributes().putAttribute(
-                BikeLinkSpeedCalculator.BIKE_SPEED_FACTOR_KEY, 0.5
-        ));
     }
 
     private Set<Long> readNodeIds(List<String> listOfCSVFiles) {

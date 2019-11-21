@@ -79,7 +79,7 @@
             <artifactId>bicycle</artifactId>
             <version>${matsim.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>drt</artifactId>
@@ -148,6 +148,12 @@
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
         </dependency>
+        <dependency>
+            <groupId>org.matsim</groupId>
+            <artifactId>supersonic-osm-network-reader</artifactId>
+            <version>0.1.4-SNAPSHOT</version>
+        </dependency>
+
 
     </dependencies>
 
