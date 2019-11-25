@@ -16,8 +16,8 @@ import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
-import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -106,12 +106,10 @@ public class SmartCityRunner {
 
         logger.info("Start configuring drt. Add DrtModeModule, DvrpModule, DrtFareModule and activate drt-mode");
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
-		controler.addOverridingModule(new DrtModeModule(drtConfigGroup));
 		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
 		controler.addOverridingModule(new DrtFareModule());
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(drtConfigGroup.getMode())
-		);
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtConfigGroup.getMode()));
 
         logger.info("Set passengerRequestValidator");
 		controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtConfigGroup.getMode()) {
@@ -165,7 +163,7 @@ public class SmartCityRunner {
 	private Config loadConfig(Path inputDir, Path outputDir, String runId) {
 
         Config config = ConfigUtils.loadConfig(inputDir.resolve("config.xml").toString(), new DvrpConfigGroup(),
-                new MultiModeDrtConfigGroup(), new DrtFaresConfigGroup(), new BicycleConfigGroup());
+				new MultiModeDrtConfigGroup(), new DrtFaresConfigGroup(), new BicycleConfigGroup());
 
 		config.controler().setOutputDirectory(outputDir.toString());
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

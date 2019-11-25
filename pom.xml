@@ -149,9 +149,9 @@
             <version>1.72</version>
         </dependency>
         <dependency>
-            <groupId>org.matsim</groupId>
-            <artifactId>supersonic-osm-network-reader</artifactId>
-            <version>0.1.4-SNAPSHOT</version>
+            <groupId>com.github.Janekdererste</groupId>
+            <artifactId>super-sonic-osm-network-reader</artifactId>
+            <version>0.1.4</version>
         </dependency>
 
 

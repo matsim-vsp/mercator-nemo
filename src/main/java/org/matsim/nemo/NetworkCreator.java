@@ -63,12 +63,12 @@ class NetworkCreator {
         networkReader.read(input.getInputOsmFile());
 
         logger.info("validate network before cleaning");
-        validateParsedNetwork(network, nodeIdsToKeep);
+      /*  validateParsedNetwork(network, nodeIdsToKeep);
         cleanNetwork(network);
 
         logger.info("validate network after cleaning");
         validateParsedNetwork(network, nodeIdsToKeep);
-
+*/
         return network;
     }
 

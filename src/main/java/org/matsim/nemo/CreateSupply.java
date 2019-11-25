@@ -64,7 +64,8 @@ public class CreateSupply {
 
 		// parse the osm network
 		Network network = createNetwork(inputArguments.svnDir, inputArguments.scenario, inputParams);
-
+		new NetworkWriter(network).write(Paths.get("C:\\Users\\Janek\\Desktop\\test-network.xml.gz").toString());
+/*
 		// if we are preparing the network for a scenario other than location choice we need a public transit network
 		if (!ScenarioName.locationChoice.equals(inputArguments.scenario)) {
 
@@ -84,7 +85,7 @@ public class CreateSupply {
 				network,
 				inputParams.getInputNetworkShapeFilter(),
 				outputParams.getOutputNetworkDir());
-
+*/
 
 	}
 
