@@ -24,6 +24,7 @@ import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -46,7 +47,8 @@ public final class ServiceAreaRequestValidator implements PassengerRequestValida
 	@Override
 	public Set<String> validateRequest(PassengerRequest request) {
 
-		Set<String> invalidRequestCauses = defaultValidator.validateRequest(request);
+		// the returned set is immutable
+		Set<String> invalidRequestCauses = new HashSet<>(defaultValidator.validateRequest(request));
 
 		boolean fromLinkInServiceArea = (boolean)request.getFromLink()
 				.getAttributes()

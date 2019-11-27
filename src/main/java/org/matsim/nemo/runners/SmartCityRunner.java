@@ -179,6 +179,7 @@ public class SmartCityRunner {
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
         config.qsim().setNumberOfThreads(1); //drt works only single threaded
         config.qsim().setUsePersonIdForMissingVehicleId(false);
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
         //set up drt config
 		DrtConfigs.adjustDrtConfig(DrtConfigGroup.getSingleModeDrtConfig(config), config.planCalcScore(), config.plansCalcRoute());
