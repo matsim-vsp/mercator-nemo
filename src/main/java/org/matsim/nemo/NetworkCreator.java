@@ -1,5 +1,6 @@
 package org.matsim.nemo;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -23,7 +24,6 @@ import org.matsim.osmNetworkReader.OsmTags;
 import org.matsim.osmNetworkReader.SupersonicOsmNetworkReader;
 
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
@@ -31,7 +31,7 @@ class NetworkCreator {
 
     private static final double BIKE_PCU = 0.25;
     private Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList("motorway", "motorway_link", "trunk", "trunk_link"));
-	private static Logger logger = Logger.getLogger("NetworkCreator");
+    private static Logger logger = Logger.getLogger(NetworkCreator.class);
 
     private final NetworkInput input;
     private final CountsInput countsInput;
@@ -85,7 +85,7 @@ class NetworkCreator {
                 .coordinateTransformation(this.transformation)
                 .linkFilter(osmFilter::coordInFilter)
                 .preserveNodeWithId(nodeIdsToKeep::contains)
-                .overridingLinkProperties(createBicycleLinkProperties())
+                //.overridingLinkProperties(createBicycleLinkProperties())
                 .afterLinkCreated(this::addBicyclePropertiesAndRideToLink)
                 .build();
 
@@ -93,14 +93,18 @@ class NetworkCreator {
 
     private void addBicyclePropertiesAndRideToLink(Link link, Map<String, String> tags, boolean isInverse) {
 
+        // add ride mode to all car streets
+        HashSet<String> allowedModes = new HashSet<>(link.getAllowedModes());
+        if (allowedModes.contains(TransportMode.car))
+            allowedModes.add(TransportMode.ride);
+
         // add bike mode to most streets
         String highwayType = tags.get(OsmTags.HIGHWAY);
         if (!bicycleNotAllowed.contains(highwayType)) {
-            HashSet<String> allowedModes = new HashSet<>(link.getAllowedModes());
             allowedModes.add(TransportMode.bike);
-            allowedModes.add(TransportMode.ride);
-            link.setAllowedModes(allowedModes);
+
         }
+        link.setAllowedModes(allowedModes);
 
         //do surface
         if (tags.containsKey(BicycleUtils.SURFACE)) {
@@ -152,7 +156,7 @@ class NetworkCreator {
 
         nodeIdsToKeep.forEach(id -> {
             if (!network.getNodes().containsKey(Id.createNodeId(id)))
-				logger.severe("COULD NOT FIND NODE: " + id + " IN THE NETWORK");
+                logger.error("COULD NOT FIND NODE: " + id + " IN THE NETWORK");
         });
     }
 
