@@ -5,50 +5,35 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.bicycle.BicycleConfigGroup;
+import org.matsim.contrib.bicycle.Bicycles;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class BaseCaseCalibrationRunner {
 
-    private final String configPath;
+
     private final String runId;
     private final String outputDir;
     private final String inputDir;
-    private Config config;
-    private Scenario scenario;
-    private Controler controler;
 
-    //
+    BaseCaseCalibrationRunner(String runId, String outputDir, String inputDir) {
 
-    public Config getConfig() {
-        return config;
-    }
 
-    public Scenario getScenario() {
-        return scenario;
-    }
-
-    public Controler getControler() {
-        return controler;
-    }
-
-    public BaseCaseCalibrationRunner(String runId, String outputDir, String inputDir) {
-        this(Paths.get(inputDir).resolve("config.xml").toString(), runId, outputDir, inputDir);
-    }
-
-	BaseCaseCalibrationRunner(String configPath, String runId, String outputDir, String inputDir) {
-
-        this.configPath = configPath;
         this.runId = runId;
         this.outputDir = outputDir;
         this.inputDir = inputDir;
@@ -59,25 +44,28 @@ public class BaseCaseCalibrationRunner {
         InputArguments arguments = new InputArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-        BaseCaseCalibrationRunner runner = new BaseCaseCalibrationRunner(arguments.configPath,
+        BaseCaseCalibrationRunner runner = new BaseCaseCalibrationRunner(
                 arguments.runId, arguments.outputDir, arguments.inputDir);
         runner.run();
     }
 
     public void run() {
-        if (controler == null) prepareControler();
+
+        Config config = prepareConfig();
+
+        Scenario scenario = prepareScenario(config);
+
+        Controler controler = prepareControler(scenario);
         controler.run();
-        System.exit(0);
     }
 
-	Controler prepareControler(AbstractQSimModule... overridingQSimModule) {
+    Controler prepareControler(Scenario scenario) {
 
-        if (scenario == null) prepareScenario();
 
-        controler = new Controler(scenario);
+        Controler controler = new Controler(scenario);
 
         // use fast pt router
-		controler.addOverridingModule(new AbstractModule() {
+        controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 install(new SwissRailRaptorModule());
@@ -93,59 +81,74 @@ public class BaseCaseCalibrationRunner {
             }
         });
 
-		// add overridingQSimModules from method parameters
-        Arrays.stream(overridingQSimModule).forEach(controler::addOverridingQSimModule);
+        Bicycles.addAsOverridingModule(controler);
 
         return controler;
     }
 
-	private Scenario prepareScenario() {
+    private Scenario prepareScenario(Config config) {
 
-        if (config == null) prepareConfig();
+        Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        scenario = ScenarioUtils.loadScenario(config);
+        scenario.getPopulation().getPersons().entrySet().removeIf(person -> Math.random() > 0.1);
+
+        // remove routes from legs, since we have different network modes than before
+        scenario.getPopulation().getPersons().values().parallelStream()
+                .flatMap(person -> person.getPlans().stream())
+                .flatMap(plan -> plan.getPlanElements().stream())
+                .filter(element -> element instanceof Leg)
+                .map(element -> (Leg) element)
+                .filter(leg -> !(leg.getRoute() instanceof NetworkRoute))
+                .forEach(leg -> leg.setRoute(null));
         return scenario;
     }
 
-	private Config prepareConfig(ConfigGroup... customModules) {
+    private Config prepareConfig() {
 
-        OutputDirectoryLogging.catchLogEntries();
-        config = ConfigUtils.loadConfig(configPath, customModules);
+        Config config = ConfigUtils.loadConfig(Paths.get(inputDir).resolve("config_baseCase.xml").toString(), new BicycleConfigGroup());
+
         config.controler().setRunId(runId);
         config.controler().setOutputDirectory(outputDir);
+        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks);
+
+        config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
+        config.plansCalcRoute().removeModeRoutingParams(TransportMode.ride);
         config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+
         config.qsim().setUsingTravelTimeCheckInTeleportation(true);
-        config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
+        config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+        config.qsim().setUsePersonIdForMissingVehicleId(true); // use this to use old plans file
+        config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
         final long minDuration = 600;
         final long maxDuration = 3600 * 27;
         final long difference = 600;
-        addTypicalDurations("home", minDuration, maxDuration, difference);
-        addTypicalDurations("work", minDuration, maxDuration, difference);
-        addTypicalDurations("education", minDuration, maxDuration, difference);
-        addTypicalDurations("leisure", minDuration, maxDuration, difference);
-        addTypicalDurations("shopping", minDuration, maxDuration, difference);
-        addTypicalDurations("other", minDuration, maxDuration, difference);
+        createTypicalDuration("home", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        createTypicalDuration("work", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        createTypicalDuration("education", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        createTypicalDuration("leisure", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        createTypicalDuration("shopping", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        createTypicalDuration("other", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
 
         return config;
     }
 
-    private void addTypicalDurations(String type, long minDurationInSeconds, long maxDurationInSeconds, long durationDifferenceInSeconds) {
+    private Collection<PlanCalcScoreConfigGroup.ActivityParams> createTypicalDuration(String type, long minDurationInSeconds, long maxDurationInSeconds, long durationDifferenceInSeconds) {
 
+        List<PlanCalcScoreConfigGroup.ActivityParams> result = new ArrayList<>();
         for (long duration = minDurationInSeconds; duration <= maxDurationInSeconds; duration += durationDifferenceInSeconds) {
             final PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams(type + "_" + duration + ".0");
             params.setTypicalDuration(duration);
-            config.planCalcScore().addActivityParams(params);
+            result.add(params);
         }
+        return result;
     }
 
     /**
      * Arguments for invocation from the command line
      */
     private static class InputArguments {
-
-        @Parameter(names = "-configPath", required = true)
-        private String configPath;
 
         @Parameter(names = "-runId", required = true)
         private String runId;
