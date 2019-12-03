@@ -1,4 +1,4 @@
-package org.matsim.nemo.util;
+package org.matsim.nemo;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -84,7 +84,6 @@ public class TinderRelocator {
 				else {
 					handleRecord(record);
 				}
-				logger.info("moved: " + movedPersonCounter);
 			}
 		}
 
@@ -92,7 +91,7 @@ public class TinderRelocator {
 		logger.info("empty cells: " + emptySourceCellCounter);
 
 		// write out new population
-		new PopulationWriter(scenario.getPopulation()).write(Paths.get("C:\\Users\\Janek\\Desktop\\tinder-test").toString());
+		new PopulationWriter(scenario.getPopulation()).write(Paths.get("C:\\Users\\Janek\\Desktop\\tinder-test\\population.xml.gz").toString());
 
 	}
 
@@ -116,8 +115,8 @@ public class TinderRelocator {
 
 	private void handleRecord(CSVRecord record) {
 
-		// index is record number - 2, since first row is header and record number is index based
-		final long index = record.getRecordNumber();
+		// index is record number - 2, since first row is header and record number is 1-index based
+		final long index = record.getRecordNumber() - 2;
 
 		// get the source shape
 		SimpleFeature sourceFeature = murmoFeatures.get((int) index);
@@ -140,7 +139,6 @@ public class TinderRelocator {
 			else
 				move(destinationFeature, sourceFeature, value);
 		}
-
 	}
 
 	private void move(SimpleFeature sourceFeature, SimpleFeature destinationFeature, double value) {
