@@ -87,11 +87,19 @@ public class TinderRelocator {
 			}
 		}
 
-		logger.info("moved: " + movedPersonCounter);
+		List<Person> movedAgents = scenario.getPopulation().getPersons().values().stream()
+				.filter(person -> {
+					Object wasMovedRaw = person.getAttributes().getAttribute("was_moved");
+					return wasMovedRaw != null;
+				})
+				.collect(Collectors.toList());
+
+		logger.info("moved agents size: " + movedAgents.size());
+		logger.info("moved counter: " + movedPersonCounter);
 		logger.info("empty cells: " + emptySourceCellCounter);
 
 		// write out new population
-		new PopulationWriter(scenario.getPopulation()).write(Paths.get("C:\\Users\\Janek\\Desktop\\tinder-test\\population.xml.gz").toString());
+		new PopulationWriter(scenario.getPopulation()).write(Paths.get("G:\\Users\\Janek\\Desktop\\tinder-test\\population.xml.gz").toString());
 
 	}
 
@@ -171,7 +179,8 @@ public class TinderRelocator {
 					.findAny()
 					.orElseThrow(() -> new RuntimeException("no one should be homeless"));
 
-			Coord newHomeCoord = drawCoordFromGeometry((Geometry) destinationFeature.getDefaultGeometry());
+			//Coord newHomeCoord = drawCoordFromGeometry((Geometry) destinationFeature.getDefaultGeometry());
+			Coord newHomeCoord = drawCoordFromGeometry((Geometry) murmoFeatures.get(10).getDefaultGeometry());
 			homeActivity.setCoord(newHomeCoord);
 			person.getAttributes().putAttribute("was_moved", true);
 			movedPersonCounter++;
