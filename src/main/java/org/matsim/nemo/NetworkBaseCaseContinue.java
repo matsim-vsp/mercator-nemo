@@ -79,6 +79,12 @@ public class NetworkBaseCaseContinue {
 				ll.setFreespeed(0);
 			}
 		}
+		
+		//Link ll = fac.createLink(ID_1+ nodesToConnect.lastIndexOf(nodesToConnect), nodesToConnect.lastIndexOf(nodesToConnect), )
+		//nodesToConnect.lastIndexOf(nodesToConnect)
+		
+		
+		
 		return nodesToConnect;
 	}
 
@@ -538,6 +544,7 @@ public class NetworkBaseCaseContinue {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static void connectNodeToNetwork(Network network, List<Node> nodesToAvoid, Node node,
 			final NetworkFactory fac) {
 
@@ -562,7 +569,6 @@ public class NetworkBaseCaseContinue {
 					network.addLink(l);
 				});
 	}
-	
 	
 
 	private static Collection<Node> getNearestNodes(Network network, Node node) {
