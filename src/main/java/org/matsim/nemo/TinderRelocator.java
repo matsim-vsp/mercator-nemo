@@ -76,10 +76,11 @@ public class TinderRelocator {
 		// remove all plans other than the selected plan
 		scenario.getPopulation().getPersons().values().parallelStream()
 				.forEach(person -> {
+
 					Plan selectedPlan = person.getSelectedPlan();
-					for (Plan plan : person.getPlans()) {
-						if (!plan.equals(selectedPlan)) person.removePlan(plan);
-					}
+					person.getPlans().clear();
+					person.addPlan(selectedPlan);
+					person.setSelectedPlan(selectedPlan);
 				});
 
 		// get the feature source of the murmo grid, to extract bounds from it
