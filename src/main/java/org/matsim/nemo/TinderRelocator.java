@@ -14,8 +14,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -25,10 +27,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TinderRelocator {
@@ -37,11 +36,19 @@ public class TinderRelocator {
 	private static final String MURMO_SHAPE_FILE = "projects\\nemo_mercator\\data\\original_files\\murmo\\Ruhr_Grid_1km\\Ruhr_Grid_1km_EW.shp";
 	private static final String MURMO_TRANSITION_DATA = "projects\\nemo_mercator\\data\\original_files\\murmo\\p_trans.csv";
 	private static final Comparator<SimpleFeature> featureComparator = Comparator.comparingLong(feature -> (Long) (feature.getAttribute("ID_Gitter_")));
+	private static final String WAS_MOVED_KEY = "was_moved";
 
 	private static final Logger logger = Logger.getLogger(TinderRelocator.class);
+	private static final Random random = MatsimRandom.getRandom();
 
 	@Parameter(names = {"-svnDir"}, required = true)
 	private String svnDir;
+
+	@Parameter(names = {"-scalingFactor", "-sf"})
+	private double scalingFactor = 0.01;
+
+	@Parameter(names = {"-tinderMatches", "-tm"})
+	private double shareOfTinderMatches = 0.5;
 
 	private Scenario scenario;
 	private List<SimpleFeature> murmoFeatures;
@@ -49,6 +56,8 @@ public class TinderRelocator {
 
 	private int movedPersonCounter = 0;
 	private int emptySourceCellCounter = 0;
+	private double sumOfPeopleToMove;
+
 
 	public static void main(String[] args) throws IOException {
 
@@ -63,6 +72,15 @@ public class TinderRelocator {
 
 		// read in the base case scenario
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(svnPath.resolve(BASE_CASE_CONFIG).toString()));
+
+		// remove all plans other than the selected plan
+		scenario.getPopulation().getPersons().values().parallelStream()
+				.forEach(person -> {
+					Plan selectedPlan = person.getSelectedPlan();
+					for (Plan plan : person.getPlans()) {
+						if (!plan.equals(selectedPlan)) person.removePlan(plan);
+					}
+				});
 
 		// get the feature source of the murmo grid, to extract bounds from it
 		SimpleFeatureSource featureSource = ShapeFileReader.readDataFile(svnPath.resolve(MURMO_SHAPE_FILE).toString());
@@ -89,17 +107,25 @@ public class TinderRelocator {
 
 		List<Person> movedAgents = scenario.getPopulation().getPersons().values().stream()
 				.filter(person -> {
-					Object wasMovedRaw = person.getAttributes().getAttribute("was_moved");
+					Object wasMovedRaw = person.getAttributes().getAttribute(WAS_MOVED_KEY);
 					return wasMovedRaw != null;
 				})
 				.collect(Collectors.toList());
 
+		Map<Integer, List<Person>> bla = movedAgents.stream()
+				.collect(Collectors.groupingBy(person -> (int) person.getAttributes().getAttribute(WAS_MOVED_KEY)));
+
+		logger.info("sum of people to move: " + sumOfPeopleToMove);
 		logger.info("moved agents size: " + movedAgents.size());
 		logger.info("moved counter: " + movedPersonCounter);
 		logger.info("empty cells: " + emptySourceCellCounter);
 
+		for (Map.Entry<Integer, List<Person>> integerListEntry : bla.entrySet()) {
+			logger.info(integerListEntry.getValue().size() + " persons moved " + integerListEntry.getKey() + " times");
+		}
+
 		// write out new population
-		new PopulationWriter(scenario.getPopulation()).write(Paths.get("G:\\Users\\Janek\\Desktop\\tinder-test\\population.xml.gz").toString());
+		new PopulationWriter(scenario.getPopulation()).write(Paths.get("C:\\Users\\Janek\\Desktop\\tinder-test\\population-may-move-twice.xml.gz").toString());
 
 	}
 
@@ -123,30 +149,40 @@ public class TinderRelocator {
 
 	private void handleRecord(CSVRecord record) {
 
+
 		// index is record number - 2, since first row is header and record number is 1-index based
 		final long index = record.getRecordNumber() - 2;
 
 		// get the source shape
 		SimpleFeature sourceFeature = murmoFeatures.get((int) index);
 
+		Double baseInhabitants = (Double) sourceFeature.getAttribute("EW_2011");
+		Geometry geometry = (Geometry) sourceFeature.getDefaultGeometry();
+		List<Id<Person>> peopleWithinSource = getPersonsFromSpatialIndex(geometry);
+
+		logger.info("#" + index + " baseInhabitants=" + baseInhabitants + ", sourceInhabitants=" + peopleWithinSource.size());
+
+		double rowSum = 0;
 		for (int columnIndex = 0; columnIndex < record.size(); columnIndex++) {
 
-			// we have a symmetric matrix only parse the lower half
-			if (columnIndex >= index) {
-				break;
+			// the diagonal of the matrix is not relefant for us
+			if (columnIndex == index) {
+				continue;
 			}
 
 			// the destination feature is the index of the colum
 			SimpleFeature destinationFeature = murmoFeatures.get(columnIndex);
 
-			// propability of moving from cell (index) to cell (columnIndex)
+			// number of people moving from cell (index) to cell (columnIndex)
 			double value = Double.parseDouble(record.get(columnIndex));
+			rowSum += value;
 
 			if (value >= 0)
 				move(sourceFeature, destinationFeature, value);
 			else
-				move(destinationFeature, sourceFeature, value);
+				logger.info("Value was: " + value);
 		}
+		logger.info("# " + index + " is: " + rowSum);
 	}
 
 	private void move(SimpleFeature sourceFeature, SimpleFeature destinationFeature, double value) {
@@ -157,34 +193,83 @@ public class TinderRelocator {
 		List<Id<Person>> peopleWithinSource = getPersonsFromSpatialIndex(geometry);
 
 		if (peopleWithinSource.size() > 0) {
-			long numberOfPeopleToMove = Math.round(baseInhabitants * Math.abs(value) * 0.01); // use scaling factor of 1% for now. Make it configurable later
-			movePersons(numberOfPeopleToMove, peopleWithinSource, destinationFeature);
+
+			double shareOfPeopleMoving = value / baseInhabitants;
+			List<Id<Person>> matsimPeopleMoving = peopleWithinSource.stream()
+					.filter(personId -> random.nextDouble() < shareOfPeopleMoving)
+					.collect(Collectors.toList());
+
+			if (matsimPeopleMoving.size() > 0) {
+				logger.info("moving " + matsimPeopleMoving.size() + " people. Share=" + shareOfPeopleMoving + " base=" + baseInhabitants + " value=" + value);
+			}
+
+			for (Id<Person> personId : matsimPeopleMoving) {
+				movePerson(personId, (Geometry) destinationFeature.getDefaultGeometry());
+			}
+
+			sumOfPeopleToMove += value * scalingFactor;
+
 		} else {
 			emptySourceCellCounter++;
 		}
 	}
 
-	private void handleHeaderRecord(CSVRecord record) {
-	}
 
-	private void movePersons(long numberOfPersonsToMove, List<Id<Person>> personsWithinSourceCell, SimpleFeature destinationFeature) {
+	private void movePerson(Id<Person> personId, Geometry destinationGeometry) {
 
-		for (int i = 0; i < numberOfPersonsToMove && i < personsWithinSourceCell.size(); i++) {
-			Id<Person> id = personsWithinSourceCell.get(i);
-			Person person = scenario.getPopulation().getPersons().get(id);
-			Activity homeActivity = person.getSelectedPlan().getPlanElements().stream()
+		Person movingPerson = scenario.getPopulation().getPersons().get(personId);
+
+
+		// this only moves the home activities for now. Later we should also move other stuff.
+		List<Activity> homeActivities = movingPerson.getSelectedPlan().getPlanElements().stream()
+				.filter(element -> element instanceof Activity)
+				.map(element -> (Activity) element)
+				.filter(activity -> activity.getType().startsWith("home"))
+				.collect(Collectors.toList());
+
+		//Coord newHomeCoord = drawCoordFromGeometry((Geometry) murmoFeatures.get(10).getDefaultGeometry());
+		Coord newHomeCoord = drawCoordFromGeometry(destinationGeometry);
+		boolean isSpatialIndexUpdated = false;
+
+		for (Activity homeActivity : homeActivities) {
+			if (!isSpatialIndexUpdated) {
+				spatialPersonIndex.remove(homeActivity.getCoord().getX(), homeActivity.getCoord().getY(), movingPerson.getId());
+				spatialPersonIndex.put(newHomeCoord.getX(), newHomeCoord.getY(), movingPerson.getId());
+				isSpatialIndexUpdated = true;
+			}
+
+			homeActivity.setCoord(newHomeCoord);
+		}
+
+
+		Object wasMovedAttribute = movingPerson.getAttributes().getAttribute(WAS_MOVED_KEY);
+		if (wasMovedAttribute == null)
+			movingPerson.getAttributes().putAttribute(WAS_MOVED_KEY, 1);
+		else {
+			int timesMoved = (int) wasMovedAttribute + 1;
+			movingPerson.getAttributes().putAttribute(WAS_MOVED_KEY, timesMoved);
+		}
+		movedPersonCounter++;
+
+		// people who are not a tinder match relocate their other activities as well
+		// all tinder matches move with somebody else but keep their remaining activity context
+		if (random.nextDouble() > shareOfTinderMatches) {
+			List<Activity> nonHomeActivities = movingPerson.getSelectedPlan().getPlanElements().stream()
 					.filter(element -> element instanceof Activity)
 					.map(element -> (Activity) element)
-					.filter(activity -> activity.getType().startsWith("home"))
-					.findAny()
-					.orElseThrow(() -> new RuntimeException("no one should be homeless"));
+					.filter(activity -> !activity.getType().startsWith("home"))
+					.collect(Collectors.toList());
 
-			//Coord newHomeCoord = drawCoordFromGeometry((Geometry) destinationFeature.getDefaultGeometry());
-			Coord newHomeCoord = drawCoordFromGeometry((Geometry) murmoFeatures.get(10).getDefaultGeometry());
-			homeActivity.setCoord(newHomeCoord);
-			person.getAttributes().putAttribute("was_moved", true);
-			movedPersonCounter++;
+			for (Activity activity : nonHomeActivities) {
+
+				// assuming that all activities are within the same square
+				Coord newActivityLocation = drawCoordFromGeometry(destinationGeometry);
+				activity.setCoord(newActivityLocation);
+			}
 		}
+	}
+
+	private void handleHeaderRecord(CSVRecord record) {
 	}
 
 	private boolean isWithinBounds(Coord homeCoord) {
