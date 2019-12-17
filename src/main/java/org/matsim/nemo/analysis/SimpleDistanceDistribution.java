@@ -47,6 +47,14 @@ public class SimpleDistanceDistribution {
 		void increaseCountByOne() {
 			this.value++;
 		}
+
+		SimpleDistanceRange getDistanceRange() {
+			return this.distanceRange;
+		}
+
+		int getValue() {
+			return this.value;
+		}
 	}
 
 	public static class SimpleDistanceRange {

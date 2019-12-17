@@ -18,14 +18,15 @@ public class TripAnalysis {
 
 	private final Scenario scenario;
 	private final Network network;
+	private final Map<Id<Person>, List<TripEventHandler.Trip>> personTrips;
 
-	public TripAnalysis(Scenario scenario, Network network) {
+	public TripAnalysis(Map<Id<Person>, List<TripEventHandler.Trip>> personTrips, Scenario scenario, Network network) {
 		this.scenario = scenario;
 		this.network = network;
+		this.personTrips = personTrips;
 	}
 
-	public DistanceDistribution calculateModalDistanceDistribution(Map<Id<Person>, List<TripEventHandler.Trip>> personTrips,
-																   DistanceDistribution expectedDistribution) {
+	public DistanceDistribution calculateModalDistanceDistribution(DistanceDistribution expectedDistribution) {
 
 		DistanceDistribution simulatedDistribution = expectedDistribution.copyWithEmptyBins();
 		personTrips.entrySet().parallelStream().flatMap(entry -> entry.getValue().stream())
@@ -36,8 +37,7 @@ public class TripAnalysis {
 		return simulatedDistribution;
 	}
 
-	public SimpleDistanceDistribution calculateDistanceDistribution(Map<Id<Person>, List<TripEventHandler.Trip>> personTrips,
-																	SimpleDistanceDistribution expectedDistribution) {
+	public SimpleDistanceDistribution calculateDistanceDistribution(SimpleDistanceDistribution expectedDistribution) {
 		SimpleDistanceDistribution simulatedDistribution = expectedDistribution.copyWithEmptyBins();
 		personTrips.entrySet().parallelStream().
 				flatMap(entry -> entry.getValue().stream())
@@ -48,13 +48,12 @@ public class TripAnalysis {
 		return simulatedDistribution;
 	}
 
-	public Map<String, Long> calculateModalSplit(Map<Id<Person>, List<TripEventHandler.Trip>> personTrips) {
+	public Map<String, Long> calculateModalSplit() {
 
 		return personTrips.values().parallelStream()
 				.flatMap(Collection::stream)
 				.collect(Collectors.groupingBy(TripEventHandler.Trip::getMainMode, Collectors.counting()));
 	}
-
 
 	private double calculateBeelineDistance(TripEventHandler.Trip trip) {
 
@@ -70,5 +69,4 @@ public class TripAnalysis {
 			return CoordUtils.calcEuclideanDistance(departureLink.getToNode().getCoord(), arrivalLink.getToNode().getCoord());
 		}
 	}
-
 }

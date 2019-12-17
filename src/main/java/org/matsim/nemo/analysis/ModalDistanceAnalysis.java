@@ -3,9 +3,6 @@ package org.matsim.nemo.analysis;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -17,20 +14,22 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.nemo.RuhrAgentsFilter;
 import org.matsim.nemo.runners.NemoModeLocationChoiceMainModeIdentifier;
+import org.matsim.nemo.util.ExpectedDistanceDistribution;
 import org.matsim.nemo.util.ExpectedModalDistanceDistribution;
+import org.matsim.nemo.util.ExpectedModalShare;
 import playground.vsp.cadyts.marginals.DistanceDistribution;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ModalDistanceAnalysis {
@@ -69,7 +68,7 @@ public class ModalDistanceAnalysis {
 
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenario).readFile(populationFile);
-        RuhrAgentsFilter agentsFilter = new RuhrAgentsFilter(this.scenario, ShapeFileReader.getAllFeatures(this.ruhrShapeFile));
+		RuhrAgentsFilter agentsFilter = new RuhrAgentsFilter(this.scenario, ShapeFileReader.getAllFeatures(this.ruhrShapeFile));
 
 		network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
@@ -77,10 +76,23 @@ public class ModalDistanceAnalysis {
 		DistanceDistribution expectedDistanceDistribution = ExpectedModalDistanceDistribution.create();
 
 
-		List<NamedDistanceDistribution> result = eventFiles.parallelStream()
-                .map(eventFile -> parseEventFile(Paths.get(eventFile), expectedDistanceDistribution, agentsFilter))
+		List<Tuple<String, TripAnalysis>> result = eventFiles.parallelStream()
+				.map(eventFile -> parseEventFile(Paths.get(eventFile), expectedDistanceDistribution, agentsFilter))
 				.collect(Collectors.toList());
 
+
+		new TripAnalysisExcelWriter.Builder()
+				.filePath(Paths.get(outputFile))
+				.scalingFactor(scalingFactor)
+				.tripAnalysises(result)
+				.addExpectedModalShare(ExpectedModalShare.create())
+				.addExpectedDistanceDistribution(ExpectedDistanceDistribution.create())
+				.addExpectedModalDistanceDistribution(ExpectedModalDistanceDistribution.create())
+				.build()
+				.write();
+
+
+/*
 		// write results to an excel file
         XSSFWorkbook wb = new XSSFWorkbook();
 
@@ -213,6 +225,8 @@ public class ModalDistanceAnalysis {
 		}
 
         logger.info("Finished writing analysis to: " + outputFile);
+        */
+
 	}
 
 	private int compareBinsByModeAndDistanceRange(DistanceDistribution.DistanceBin bin1, DistanceDistribution.DistanceBin bin2) {
@@ -220,11 +234,11 @@ public class ModalDistanceAnalysis {
 		return (mode == 0) ? Double.compare(bin1.getDistanceRange().getLowerLimit(), bin2.getDistanceRange().getLowerLimit()) : mode;
 	}
 
-    private NamedDistanceDistribution parseEventFile(Path file, DistanceDistribution expectedDistribution, RuhrAgentsFilter agentsFilter) {
+	private Tuple<String, TripAnalysis> parseEventFile(Path file, DistanceDistribution expectedDistribution, RuhrAgentsFilter agentsFilter) {
 
 		EventsManager manager = EventsUtils.createEventsManager();
 
-        TripEventHandler tripEventHandler = new TripEventHandler(new NemoModeLocationChoiceMainModeIdentifier(), agentsFilter::includeAgent);
+		TripEventHandler tripEventHandler = new TripEventHandler(new NemoModeLocationChoiceMainModeIdentifier(), agentsFilter::includeAgent);
 
 		manager.addHandler(tripEventHandler);
 		new MatsimEventsReader(manager).readFile(file.toString());
@@ -234,16 +248,17 @@ public class ModalDistanceAnalysis {
         tripEventHandler.getTrips().entrySet().parallelStream().flatMap(entry -> entry.getValue().stream())
 				.forEach(trip -> {
 					double distance = calculateBeelineDistance(trip);
-                    simulatedDistribution.increaseCountByOne(trip.getMainMode(), distance);
+					simulatedDistribution.increaseCountByOne(trip.getMainMode(), distance);
 				});
 
+		TripAnalysis analysis = new TripAnalysis(tripEventHandler.getTrips(), scenario, network);
 		String runId = file.getFileName().toString().split("[.]")[0];
 
-        if (tripEventHandler.getStuckPersons().size() > 0) {
-            logger.warn("Run: " + runId + " had " + tripEventHandler.getStuckPersons().size() + " stuck agents.");
-        }
+		if (tripEventHandler.getStuckPersons().size() > 0) {
+			logger.warn("Run: " + runId + " had " + tripEventHandler.getStuckPersons().size() + " stuck agents.");
+		}
 
-		return new NamedDistanceDistribution(runId, simulatedDistribution);
+		return Tuple.of(runId, analysis);
 	}
 
 	private double calculateBeelineDistance(TripEventHandler.Trip trip) {
