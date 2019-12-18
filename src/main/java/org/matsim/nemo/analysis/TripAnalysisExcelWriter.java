@@ -95,6 +95,10 @@ public class TripAnalysisExcelWriter {
 		Row expectedSumRow = sheet.createRow(rowIndex);
 		expectedSumRow.createCell(0).setCellValue("sum");
 		expectedSumRow.createCell(3).setCellValue(expectedSum);
+
+		Row errorRow = sheet.createRow(rowIndex + 1);
+		errorRow.createCell(0).setCellValue("error");
+		errorRow.createCell(3).setCellValue(0);
 	}
 
 	private void addModalDistanceValues(Sheet sheet, DistanceDistribution expectedModalDistanceDistribution, double scalingFactor) {
@@ -109,13 +113,19 @@ public class TripAnalysisExcelWriter {
 					.collect(Collectors.toList());
 
 			int distributionSum = 0;
+			int errorSum = 0;
 			for (DistanceDistribution.DistanceBin bin : bins) {
 
-				sheet.getRow(rowIndex).createCell(cellIndex).setCellValue(bin.getValue() * scalingFactor);
-				distributionSum += bin.getValue() * scalingFactor;
+				double value = bin.getValue() * scalingFactor;
+				sheet.getRow(rowIndex).createCell(cellIndex).setCellValue(value);
+				distributionSum += value;
+
+				DistanceDistribution.DistanceBin xBin = expectedModalDistanceDistribution.getBin(bin.getId());
+				errorSum += (value - xBin.getValue()) * (value - xBin.getValue());
 				rowIndex++;
 			}
 			sheet.getRow(rowIndex).createCell(cellIndex).setCellValue(distributionSum);
+			sheet.getRow(rowIndex + 1).createCell(cellIndex).setCellValue(errorSum);
 
 			rowIndex = 1;
 			cellIndex++;
@@ -148,31 +158,38 @@ public class TripAnalysisExcelWriter {
 			Row row = sheet.createRow(rowIndex);
 			row.createCell(0).setCellValue(share.getKey());
 			row.createCell(1).setCellValue(share.getValue());
-			expectedSum++;
+			expectedSum += share.getValue();
 			rowIndex++;
 		}
 		sheet.createRow(rowIndex).createCell(0).setCellValue("sum");
 		sheet.getRow(rowIndex).createCell(1).setCellValue(expectedSum);
+		sheet.createRow(rowIndex + 1).createCell(0).setCellValue("error-squared");
+		sheet.getRow(rowIndex + 1).createCell(1).setCellValue(0);
 	}
 
 	private void addModalSplitValues(Sheet sheet, double scalingFactor) {
 
 		int rowIndex = 1;
 		int celIndex = 2;
-		int sum = 0;
+
 
 		for (Tuple<String, TripAnalysis> analysis : analyses) {
+			int sum = 0;
+			double errorSum = 0;
 
 			List<Map.Entry<String, Long>> modalSplit = analysis.getSecond().calculateModalSplit().entrySet().stream()
 					.sorted(Map.Entry.comparingByKey())
 					.collect(Collectors.toList());
 
 			for (Map.Entry<String, Long> split : modalSplit) {
-				sheet.getRow(rowIndex).createCell(celIndex).setCellValue(split.getValue() * scalingFactor);
-				sum += split.getValue() * scalingFactor;
+				double value = split.getValue() * scalingFactor;
+				sheet.getRow(rowIndex).createCell(celIndex).setCellValue(value);
+				sum += value;
+				errorSum = (expectedModalShare.get(split.getKey()) - value) * (expectedModalShare.get(split.getKey()) - value);
 				rowIndex++;
 			}
 			sheet.getRow(rowIndex).createCell(celIndex).setCellValue(sum);
+			sheet.getRow(rowIndex + 1).createCell(celIndex).setCellValue(errorSum);
 			celIndex++;
 			rowIndex = 1;
 		}
@@ -212,28 +229,37 @@ public class TripAnalysisExcelWriter {
 		}
 
 		sheet.createRow(rowIndex).createCell(2).setCellValue(sum);
+		sheet.createRow(rowIndex + 1).createCell(2).setCellValue(0);
 	}
 
 	private void addDistanceDistributionValues(Sheet sheet, SimpleDistanceDistribution expectedDistanceDistribution, double scalingFactor) {
 
 		int rowIndex = 1;
 		int cellIndex = 3;
-		int sum = 0;
+
 
 		for (Tuple<String, TripAnalysis> analysis : analyses) {
 
+			int sum = 0;
+			double errorSum = 0;
 			List<SimpleDistanceDistribution.SimpleDistanceBin> sorted = analysis.getSecond().calculateDistanceDistribution(expectedDistanceDistribution).getDistanceBins().stream()
 					.sorted(Comparator.comparingDouble(b -> b.getDistanceRange().getLowerLimit()))
 					.collect(Collectors.toList());
 
 			for (SimpleDistanceDistribution.SimpleDistanceBin bin : sorted) {
 
-				sheet.getRow(rowIndex).createCell(cellIndex).setCellValue(bin.getValue() * scalingFactor);
-				sum += bin.getValue() * scalingFactor;
+				SimpleDistanceDistribution.SimpleDistanceBin expectedBin = expectedDistanceDistribution.getDistanceBins().stream()
+						.filter(xbin -> xbin.getDistanceRange().getLowerLimit() == bin.getDistanceRange().getLowerLimit())
+						.findFirst().orElseThrow(() -> new RuntimeException("couldn't find bin"));
+				double value = bin.getValue() * scalingFactor;
+				sheet.getRow(rowIndex).createCell(cellIndex).setCellValue(value);
+				sum += value;
+				errorSum = (value - expectedBin.getValue()) * (value - expectedBin.getValue());
 				rowIndex++;
 			}
 
 			sheet.getRow(rowIndex).createCell(cellIndex).setCellValue(sum);
+			sheet.getRow(rowIndex + 1).createCell(cellIndex).setCellValue(errorSum);
 			cellIndex++;
 			rowIndex = 1;
 		}
