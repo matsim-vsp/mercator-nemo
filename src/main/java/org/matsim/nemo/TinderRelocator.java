@@ -3,7 +3,6 @@ package org.matsim.nemo;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureSource;
@@ -13,12 +12,10 @@ import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -26,7 +23,6 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -43,8 +39,11 @@ public class TinderRelocator {
 	private static final Logger logger = Logger.getLogger(TinderRelocator.class);
 	private static final Random random = MatsimRandom.getRandom();
 
-	@Parameter(names = {"-svnDir"}, required = true)
-	private String svnDir;
+	@Parameter(names = {"-sharedSvn"}, required = true)
+	private String sharedSvn;
+
+	@Parameter(names = {"-runsSvn"}, required = true)
+	private String runsSvn;
 
 	@Parameter(names = {"-scalingFactor", "-sf"})
 	private double scalingFactor = 0.01;
@@ -70,12 +69,17 @@ public class TinderRelocator {
 
 	private void run() throws IOException {
 
-		final Path svnPath = Paths.get(svnDir);
+		final Path sharedSvnPath = Paths.get(sharedSvn);
+		final Path runsSvnPath = Paths.get(runsSvn);
 
 		// read in the base case scenario
-		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(svnPath.resolve(BASE_CASE_CONFIG).toString()));
+		//scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(sharedSvnPath.resolve(BASE_CASE_CONFIG).toString()));
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		new PopulationReader(scenario).readFile(runsSvnPath.resolve("nemo\\baseCaseCalibration\\nemo_baseCase_089\\output\\nemo_baseCase_089.output_plans.xml.gz").toString());
 
 		// remove all plans other than the selected plan
+		// also remove all route informations
 		scenario.getPopulation().getPersons().values().parallelStream()
 				.forEach(person -> {
 
@@ -83,21 +87,26 @@ public class TinderRelocator {
 					person.getPlans().clear();
 					person.addPlan(selectedPlan);
 					person.setSelectedPlan(selectedPlan);
+
+					person.getSelectedPlan().getPlanElements().stream()
+							.filter(element -> element instanceof Leg)
+							.map(element -> (Leg) element)
+							.forEach(leg -> leg.setRoute(null));
 				});
 
 		// get the feature source of the murmo grid, to extract bounds from it
-		SimpleFeatureSource featureSource = ShapeFileReader.readDataFile(svnPath.resolve(MURMO_SHAPE_FILE).toString());
+		SimpleFeatureSource featureSource = ShapeFileReader.readDataFile(sharedSvnPath.resolve(MURMO_SHAPE_FILE).toString());
 
 		// create a spacial index of agents
 		initializeSpatialIndex(scenario, featureSource.getBounds());
 
 		// read in murmo transition raster
-		murmoFeatures = ShapeFileReader.getAllFeatures(svnPath.resolve(MURMO_SHAPE_FILE).toString()).stream()
+		murmoFeatures = ShapeFileReader.getAllFeatures(sharedSvnPath.resolve(MURMO_SHAPE_FILE).toString()).stream()
 				.sorted(featureComparator)
 				.collect(Collectors.toList());
 
 		// iterate over mumo csv
-		try (FileReader reader = new FileReader(svnPath.resolve(MURMO_TRANSITION_DATA).toString())) {
+		try (FileReader reader = new FileReader(sharedSvnPath.resolve(MURMO_TRANSITION_DATA).toString())) {
 
 			for (CSVRecord record : CSVFormat.newFormat(',').parse(reader)) {
 				if (record.getRecordNumber() == 1)
@@ -127,11 +136,13 @@ public class TinderRelocator {
 			logger.info(integerListEntry.getValue().size() + " persons moved " + integerListEntry.getKey() + " times");
 		}
 
+		String filename = "population_" + shareOfTinderMatches + "_matched-agents.xml.gz";
 		// write out new population
-		new PopulationWriter(scenario.getPopulation()).write(Paths.get("C:\\Users\\Janek\\Desktop\\tinder-test\\population-may-move-twice.xml.gz").toString());
+		new PopulationWriter(scenario.getPopulation()).write(sharedSvnPath.resolve("projects\\nemo_mercator\\data\\matsim_input\\deurbanisation").resolve(filename).toString());
 
 		// write out new popoulation as csv
-		try (CSVPrinter printer = CSVFormat.DEFAULT.withHeader("id", "homeX", "homeY", "was-moved").print(Paths.get("C:\\Users\\Janek\\Desktop\\tinder-test\\population.csv"), Charset.defaultCharset())) {
+		/*try (CSVPrinter printer = CSVFormat.DEFAULT.withHeader("id", "homeX", "homeY", "was-moved")
+				.print(sharedSvnPath.resolve("projects\\nemo_mercator\\data\\matsim_input\\deurbanisation\\population.csv"), Charset.defaultCharset())) {
 
 			for (Person p : scenario.getPopulation().getPersons().values()) {
 				Optional<Activity> homeActivity = p.getSelectedPlan().getPlanElements().stream()
@@ -144,7 +155,7 @@ public class TinderRelocator {
 				Activity home = homeActivity.get();
 				printer.printRecord(p.getId(), home.getCoord().getX(), home.getCoord().getY(), p.getAttributes().getAttribute(WAS_MOVED_KEY));
 			}
-		}
+		}*/
 	}
 
 	private void initializeSpatialIndex(Scenario scenario, ReferencedEnvelope bounds) {
@@ -199,7 +210,7 @@ public class TinderRelocator {
 			else
 				move(destinationFeature, sourceFeature, value);
 		}
-		logger.info("# " + index + " is: " + rowSum);
+		//	logger.info("# " + index + " is: " + rowSum);
 	}
 
 	private void move(SimpleFeature sourceFeature, SimpleFeature destinationFeature, double value) {
