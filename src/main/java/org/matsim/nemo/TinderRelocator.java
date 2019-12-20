@@ -3,6 +3,7 @@ package org.matsim.nemo;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureSource;
@@ -25,6 +26,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -34,7 +36,7 @@ public class TinderRelocator {
 
 	private static final String BASE_CASE_CONFIG = "projects\\nemo_mercator\\data\\matsim_input\\baseCase\\config_baseCase.xml";
 	private static final String MURMO_SHAPE_FILE = "projects\\nemo_mercator\\data\\original_files\\murmo\\Ruhr_Grid_1km\\Ruhr_Grid_1km_EW.shp";
-	private static final String MURMO_TRANSITION_DATA = "projects\\nemo_mercator\\data\\original_files\\murmo\\p_trans.csv";
+	private static final String MURMO_TRANSITION_DATA = "projects\\nemo_mercator\\data\\original_files\\murmo\\p_anti.csv";
 	private static final Comparator<SimpleFeature> featureComparator = Comparator.comparingLong(feature -> (Long) (feature.getAttribute("ID_Gitter_")));
 	private static final String WAS_MOVED_KEY = "was_moved";
 
@@ -128,6 +130,21 @@ public class TinderRelocator {
 		// write out new population
 		new PopulationWriter(scenario.getPopulation()).write(Paths.get("C:\\Users\\Janek\\Desktop\\tinder-test\\population-may-move-twice.xml.gz").toString());
 
+		// write out new popoulation as csv
+		try (CSVPrinter printer = CSVFormat.DEFAULT.withHeader("id", "homeX", "homeY", "was-moved").print(Paths.get("C:\\Users\\Janek\\Desktop\\tinder-test\\population.csv"), Charset.defaultCharset())) {
+
+			for (Person p : scenario.getPopulation().getPersons().values()) {
+				Optional<Activity> homeActivity = p.getSelectedPlan().getPlanElements().stream()
+						.filter(element -> element instanceof Activity)
+						.map(element -> (Activity) element)
+						.filter(activity -> activity.getType().startsWith("home"))
+						.findAny();
+
+				if (!homeActivity.isPresent()) throw new RuntimeException("no!");
+				Activity home = homeActivity.get();
+				printer.printRecord(p.getId(), home.getCoord().getX(), home.getCoord().getY(), p.getAttributes().getAttribute(WAS_MOVED_KEY));
+			}
+		}
 	}
 
 	private void initializeSpatialIndex(Scenario scenario, ReferencedEnvelope bounds) {
@@ -150,7 +167,6 @@ public class TinderRelocator {
 
 	private void handleRecord(CSVRecord record) {
 
-
 		// index is record number - 2, since first row is header and record number is 1-index based
 		final long index = record.getRecordNumber() - 2;
 
@@ -161,14 +177,14 @@ public class TinderRelocator {
 		Geometry geometry = (Geometry) sourceFeature.getDefaultGeometry();
 		List<Id<Person>> peopleWithinSource = getPersonsFromSpatialIndex(geometry);
 
-		logger.info("#" + index + " baseInhabitants=" + baseInhabitants + ", sourceInhabitants=" + peopleWithinSource.size());
+		//logger.info("#" + index + " baseInhabitants=" + baseInhabitants + ", sourceInhabitants=" + peopleWithinSource.size());
 
 		double rowSum = 0;
 		for (int columnIndex = 0; columnIndex < record.size(); columnIndex++) {
 
-			// the diagonal of the matrix is not relefant for us
+			// the we just need the lower half of the matrix since it is anti-symmetrical now
 			if (columnIndex == index) {
-				continue;
+				break;
 			}
 
 			// the destination feature is the index of the colum
@@ -181,7 +197,7 @@ public class TinderRelocator {
 			if (value >= 0)
 				move(sourceFeature, destinationFeature, value);
 			else
-				logger.info("Value was: " + value);
+				move(destinationFeature, sourceFeature, value);
 		}
 		logger.info("# " + index + " is: " + rowSum);
 	}
@@ -195,17 +211,21 @@ public class TinderRelocator {
 
 		if (peopleWithinSource.size() > 0) {
 
-			double shareOfPeopleMoving = value / baseInhabitants;
-			List<Id<Person>> matsimPeopleMoving = peopleWithinSource.stream()
-					.filter(personId -> random.nextDouble() < shareOfPeopleMoving)
+			double shareOfPeopleMoving = Math.abs(value) / baseInhabitants;
+			List<Person> matsimPeopleMoving = peopleWithinSource.stream()
+					.map(id -> scenario.getPopulation().getPersons().get(id))
+					.filter(person -> person.getAttributes().getAttribute(WAS_MOVED_KEY) == null)
+					.filter(person -> random.nextDouble() < shareOfPeopleMoving)
 					.collect(Collectors.toList());
 
 			if (matsimPeopleMoving.size() > 0) {
 				logger.info("moving " + matsimPeopleMoving.size() + " people. Share=" + shareOfPeopleMoving + " base=" + baseInhabitants + " value=" + value);
 			}
 
-			for (Id<Person> personId : matsimPeopleMoving) {
-				movePerson(personId, (Geometry) destinationFeature.getDefaultGeometry());
+			for (Person person : matsimPeopleMoving) {
+				movePerson(person, (Geometry) destinationFeature.getDefaultGeometry());
+				person.getAttributes().putAttribute("source-feature", sourceFeature.getAttribute("ID_Gitter_"));
+				person.getAttributes().putAttribute("destination-feature", destinationFeature.getAttribute("ID_Gitter_"));
 			}
 
 			sumOfPeopleToMove += value * scalingFactor;
@@ -215,11 +235,7 @@ public class TinderRelocator {
 		}
 	}
 
-
-	private void movePerson(Id<Person> personId, Geometry destinationGeometry) {
-
-		Person movingPerson = scenario.getPopulation().getPersons().get(personId);
-
+	private void movePerson(Person movingPerson, Geometry destinationGeometry) {
 
 		// this only moves the home activities for now. Later we should also move other stuff.
 		List<Activity> homeActivities = movingPerson.getSelectedPlan().getPlanElements().stream()
@@ -244,9 +260,9 @@ public class TinderRelocator {
 
 
 		Object wasMovedAttribute = movingPerson.getAttributes().getAttribute(WAS_MOVED_KEY);
-		if (wasMovedAttribute == null)
+		if (wasMovedAttribute == null) {
 			movingPerson.getAttributes().putAttribute(WAS_MOVED_KEY, 1);
-		else {
+		} else {
 			int timesMoved = (int) wasMovedAttribute + 1;
 			movingPerson.getAttributes().putAttribute(WAS_MOVED_KEY, timesMoved);
 		}
