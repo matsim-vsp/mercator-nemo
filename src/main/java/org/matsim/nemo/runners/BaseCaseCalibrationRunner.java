@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.bicycle.Bicycles;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -16,7 +17,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.nio.file.Paths;
@@ -81,6 +81,7 @@ public class BaseCaseCalibrationRunner {
             }
         });
 
+        //
         Bicycles.addAsOverridingModule(controler);
 
         return controler;
@@ -93,19 +94,26 @@ public class BaseCaseCalibrationRunner {
         scenario.getPopulation().getPersons().entrySet().removeIf(person -> Math.random() > 0.1);
 
         // remove routes from legs, since we have different network modes than before
+        // also generation of vehicleIds has changed
         scenario.getPopulation().getPersons().values().parallelStream()
                 .flatMap(person -> person.getPlans().stream())
                 .flatMap(plan -> plan.getPlanElements().stream())
                 .filter(element -> element instanceof Leg)
                 .map(element -> (Leg) element)
-                .filter(leg -> !(leg.getRoute() instanceof NetworkRoute))
                 .forEach(leg -> leg.setRoute(null));
+
+        // add link speed infrastructure factor of 1.0 for each bike link
+        scenario.getNetwork().getLinks().values().parallelStream()
+                .filter(link -> link.getAllowedModes().contains(TransportMode.bike))
+                .forEach(link -> link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 1.0));
         return scenario;
     }
 
     private Config prepareConfig() {
 
-        Config config = ConfigUtils.loadConfig(Paths.get(inputDir).resolve("config_baseCase.xml").toString(), new BicycleConfigGroup());
+        BicycleConfigGroup bikeConfigGroup = new BicycleConfigGroup();
+        bikeConfigGroup.setBicycleMode(TransportMode.bike);
+        Config config = ConfigUtils.loadConfig(Paths.get(inputDir).resolve("config_baseCase.xml").toString(), bikeConfigGroup);
 
         config.controler().setRunId(runId);
         config.controler().setOutputDirectory(outputDir);
@@ -118,7 +126,7 @@ public class BaseCaseCalibrationRunner {
 
         config.qsim().setUsingTravelTimeCheckInTeleportation(true);
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
-        config.qsim().setUsePersonIdForMissingVehicleId(true); // use this to use old plans file
+        config.qsim().setUsePersonIdForMissingVehicleId(false);
         config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
         final long minDuration = 600;
