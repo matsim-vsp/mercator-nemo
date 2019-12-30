@@ -91,8 +91,6 @@ public class BaseCaseCalibrationRunner {
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        scenario.getPopulation().getPersons().entrySet().removeIf(person -> Math.random() > 0.1);
-
         // remove routes from legs, since we have different network modes than before
         // also generation of vehicleIds has changed
         scenario.getPopulation().getPersons().values().parallelStream()
