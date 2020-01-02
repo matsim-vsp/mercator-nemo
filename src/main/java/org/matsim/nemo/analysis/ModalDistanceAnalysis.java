@@ -101,7 +101,7 @@ public class ModalDistanceAnalysis {
 
 		DistanceDistribution simulatedDistribution = expectedDistribution.copyWithEmptyBins();
 
-        tripEventHandler.getTrips().entrySet().parallelStream().flatMap(entry -> entry.getValue().stream())
+		tripEventHandler.getTrips().entrySet().parallelStream().flatMap(entry -> entry.getValue().stream())
 				.forEach(trip -> {
 					double distance = calculateBeelineDistance(trip);
 					simulatedDistribution.increaseCountByOne(trip.getMainMode(), distance);

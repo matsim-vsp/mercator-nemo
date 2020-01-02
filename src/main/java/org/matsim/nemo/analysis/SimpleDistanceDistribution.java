@@ -44,7 +44,7 @@ public class SimpleDistanceDistribution {
 			this.value = value;
 		}
 
-		void increaseCountByOne() {
+		synchronized void increaseCountByOne() {
 			this.value++;
 		}
 
