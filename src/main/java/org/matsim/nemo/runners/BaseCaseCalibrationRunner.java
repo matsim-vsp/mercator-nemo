@@ -12,20 +12,16 @@ import org.matsim.contrib.bicycle.Bicycles;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.nemo.util.NEMOUtils;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class BaseCaseCalibrationRunner {
-
 
     private final String runId;
     private final String outputDir;
@@ -107,11 +103,11 @@ public class BaseCaseCalibrationRunner {
         return scenario;
     }
 
-    private Config prepareConfig() {
+    Config prepareConfig() {
 
         BicycleConfigGroup bikeConfigGroup = new BicycleConfigGroup();
         bikeConfigGroup.setBicycleMode(TransportMode.bike);
-        Config config = ConfigUtils.loadConfig(Paths.get(inputDir).resolve("config_baseCase.xml").toString(), bikeConfigGroup);
+        Config config = ConfigUtils.loadConfig(Paths.get(inputDir).resolve("config.xml").toString(), bikeConfigGroup);
 
         config.controler().setRunId(runId);
         config.controler().setOutputDirectory(outputDir);
@@ -130,25 +126,14 @@ public class BaseCaseCalibrationRunner {
         final long minDuration = 600;
         final long maxDuration = 3600 * 27;
         final long difference = 600;
-        createTypicalDuration("home", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
-        createTypicalDuration("work", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
-        createTypicalDuration("education", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
-        createTypicalDuration("leisure", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
-        createTypicalDuration("shopping", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
-        createTypicalDuration("other", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        NEMOUtils.createTypicalDurations("home", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        NEMOUtils.createTypicalDurations("work", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        NEMOUtils.createTypicalDurations("education", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        NEMOUtils.createTypicalDurations("leisure", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        NEMOUtils.createTypicalDurations("shopping", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
+        NEMOUtils.createTypicalDurations("other", minDuration, maxDuration, difference).forEach(params -> config.planCalcScore().addActivityParams(params));
 
         return config;
-    }
-
-    private Collection<PlanCalcScoreConfigGroup.ActivityParams> createTypicalDuration(String type, long minDurationInSeconds, long maxDurationInSeconds, long durationDifferenceInSeconds) {
-
-        List<PlanCalcScoreConfigGroup.ActivityParams> result = new ArrayList<>();
-        for (long duration = minDurationInSeconds; duration <= maxDurationInSeconds; duration += durationDifferenceInSeconds) {
-            final PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams(type + "_" + duration + ".0");
-            params.setTypicalDuration(duration);
-            result.add(params);
-        }
-        return result;
     }
 
     /**
