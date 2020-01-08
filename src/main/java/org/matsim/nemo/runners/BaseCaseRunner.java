@@ -1,4 +1,4 @@
-package org.matsim.nemo.runners.smartCity;
+package org.matsim.nemo.runners;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import com.beust.jcommander.JCommander;
