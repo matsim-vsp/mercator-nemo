@@ -88,10 +88,10 @@ public class BaseCaseRunner {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// add link speed infrastructure factor of 1.0 for each bike link
+		// add link speed infrastructure factor of 0.5 for each bike link
 		scenario.getNetwork().getLinks().values().parallelStream()
 				.filter(link -> link.getAllowedModes().contains(TransportMode.bike))
-				.forEach(link -> link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 1.0));
+				.forEach(link -> link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5));
 		return scenario;
 	}
 
