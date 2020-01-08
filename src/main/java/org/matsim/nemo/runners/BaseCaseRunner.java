@@ -56,6 +56,17 @@ public class BaseCaseRunner {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		// the scenario generation uses bike_speed_factor, but the bicycle module expects something else
+		// replace the attribute key with the bicycle contrib's key
+		scenario.getNetwork().getLinks().values().parallelStream()
+				.filter(link -> link.getAllowedModes().contains(TransportMode.bike))
+				.filter(link -> link.getAttributes().getAttribute("bike_speed_factor") != null)
+				.forEach(link -> {
+					var speedFactor = (Double) link.getAttributes().getAttribute("bike_speed_factor");
+					link.getAttributes().removeAttribute("bike_speed_factor");
+					link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, speedFactor);
+				});
+
 		// add link speed infrastructure factor of 0.5 for each bike link which doesn't have infrastructure attribute
 		scenario.getNetwork().getLinks().values().parallelStream()
 				.filter(link -> link.getAllowedModes().contains(TransportMode.bike))
