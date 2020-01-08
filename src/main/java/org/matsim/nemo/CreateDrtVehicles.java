@@ -1,4 +1,4 @@
-package org.matsim.nemo.runners.smartCity;
+package org.matsim.nemo;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;

@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.nemo.runners.BikeLinkSpeedCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +132,7 @@ class BikeNetworkMerger {
 		result.setAllowedModes(new HashSet<>(Collections.singletonList(TransportMode.bike)));
 		result.setCapacity(10000); // set to pretty much unlimited
 		result.setFreespeed(8.3); // 30km/h
-		result.getAttributes().putAttribute(BikeLinkSpeedCalculator.BIKE_SPEED_FACTOR_KEY, 1.0); // bikes can reach their max velocity on bike highways
+		result.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 1.0); // bikes can reach their max velocity on bike highways
 		result.setNumberOfLanes(1);
 		result.setLength(NetworkUtils.getEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
 		return result;
