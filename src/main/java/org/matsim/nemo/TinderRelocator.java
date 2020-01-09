@@ -76,7 +76,7 @@ public class TinderRelocator {
 		//scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(sharedSvnPath.resolve(BASE_CASE_CONFIG).toString()));
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new PopulationReader(scenario).readFile(runsSvnPath.resolve("nemo\\baseCaseCalibration\\nemo_baseCase_089\\output\\nemo_baseCase_089.output_plans.xml.gz").toString());
+		new PopulationReader(scenario).readFile(runsSvnPath.resolve("nemo\\baseCaseCalibration2\\baseCase_021\\output\\baseCase_021.output_plans.xml.gz").toString());
 
 		// remove all plans other than the selected plan
 		// also remove all route informations
