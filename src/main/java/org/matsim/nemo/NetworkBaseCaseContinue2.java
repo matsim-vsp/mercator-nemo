@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.*;
@@ -21,11 +21,11 @@ public class NetworkBaseCaseContinue2 {
     private static final String inputNetwork = "D:/Arbeit/mercator-nemo/ruhrgebiet-v1.0-network-with-RSV.xml.gz";
     private static final String outputNetwork = "";
 
-    private static final Network NETWORK = readNetwork();
+    private static Network network = readNetwork();
 
     private static List<LinkAttributes> linksAtributes = new ArrayList<>();
     private static List<Link> links = new ArrayList<>();
-    private static List<Node> node = new ArrayList<>();
+    private static List<Node> nodes = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -35,14 +35,55 @@ public class NetworkBaseCaseContinue2 {
 //        addLinks_Hagen_Westhofen();
 //        addLinks_Westring_Sonnborn();
 //        addLinks_DuisburgSerm_DuisburgRahm();
+        addLinks_Herne_RecklinghausenHerten();
 
         addNodes_Loehne_Rehme();
+        addNodes_BielefeldBrackwede_Borgholzhausen();
+        addNodes_BielefeldBrackwede_Borgholzhausen_Zubringer();
 
+        generateModifiedNetwork();
+
+        new NetworkWriter(network).write("D:/Arbeit/mercator-nemo/testNetwork.xml");
+    }
+
+    private static void addNodes_BielefeldBrackwede_Borgholzhausen_Zubringer() {
+        List<NodeAttributes> nodes = new ArrayList<>();
+        final String preFix = "BielefeldBrackwede_Borgholzhausen_Zubringer";
+
+        nodes.add(new NodeAttributes(preFix + "1A", 464296.553, 5758168.792));
+        nodes.add(new NodeAttributes(preFix + "2", 464040.896, 5757289.156));
+        nodes.add(new NodeAttributes(preFix + "3", 463364.919, 5756565.514));
+        nodes.add(new NodeAttributes(preFix + "4", 462515.615, 5755724.876));
+        nodes.add(new NodeAttributes(preFix + "5A", 461341.323, 5755655.546));
+
+        addNodes(nodes);
+        buildingLinks(nodes, 1, 1800, 22.22222222222222);
+    }
+
+    private static void addNodes_BielefeldBrackwede_Borgholzhausen() {
+        List<NodeAttributes> nodes = new ArrayList<>();
+        final String preFix = "BielefeldBrackwede_Borgholzhausen";
+
+        nodes.add(new NodeAttributes(preFix + "1A", 448273.526, 5769994.048));
+        nodes.add(new NodeAttributes(preFix + "2", 449436.986, 5768938.918));
+        nodes.add(new NodeAttributes(preFix + "3", 450478.033, 5768834.922));
+        nodes.add(new NodeAttributes(preFix + "4", 451500.664, 5768947.584));
+        nodes.add(new NodeAttributes(preFix + "5", 453012.945, 5768444.935));
+        nodes.add(new NodeAttributes(preFix + "6", 454464.561, 5767664.962));
+        nodes.add(new NodeAttributes(preFix + "7", 454785.217, 5767014.985));
+        nodes.add(new NodeAttributes(preFix + "8A", 454689.887, 5766109.349));
+        nodes.add(new NodeAttributes(preFix + "9", 455014.875, 5765372.708));
+        nodes.add(new NodeAttributes(preFix + "10", 456362.495, 5764358.744));
+        nodes.add(new NodeAttributes(preFix + "11A", 457723.115, 5763700.1));
+
+        addNodes(nodes);
+        buildingLinks(nodes, 2, 4000, 27.77777777777778);
     }
 
     private static void addNodes_Loehne_Rehme() {
         List<NodeAttributes> nodes = new ArrayList<>();
         final String preFix = "Loehne_Rehme_";
+
         nodes.add(new NodeAttributes(preFix + "1A", 482634.933, 5783669.391));
         nodes.add(new NodeAttributes(preFix + "2", 483133.249, 5783979.213));
         nodes.add(new NodeAttributes(preFix + "3", 483341.242, 5784449.364));
@@ -55,36 +96,145 @@ public class NetworkBaseCaseContinue2 {
         nodes.add(new NodeAttributes(preFix + "10", 487763.255, 5786078.641));
         nodes.add(new NodeAttributes(preFix + "11A", 488125.076, 5785281.335));
 
-        Iterator<NodeAttributes> iterator = nodes.listIterator();
+        addNodes(nodes);
+        buildingLinks(nodes, 2, 4000, 27.77777777777778);
+    }
+
+    private static void addNodes(List<NodeAttributes> nodesAttributes) {
+        for (NodeAttributes node : nodesAttributes) {
+            nodes.add(NetworkUtils.createNode(Id.createNodeId(node.NodeId), new Coord(node.xCoord, node.yCoord)));
+        }
+    }
+
+    private static void buildingLinks(List<NodeAttributes> nodesAttributes, double lanes, double capacity, double freeSpeed) {
+        Iterator<NodeAttributes> iterator = nodesAttributes.listIterator();
         NodeAttributes nodeAttributes1 = iterator.next();
-        NodeAttributes tmp;
         while (iterator.hasNext()) {
             NodeAttributes nodeAttributes2 = iterator.next();
-            conectTwoNodes(nodeAttributes1, nodeAttributes2,0,0,0);
+            conectTwoNodes(nodeAttributes1, nodeAttributes2, lanes, capacity, freeSpeed);
+            nodeAttributes1 = nodeAttributes2;
         }
     }
 
     private static void conectTwoNodes(NodeAttributes n1, NodeAttributes n2, double lanes, double capacity, double freeSpeed) {
-        NetworkFactory nf = NETWORK.getFactory();
+        NetworkFactory nf = network.getFactory();
+
         Set<String> modes = new HashSet<>();
         modes.add(TransportMode.car);
         modes.add(TransportMode.ride);
+
         Node node1 = NetworkUtils.createNode(Id.createNodeId(n1.NodeId), new Coord(n1.xCoord, n1.yCoord));
         Node node2 = NetworkUtils.createNode(Id.createNodeId(n2.NodeId), new Coord(n2.xCoord, n2.yCoord));
-        Link link1 = nf.createLink(Id.createLinkId(n1.NodeId + n2.NodeId), node1, node2);
-        Link link2 = nf.createLink(Id.createLinkId(n2.NodeId + n1.NodeId), node2, node1);
+        Link link1 = nf.createLink(Id.createLinkId(n1.NodeId + "_" + n2.NodeId), node1, node2);
+        Link link2 = nf.createLink(Id.createLinkId(n2.NodeId + "_" + n1.NodeId), node2, node1);
+
         link1.setFreespeed(freeSpeed);
-        link1.setCapacity(capacity);
-        link1.setNumberOfLanes(lanes);
-        link1.setAllowedModes(modes);
         link2.setFreespeed(freeSpeed);
+        link1.setCapacity(capacity);
         link2.setCapacity(capacity);
+        link1.setNumberOfLanes(lanes);
         link2.setNumberOfLanes(lanes);
+        link1.setAllowedModes(modes);
         link2.setAllowedModes(modes);
+
         links.add(link1);
         links.add(link2);
     }
 
+    private static void addLinks_Herne_RecklinghausenHerten() {
+        new LinkAttributes("425917", 3, 6000);
+        new LinkAttributes("425895", 3, 6000);
+        new LinkAttributes("483602", 3, 6000);
+        new LinkAttributes("440369", 3, 6000);
+        new LinkAttributes("425901", 3, 6000);
+        new LinkAttributes("421174", 3, 6000);
+        new LinkAttributes("78817", 3, 6000);
+        new LinkAttributes("171289", 3, 6000);
+        new LinkAttributes("171299", 3, 6000);
+        new LinkAttributes("409591", 3, 6000);
+        new LinkAttributes("78801", 3, 6000);
+        new LinkAttributes("79408", 3, 6000);
+        new LinkAttributes("272294", 3, 6000);
+        new LinkAttributes("272296", 3, 6000);
+        new LinkAttributes("504111", 3, 6000);
+        new LinkAttributes("231675", 3, 6000);
+        new LinkAttributes("231690", 3, 6000);
+        new LinkAttributes("231669", 3, 6000);
+        new LinkAttributes("231680", 3, 6000);
+        new LinkAttributes("231633", 3, 6000);
+        new LinkAttributes("234410", 3, 6000);
+        new LinkAttributes("29522", 3, 6000);
+        new LinkAttributes("29539", 3, 6000);
+        new LinkAttributes("79420", 3, 6000);
+        new LinkAttributes("79425", 3, 6000);
+        new LinkAttributes("79105", 3, 6000);
+        new LinkAttributes("79103", 3, 6000);
+        new LinkAttributes("371600", 3, 6000);
+        new LinkAttributes("371599", 3, 6000);
+        new LinkAttributes("397339", 3, 6000);
+        new LinkAttributes("39566", 3, 6000);
+        new LinkAttributes("440404", 3, 6000);
+        new LinkAttributes("203319", 3, 6000);
+        new LinkAttributes("12062", 3, 6000);
+        new LinkAttributes("12063", 3, 6000);
+        new LinkAttributes("512139", 3, 6000);
+        new LinkAttributes("512129", 3, 6000);
+        new LinkAttributes("320942", 3, 6000);
+        new LinkAttributes("320937", 3, 6000);
+        new LinkAttributes("352671", 3, 6000);
+        new LinkAttributes("85690", 3, 6000);
+        new LinkAttributes("85333", 3, 6000);
+        new LinkAttributes("157001", 3, 6000);
+        new LinkAttributes("157013", 3, 6000);
+
+        new LinkAttributes("85508", 3, 6000);
+        new LinkAttributes("157002", 3, 6000);
+        new LinkAttributes("157010", 3, 6000);
+        new LinkAttributes("422682", 3, 6000);
+        new LinkAttributes("85689", 3, 6000);
+        new LinkAttributes("85332", 3, 6000);
+        new LinkAttributes("352670", 3, 6000);
+        new LinkAttributes("320934", 3, 6000);
+        new LinkAttributes("320945", 3, 6000);
+        new LinkAttributes("512126", 3, 6000);
+        new LinkAttributes("512132", 3, 6000);
+        new LinkAttributes("12070", 3, 6000);
+        new LinkAttributes("12064", 3, 6000);
+        new LinkAttributes("20312", 3, 6000);
+        new LinkAttributes("440386", 3, 6000);
+        new LinkAttributes("171290", 3, 6000);
+        new LinkAttributes("371602", 3, 6000);
+        new LinkAttributes("371601", 3, 6000);
+        new LinkAttributes("425893", 3, 6000);
+        new LinkAttributes("425899", 3, 6000);
+        new LinkAttributes("440372", 3, 6000);
+        new LinkAttributes("440403", 3, 6000);
+        new LinkAttributes("421171", 3, 6000);
+        new LinkAttributes("421172", 3, 6000);
+        new LinkAttributes("78224", 3, 6000);
+        new LinkAttributes("396502", 3, 6000);
+        new LinkAttributes("510095", 3, 6000);
+        new LinkAttributes("396463", 3, 6000);
+        new LinkAttributes("78226", 3, 6000);
+        new LinkAttributes("78221", 3, 6000);
+        new LinkAttributes("272295", 3, 6000);
+        new LinkAttributes("272293", 3, 6000);
+        new LinkAttributes("178447", 3, 6000);
+        new LinkAttributes("231662", 3, 6000);
+        new LinkAttributes("231622", 3, 6000);
+        new LinkAttributes("231687", 3, 6000);
+        new LinkAttributes("231674", 3, 6000);
+        new LinkAttributes("234409", 3, 6000);
+        new LinkAttributes("29487", 3, 6000);
+        new LinkAttributes("186105", 3, 6000);
+        new LinkAttributes("105659", 3, 6000);
+        new LinkAttributes("105660", 3, 6000);
+        new LinkAttributes("104611", 3, 6000);
+    }
+
+    /**
+     * von Gregor
+     */
     private static void addLinks_MuensterM_LotteOsnabrueck() {
         linksAtributes.add(new LinkAttributes("454963", 3, 6000));
         linksAtributes.add(new LinkAttributes("300431", 3, 6000));
@@ -300,6 +450,9 @@ public class NetworkBaseCaseContinue2 {
         linksAtributes.add(new LinkAttributes("21295", 3, 6000));
     }
 
+    /**
+     * von Gregor
+     */
     private static void addLinks_KoelnMuelheim_Leverkusen() {
         linksAtributes.add(new LinkAttributes("61355", 4, 8000));
         linksAtributes.add(new LinkAttributes("478238", 4, 8000));
@@ -342,6 +495,9 @@ public class NetworkBaseCaseContinue2 {
         linksAtributes.add(new LinkAttributes("61333", 4, 8000));
     }
 
+    /**
+     * von Gregor
+     */
     private static void addLinks_KoelnNiehl_Leverkusen() {
         linksAtributes.add(new LinkAttributes("161255", 4, 8000));
         linksAtributes.add(new LinkAttributes("203991", 4, 8000));
@@ -400,6 +556,9 @@ public class NetworkBaseCaseContinue2 {
         linksAtributes.add(new LinkAttributes("449211", 4, 8000));
     }
 
+    /**
+     * von Gregor
+     */
     private static void addLinks_Hagen_Westhofen() {
         linksAtributes.add(new LinkAttributes("494734", 3, 6000));
         linksAtributes.add(new LinkAttributes("245830", 3, 6000));
@@ -464,6 +623,9 @@ public class NetworkBaseCaseContinue2 {
         linksAtributes.add(new LinkAttributes("387651", 3, 6000));
     }
 
+    /**
+     * von Gregor
+     */
     private static void addLinks_Westring_Sonnborn() {
         linksAtributes.add(new LinkAttributes("45323", 3, 6000));
         linksAtributes.add(new LinkAttributes("45341", 3, 6000));
@@ -484,6 +646,9 @@ public class NetworkBaseCaseContinue2 {
         linksAtributes.add(new LinkAttributes("45325", 3, 6000));
     }
 
+    /**
+     * von Gregor
+     */
     private static void addLinks_DuisburgSerm_DuisburgRahm() {
         linksAtributes.add(new LinkAttributes("241734", 2, 4000));
         linksAtributes.add(new LinkAttributes("233393", 2, 4000));
@@ -504,9 +669,19 @@ public class NetworkBaseCaseContinue2 {
     private static Network readNetwork() {
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetwork);
-        Network network = scenario.getNetwork();
+//        new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetwork);
+//        Network network = scenario.getNetwork();
+        Network network = NetworkUtils.createNetwork();
         return network;
+    }
+
+    private static void generateModifiedNetwork() {
+        for (Node node : nodes) {
+            network.addNode(node);
+        }
+        for (Link link : links) {
+            network.addLink(link);
+        }
     }
 
     private static class LinkAttributes {
@@ -521,7 +696,7 @@ public class NetworkBaseCaseContinue2 {
         }
     }
 
-    public static class NodeAttributes {
+    private static class NodeAttributes {
         private String NodeId;
         private double xCoord;
         private double yCoord;
