@@ -5,14 +5,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.MainModeIdentifier;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class NemoModeLocationChoiceMainModeIdentifier implements MainModeIdentifier {
 
-	private final List<String> modes = Collections.unmodifiableList(Arrays.asList(
-			TransportMode.walk, TransportMode.bike, TransportMode.ride, TransportMode.car, TransportMode.pt));
+	private final List<String> modes = List.of(TransportMode.walk, TransportMode.bike, TransportMode.ride, TransportMode.car, TransportMode.drt, TransportMode.pt);
 
 	@Override
 	public String identifyMainMode(List<? extends PlanElement> list) {
