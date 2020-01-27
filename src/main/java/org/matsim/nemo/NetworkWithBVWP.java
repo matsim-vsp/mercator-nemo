@@ -17,7 +17,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.*;
 
-public class NetworkBaseCaseContinue2 {
+public class NetworkWithBVWP {
 
     private static final String inputNetwork = "D:/Arbeit/mercator-nemo/ruhrgebiet-v1.0-network-with-RSV.xml.gz";
     private static final String outputNetwork = "D:/Arbeit/mercator-nemo/testNetwork.xml";
