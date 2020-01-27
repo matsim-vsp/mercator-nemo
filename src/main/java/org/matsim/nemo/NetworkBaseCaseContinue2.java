@@ -42,15 +42,68 @@ public class NetworkBaseCaseContinue2 {
         addNodes_BielefeldBrackwede_Borgholzhausen();
         addNodes_BielefeldBrackwede_Borgholzhausen_Zubringer();
         addNodes_DuesseldorfRatingen_Velbert();
+        addNodes_Bochum_BochumWitten();
+        addNodes_Bestwig_BestwigNuttlar();
 
         generateModifiedNetwork();
+        connectToExistingNetwork();
 
         new NetworkWriter(network).write(outputNetwork);
     }
 
+    private static void addNodes_Bestwig_BestwigNuttlar() {
+        List<NodeAttributes> nodes = new ArrayList<>();
+        final String preFix = "Bestwig_BestwigNuttlar_";
+
+        nodes.add(new NodeAttributes(preFix + "1A", 455858.942, 5690218.471));
+        nodes.add(new NodeAttributes(preFix + "2", 457074.624, 5690446.412));
+        nodes.add(new NodeAttributes(preFix + "3", 458268.597, 5691043.398));
+        nodes.add(new NodeAttributes(preFix + "4", 459457.143, 5691814.054));
+        nodes.add(new NodeAttributes(preFix + "5", 460135.537, 5692226.517));
+        nodes.add(new NodeAttributes(preFix + "6", 460781.368, 5692215.663));
+        nodes.add(new NodeAttributes(preFix + "7", 460944.183, 5691792.345));
+        nodes.add(new NodeAttributes(preFix + "8", 461248.103, 5691445.008));
+        nodes.add(new NodeAttributes(preFix + "9", 461242.676, 5690956.564));
+        nodes.add(new NodeAttributes(preFix + "10A", 461888.507, 5690343.296));
+
+        nodes.add(new NodeAttributes(preFix + "RXR1A", 455858.942, 5690218.471));
+        nodes.add(new NodeAttributes(preFix + "RXR2", 457074.624, 5690446.412));
+        nodes.add(new NodeAttributes(preFix + "RXR3", 458268.597, 5691043.398));
+        nodes.add(new NodeAttributes(preFix + "RXR4", 459457.143, 5691814.054));
+        nodes.add(new NodeAttributes(preFix + "RXR5", 460135.537, 5692226.517));
+        nodes.add(new NodeAttributes(preFix + "RXR6", 460781.368, 5692215.663));
+        nodes.add(new NodeAttributes(preFix + "RXR7", 460944.183, 5691792.345));
+        nodes.add(new NodeAttributes(preFix + "RXR8", 461248.103, 5691445.008));
+        nodes.add(new NodeAttributes(preFix + "RXR9", 461242.676, 5690956.564));
+        nodes.add(new NodeAttributes(preFix + "RXR10A", 461888.507, 5690343.296));
+
+        addNodes(nodes);
+        buildingLinks(nodes, 2, 4000, 33.33333333333333);
+    }
+
+    private static void addNodes_Bochum_BochumWitten() {
+        List<NodeAttributes> nodes = new ArrayList<>();
+        final String preFix = "Bochum_BochumWitten_";
+
+        nodes.add(new NodeAttributes(preFix + "1A", 378228.966, 5702671.071));
+        nodes.add(new NodeAttributes(preFix + "2", 378809.671, 5702736.196));
+        nodes.add(new NodeAttributes(preFix + "3A", 379346.959, 5702728.056));
+        nodes.add(new NodeAttributes(preFix + "4", 379943.945, 5702893.584));
+        nodes.add(new NodeAttributes(preFix + "5A", 380584.349, 5702703.634));
+
+        nodes.add(new NodeAttributes(preFix + "RXR1A", 378228.966, 5702671.071));
+        nodes.add(new NodeAttributes(preFix + "RXR2", 378809.671, 5702736.196));
+        nodes.add(new NodeAttributes(preFix + "RXR3A", 379346.959, 5702728.056));
+        nodes.add(new NodeAttributes(preFix + "RXR4", 379943.945, 5702893.584));
+        nodes.add(new NodeAttributes(preFix + "RXR5A", 380584.349, 5702703.634));
+
+        addNodes(nodes);
+        buildingLinks(nodes, 2, 4000, 33.33333333333333);
+    }
+
     private static void addNodes_DuesseldorfRatingen_Velbert() {
         List<NodeAttributes> nodes = new ArrayList<>();
-        final String preFix = "DuesseldorfRatingen_Velbert";
+        final String preFix = "DuesseldorfRatingen_Velbert_";
 
         nodes.add(new NodeAttributes(preFix + "1A", 353372.486, 5685090.744));
         nodes.add(new NodeAttributes(preFix + "2", 353916.842, 5685339.902));
@@ -64,13 +117,25 @@ public class NetworkBaseCaseContinue2 {
         nodes.add(new NodeAttributes(preFix + "10", 361437.623, 5687915.438));
         nodes.add(new NodeAttributes(preFix + "11A", 361608.242, 5688500.418));
 
+        nodes.add(new NodeAttributes(preFix + "RXR1A", 353372.486, 5685090.744));
+        nodes.add(new NodeAttributes(preFix + "RXR2", 353916.842, 5685339.902));
+        nodes.add(new NodeAttributes(preFix + "RXR3", 354428.699, 5685819.261));
+        nodes.add(new NodeAttributes(preFix + "RXR4", 355154.508, 5686073.835));
+        nodes.add(new NodeAttributes(preFix + "RXR5", 355614.908, 5686396.116));
+        nodes.add(new NodeAttributes(preFix + "RXR6", 356421.964, 5686550.485));
+        nodes.add(new NodeAttributes(preFix + "RXR7A", 357323.807, 5686642.566));
+        nodes.add(new NodeAttributes(preFix + "RXR8", 358377.312, 5687067.759));
+        nodes.add(new NodeAttributes(preFix + "RXR9", 359956.216, 5687330.458));
+        nodes.add(new NodeAttributes(preFix + "RXR10", 361437.623, 5687915.438));
+        nodes.add(new NodeAttributes(preFix + "RXR11A", 361608.242, 5688500.418));
+
         addNodes(nodes);
         buildingLinks(nodes, 2, 4000, 33.33333333333333);
     }
 
     private static void addNodes_BielefeldBrackwede_Borgholzhausen_Zubringer() {
         List<NodeAttributes> nodes = new ArrayList<>();
-        final String preFix = "BielefeldBrackwede_Borgholzhausen_Zubringer";
+        final String preFix = "BielefeldBrackwede_Borgholzhausen_Zubringer_";
 
         nodes.add(new NodeAttributes(preFix + "1A", 464296.553, 5758168.792));
         nodes.add(new NodeAttributes(preFix + "2", 464040.896, 5757289.156));
@@ -78,13 +143,19 @@ public class NetworkBaseCaseContinue2 {
         nodes.add(new NodeAttributes(preFix + "4", 462515.615, 5755724.876));
         nodes.add(new NodeAttributes(preFix + "5A", 461341.323, 5755655.546));
 
+        nodes.add(new NodeAttributes(preFix + "RXR1A", 464296.553, 5758168.792));
+        nodes.add(new NodeAttributes(preFix + "RXR2", 464040.896, 5757289.156));
+        nodes.add(new NodeAttributes(preFix + "RXR3", 463364.919, 5756565.514));
+        nodes.add(new NodeAttributes(preFix + "RXR4", 462515.615, 5755724.876));
+        nodes.add(new NodeAttributes(preFix + "RXR5A", 461341.323, 5755655.546));
+
         addNodes(nodes);
         buildingLinks(nodes, 1, 1800, 22.22222222222222);
     }
 
     private static void addNodes_BielefeldBrackwede_Borgholzhausen() {
         List<NodeAttributes> nodes = new ArrayList<>();
-        final String preFix = "BielefeldBrackwede_Borgholzhausen";
+        final String preFix = "BielefeldBrackwede_Borgholzhausen_";
 
         nodes.add(new NodeAttributes(preFix + "1A", 448273.526, 5769994.048));
         nodes.add(new NodeAttributes(preFix + "2", 449436.986, 5768938.918));
@@ -97,6 +168,18 @@ public class NetworkBaseCaseContinue2 {
         nodes.add(new NodeAttributes(preFix + "9", 455014.875, 5765372.708));
         nodes.add(new NodeAttributes(preFix + "10", 456362.495, 5764358.744));
         nodes.add(new NodeAttributes(preFix + "11A", 457723.115, 5763700.1));
+
+        nodes.add(new NodeAttributes(preFix + "RXR1A", 448273.526, 5769994.048));
+        nodes.add(new NodeAttributes(preFix + "RXR2", 449436.986, 5768938.918));
+        nodes.add(new NodeAttributes(preFix + "RXR3", 450478.033, 5768834.922));
+        nodes.add(new NodeAttributes(preFix + "RXR4", 451500.664, 5768947.584));
+        nodes.add(new NodeAttributes(preFix + "RXR5", 453012.945, 5768444.935));
+        nodes.add(new NodeAttributes(preFix + "RXR6", 454464.561, 5767664.962));
+        nodes.add(new NodeAttributes(preFix + "RXR7", 454785.217, 5767014.985));
+        nodes.add(new NodeAttributes(preFix + "RXR8A", 454689.887, 5766109.349));
+        nodes.add(new NodeAttributes(preFix + "RXR9", 455014.875, 5765372.708));
+        nodes.add(new NodeAttributes(preFix + "RXR10", 456362.495, 5764358.744));
+        nodes.add(new NodeAttributes(preFix + "RXR11A", 457723.115, 5763700.1));
 
         addNodes(nodes);
         buildingLinks(nodes, 2, 4000, 33.33333333333333);
@@ -118,6 +201,18 @@ public class NetworkBaseCaseContinue2 {
         nodes.add(new NodeAttributes(preFix + "10", 487763.255, 5786078.641));
         nodes.add(new NodeAttributes(preFix + "11A", 488125.076, 5785281.335));
 
+        nodes.add(new NodeAttributes(preFix + "RXR1A", 482634.933, 5783669.391));
+        nodes.add(new NodeAttributes(preFix + "RXR2", 483133.249, 5783979.213));
+        nodes.add(new NodeAttributes(preFix + "RXR3", 483341.242, 5784449.364));
+        nodes.add(new NodeAttributes(preFix + "RXR4", 483302.243, 5785279.168));
+        nodes.add(new NodeAttributes(preFix + "RXR5", 483770.227, 5785844.649));
+        nodes.add(new NodeAttributes(preFix + "RXR6", 484890.354, 5786522.792));
+        nodes.add(new NodeAttributes(preFix + "RXR7A", 485873.987, 5786923.611));
+        nodes.add(new NodeAttributes(preFix + "RXR8", 486911.784, 5787142.437));
+        nodes.add(new NodeAttributes(preFix + "RXR9A", 487466.432, 5786901.945));
+        nodes.add(new NodeAttributes(preFix + "RXR10", 487763.255, 5786078.641));
+        nodes.add(new NodeAttributes(preFix + "RXR11A", 488125.076, 5785281.335));
+
         addNodes(nodes);
         buildingLinks(nodes, 2, 4000, 27.77777777777778);
     }
@@ -131,14 +226,23 @@ public class NetworkBaseCaseContinue2 {
     private static void buildingLinks(List<NodeAttributes> nodesAttributes, double lanes, double capacity, double freeSpeed) {
         Iterator<NodeAttributes> iterator = nodesAttributes.listIterator();
         NodeAttributes nodeAttributes1 = iterator.next();
+        while (iterator.hasNext() && !nodeAttributes1.NodeId.contains("RXR")) {
+            NodeAttributes nodeAttributes2 = iterator.next();
+            if (nodeAttributes2.NodeId.contains("RXR")) {
+                nodeAttributes1 = nodeAttributes2;
+                break;
+            }
+            connectTwoNodes(nodeAttributes1, nodeAttributes2, lanes, capacity, freeSpeed);
+            nodeAttributes1 = nodeAttributes2;
+        }
         while (iterator.hasNext()) {
             NodeAttributes nodeAttributes2 = iterator.next();
-            conectTwoNodes(nodeAttributes1, nodeAttributes2, lanes, capacity, freeSpeed);
+            connectTwoNodes(nodeAttributes2, nodeAttributes1, lanes, capacity, freeSpeed);
             nodeAttributes1 = nodeAttributes2;
         }
     }
 
-    private static void conectTwoNodes(NodeAttributes n1, NodeAttributes n2, double lanes, double capacity, double freeSpeed) {
+    private static void connectTwoNodes(NodeAttributes n1, NodeAttributes n2, double lanes, double capacity, double freeSpeed) {
         NetworkFactory nf = network.getFactory();
 
         Set<String> modes = new HashSet<>();
@@ -148,19 +252,102 @@ public class NetworkBaseCaseContinue2 {
         Node node1 = NetworkUtils.createNode(Id.createNodeId(n1.NodeId), new Coord(n1.xCoord, n1.yCoord));
         Node node2 = NetworkUtils.createNode(Id.createNodeId(n2.NodeId), new Coord(n2.xCoord, n2.yCoord));
         Link link1 = nf.createLink(Id.createLinkId(n1.NodeId + "_" + n2.NodeId), node1, node2);
-        Link link2 = nf.createLink(Id.createLinkId(n2.NodeId + "_" + n1.NodeId), node2, node1);
 
         link1.setFreespeed(freeSpeed);
-        link2.setFreespeed(freeSpeed);
         link1.setCapacity(capacity);
-        link2.setCapacity(capacity);
         link1.setNumberOfLanes(lanes);
-        link2.setNumberOfLanes(lanes);
         link1.setAllowedModes(modes);
-        link2.setAllowedModes(modes);
 
         links.add(link1);
-        links.add(link2);
+    }
+
+    private static void connectToExistingNetwork() {
+        NetworkFactory nf = network.getFactory();
+        List<Link> driveway = new ArrayList<>();
+        List<Link> motorway = new ArrayList<>();
+
+        driveway.add(nf.createLink(Id.createLinkId("Bestwig_BestwigNuttlar_1AA"), network.getNodes().get(Id.createNodeId("264248800")), network.getNodes().get(Id.createNodeId("Bestwig_BestwigNuttlar_1A"))));
+        motorway.add(nf.createLink(Id.createLinkId("Bestwig_BestwigNuttlar_1AB"), network.getNodes().get(Id.createNodeId("34235597")), network.getNodes().get(Id.createNodeId("Bestwig_BestwigNuttlar_1A"))));
+        driveway.add(nf.createLink(Id.createLinkId("Bestwig_BestwigNuttlar_1RAA"), network.getNodes().get(Id.createNodeId("Bestwig_BestwigNuttlar_RXR1A")), network.getNodes().get(Id.createNodeId("34235577"))));
+        motorway.add(nf.createLink(Id.createLinkId("Bestwig_BestwigNuttlar_1RAB"), network.getNodes().get(Id.createNodeId("Bestwig_BestwigNuttlar_RXR1A")), network.getNodes().get(Id.createNodeId("2964883029"))));
+        driveway.add(nf.createLink(Id.createLinkId("Bestwig_BestwigNuttlar_10AA"), network.getNodes().get(Id.createNodeId("Bestwig_BestwigNuttlar_10A")), network.getNodes().get(Id.createNodeId("292673081"))));
+        driveway.add(nf.createLink(Id.createLinkId("Bestwig_BestwigNuttlar_10RAB"), network.getNodes().get(Id.createNodeId("292673081")), network.getNodes().get(Id.createNodeId("Bestwig_BestwigNuttlar_RXR10A"))));
+
+        motorway.add(nf.createLink(Id.createLinkId("Bochum_BochumWitten_1AA"), network.getNodes().get(Id.createNodeId("1020784385")), network.getNodes().get(Id.createNodeId("Bochum_BochumWitten_1A"))));
+        motorway.add(nf.createLink(Id.createLinkId("Bochum_BochumWitten_1RAB"), network.getNodes().get(Id.createNodeId("Bochum_BochumWitten_RXR1A")), network.getNodes().get(Id.createNodeId("1020784324"))));
+        driveway.add(nf.createLink(Id.createLinkId("Bochum_BochumWitten_3AA"), network.getNodes().get(Id.createNodeId("Bochum_BochumWitten_3A")), network.getNodes().get(Id.createNodeId("25575152"))));
+        driveway.add(nf.createLink(Id.createLinkId("Bochum_BochumWitten_3AB"), network.getNodes().get(Id.createNodeId("26007500")), network.getNodes().get(Id.createNodeId("Bochum_BochumWitten_3A"))));
+        driveway.add(nf.createLink(Id.createLinkId("Bochum_BochumWitten_3RAA"), network.getNodes().get(Id.createNodeId("Bochum_BochumWitten_RXR3A")), network.getNodes().get(Id.createNodeId("26007498"))));
+        driveway.add(nf.createLink(Id.createLinkId("Bochum_BochumWitten_3RAB"), network.getNodes().get(Id.createNodeId("26007498")), network.getNodes().get(Id.createNodeId("Bochum_BochumWitten_RXR3A"))));
+        motorway.add(nf.createLink(Id.createLinkId("Bochum_BochumWitten_5AB"), network.getNodes().get(Id.createNodeId("Bochum_BochumWitten_5A")), network.getNodes().get(Id.createNodeId("25525505"))));
+        motorway.add(nf.createLink(Id.createLinkId("Bochum_BochumWitten_5RAB"), network.getNodes().get(Id.createNodeId("25390978")), network.getNodes().get(Id.createNodeId("Bochum_BochumWitten_RXR5A"))));
+
+        motorway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_1AA"), network.getNodes().get(Id.createNodeId("5085174401")), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_1A"))));
+        driveway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_1AB"), network.getNodes().get(Id.createNodeId("4708283632")), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_2"))));
+        driveway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_1AC"), network.getNodes().get(Id.createNodeId("380433")), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_1A"))));
+        motorway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_1RAA"), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_RXR1A")), network.getNodes().get(Id.createNodeId("323145025"))));
+        driveway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_1RAB"), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_RXR1A")), network.getNodes().get(Id.createNodeId("380429"))));
+        driveway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_1RAC"), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_RXR2")), network.getNodes().get(Id.createNodeId("2929264230"))));
+        driveway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_7AA"), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_1A")), network.getNodes().get(Id.createNodeId("5024987421"))));
+        driveway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_7RAA"), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_RXR7A")), network.getNodes().get(Id.createNodeId("1279582236"))));
+        motorway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_11AA"), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_11A")), network.getNodes().get(Id.createNodeId("258356970"))));
+        driveway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_11AB"), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_11A")), network.getNodes().get(Id.createNodeId("253526211"))));
+        motorway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_11RAA"), network.getNodes().get(Id.createNodeId("746716495")), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_RXR11A"))));
+        driveway.add(nf.createLink(Id.createLinkId("DuesseldorfRatingen_Velbert_11RAB"), network.getNodes().get(Id.createNodeId("321421304")), network.getNodes().get(Id.createNodeId("DuesseldorfRatingen_Velbert_RXR11A"))));
+
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_Zubringer_1AA"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_Zubringer_1A")), network.getNodes().get(Id.createNodeId("1296186312"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_Zubringer_1AB"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_Zubringer_1A")), network.getNodes().get(Id.createNodeId("1296186337"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_Zubringer_1AC"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_Zubringer_1A")), network.getNodes().get(Id.createNodeId("1296186337"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_Zubringer_1RAA"), network.getNodes().get(Id.createNodeId("3295550841")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_Zubringer_RXR1A"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_Zubringer_1RAB"), network.getNodes().get(Id.createNodeId("2726014040")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_Zubringer_RXR1A"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_Zubringer_1RAC"), network.getNodes().get(Id.createNodeId("1332025998")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_Zubringer_RXR1A"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_Zubringer_5AA"), network.getNodes().get(Id.createNodeId("430917232")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_Zubringer_5A"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_Zubringer_5RAA"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_Zubringer_RXR5A")), network.getNodes().get(Id.createNodeId("430917232"))));
+
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_1AA"), network.getNodes().get(Id.createNodeId("277258210")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_1A"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_1RAA"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_RXR1A")), network.getNodes().get(Id.createNodeId("277258212"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_8AA"), network.getNodes().get(Id.createNodeId("1584875138")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_8A"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_8RAA"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_RXR8A")), network.getNodes().get(Id.createNodeId("1584875162"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_8AB"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_8A")), network.getNodes().get(Id.createNodeId("1584875138"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_8RAB"), network.getNodes().get(Id.createNodeId("1584875162")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_RXR8A"))));
+        motorway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_11AA"), network.getNodes().get(Id.createNodeId("1584831890")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_RXR11A"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_11AB"), network.getNodes().get(Id.createNodeId("4797055323")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_RXR11A"))));
+        motorway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_11RAA"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_11A")), network.getNodes().get(Id.createNodeId("1584831797"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_11RAB"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_11A")), network.getNodes().get(Id.createNodeId("4797055323"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_11AC"), network.getNodes().get(Id.createNodeId("4797055323")), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_11A"))));
+        driveway.add(nf.createLink(Id.createLinkId("BielefeldBrackwede_Borgholzhausen_11RAC"), network.getNodes().get(Id.createNodeId("BielefeldBrackwede_Borgholzhausen_RXR11A")), network.getNodes().get(Id.createNodeId("4797055323"))));
+
+        motorway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_1RAA"), network.getNodes().get(Id.createNodeId("Loehne_Rehme_RXR1A")), network.getNodes().get(Id.createNodeId("30025767"))));
+        driveway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_1RAB"), network.getNodes().get(Id.createNodeId("Loehne_Rehme_RXR1A")), network.getNodes().get(Id.createNodeId("68420541"))));
+        driveway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_1AA"), network.getNodes().get(Id.createNodeId("68420602")), network.getNodes().get(Id.createNodeId("Loehne_Rehme_1A"))));
+        motorway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_1AB"), network.getNodes().get(Id.createNodeId("20924037")), network.getNodes().get(Id.createNodeId("Loehne_Rehme_1A"))));
+        driveway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_7AA"), network.getNodes().get(Id.createNodeId("Loehne_Rehme_7A")), network.getNodes().get(Id.createNodeId("962365629"))));
+        driveway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_7AB"), network.getNodes().get(Id.createNodeId("366060377")), network.getNodes().get(Id.createNodeId("Loehne_Rehme_7A"))));
+        driveway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_7RAA"), network.getNodes().get(Id.createNodeId("Loehne_Rehme_RXR7A")), network.getNodes().get(Id.createNodeId("366060354"))));
+        driveway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_7RAB"), network.getNodes().get(Id.createNodeId("366060354")), network.getNodes().get(Id.createNodeId("Loehne_Rehme_RXR7A"))));
+        motorway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_11AA"), network.getNodes().get(Id.createNodeId("Loehne_Rehme_11A")), network.getNodes().get(Id.createNodeId("20923907"))));
+        motorway.add(nf.createLink(Id.createLinkId("Loehne_Rehme_11RAA"), network.getNodes().get(Id.createNodeId("30025958")), network.getNodes().get(Id.createNodeId("Loehne_Rehme_RXR11A"))));
+
+        Set<String> modes = new HashSet<>();
+        modes.add(TransportMode.car);
+        modes.add(TransportMode.ride);
+
+        for (Link link : driveway) {
+            link.setCapacity(1800);
+            link.setNumberOfLanes(1);
+            link.setFreespeed(22.22222222222222);
+            link.setAllowedModes(modes);
+            network.addLink(link);
+        }
+
+        for (Link link : motorway) {
+            link.setCapacity(4000);
+            link.setNumberOfLanes(2);
+            link.setFreespeed(33.33333333333333);
+            link.setAllowedModes(modes);
+            network.addLink(link);
+        }
+
     }
 
     private static void addLinks_Herne_RecklinghausenHerten() {
@@ -692,7 +879,6 @@ public class NetworkBaseCaseContinue2 {
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetwork);
-        //        Network network = NetworkUtils.createNetwork();
         return scenario.getNetwork();
     }
 
