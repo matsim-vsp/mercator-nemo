@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class TripAnalysisToCsv {
 
@@ -68,13 +69,13 @@ public class TripAnalysisToCsv {
 
 		network = NetworkUtils.readNetwork(networkFile);
 
-		parseEventsFile(Paths.get(eventFile), Paths.get(outputFile));
+		parseEventsFile(Paths.get(eventFile), Paths.get(outputFile), agentsFilter::includeAgent);
 	}
 
-	private void parseEventsFile(Path file, Path output) throws IOException {
+	private void parseEventsFile(Path file, Path output, Predicate<Id<Person>> includePerson) throws IOException {
 
 		EventsManager manager = EventsUtils.createEventsManager();
-		TripEventHandler handler = new TripEventHandler(new NemoModeLocationChoiceMainModeIdentifier(), id -> true);
+		TripEventHandler handler = new TripEventHandler(new NemoModeLocationChoiceMainModeIdentifier(), includePerson);
 		manager.addHandler(handler);
 		new MatsimEventsReader(manager).readFile(file.toString());
 
