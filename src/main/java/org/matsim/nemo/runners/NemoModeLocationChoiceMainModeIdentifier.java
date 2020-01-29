@@ -7,6 +7,13 @@ import org.matsim.core.router.MainModeIdentifier;
 
 import java.util.List;
 
+/**
+ * This main mode identifier identifies main modes according to the MiD (Mobilitaet in Deutschland). Main modes are chosen
+ * in the following order pt, drt, car, ride, bike, walk.
+ * <p>
+ * Example: If a Trip consists of Three legs with modes: walk, pt, drt; the main mode of the trip is going to be pt, since
+ * it is the highest ranking mode.
+ */
 public class NemoModeLocationChoiceMainModeIdentifier implements MainModeIdentifier {
 
 	private final List<String> modes = List.of(TransportMode.walk, TransportMode.bike, TransportMode.ride, TransportMode.car, TransportMode.drt, TransportMode.pt);
