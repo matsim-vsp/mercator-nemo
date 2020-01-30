@@ -81,18 +81,20 @@ public class TripAnalysisToCsv {
 
 		try (Writer writer = Files.newBufferedWriter(output)) {
 			try (CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
-				printer.printRecord("id", "fromX", "fromY", "toX", "toY", "startTime", "endTime", "distance", "mainMode");
+				printer.printRecord("personId", "tripNo", "fromX", "fromY", "toX", "toY", "startTime", "endTime", "distance", "mainMode");
 
 				for (Map.Entry<Id<Person>, List<TripEventHandler.Trip>> tripWithId : handler.getTrips().entrySet()) {
 
-					for (TripEventHandler.Trip trip : tripWithId.getValue()) {
+					for (int i = 0; i < tripWithId.getValue().size(); i++) {
 
+						var trip = tripWithId.getValue().get(i);
 						// this should take facilities for accurate results, but we don't have those at this place, so go for links intsead for now
 						Coord departureCoord = network.getLinks().get(trip.getDepartureLink()).getToNode().getCoord();
 						Coord arrivalCoord = network.getLinks().get(trip.getArrivalLink()).getToNode().getCoord();
 						double distance = CoordUtils.calcEuclideanDistance(departureCoord, arrivalCoord);
 						printer.printRecord(
-								tripWithId.getKey().toString(),
+								tripWithId.getKey().toString(), // person id
+								i, // trip index in combination with person id results in distinct index. This is important for joining results from different runs
 								departureCoord.getX(),
 								departureCoord.getY(),
 								arrivalCoord.getX(),
