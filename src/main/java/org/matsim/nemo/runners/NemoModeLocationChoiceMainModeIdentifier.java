@@ -3,7 +3,7 @@ package org.matsim.nemo.runners;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * Example: If a Trip consists of Three legs with modes: walk, pt, drt; the main mode of the trip is going to be pt, since
  * it is the highest ranking mode.
  */
-public class NemoModeLocationChoiceMainModeIdentifier implements MainModeIdentifier {
+public class NemoModeLocationChoiceMainModeIdentifier implements AnalysisMainModeIdentifier {
 
 	private final List<String> modes = List.of(TransportMode.walk, TransportMode.bike, TransportMode.ride, TransportMode.car, TransportMode.drt, TransportMode.pt);
 

@@ -11,6 +11,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.nemo.util.NEMOUtils;
 
@@ -34,6 +35,12 @@ public class BaseCaseRunner {
 			@Override
 			public void install() {
 				install(new SwissRailRaptorModule());
+			}
+		});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(NemoModeLocationChoiceMainModeIdentifier.class);
 			}
 		});
 

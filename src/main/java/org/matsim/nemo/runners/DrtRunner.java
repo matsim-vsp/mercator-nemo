@@ -1,11 +1,12 @@
 package org.matsim.nemo.runners;
 
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.routing.pt.raptor.RaptorIntermodalAccessEgress;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
@@ -15,21 +16,22 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.CommandLine;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.drtSpeedUp.DrtSpeedUpConfigGroup;
+import org.matsim.drtSpeedUp.DrtSpeedUpModule;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,12 +52,14 @@ public class DrtRunner {
 
         // -------------------------------- Config ----------------------------------
         var config = BaseCaseRunner.loadConfig(args, new DvrpConfigGroup(),
-                new MultiModeDrtConfigGroup(), new DrtFaresConfigGroup());
+                new MultiModeDrtConfigGroup(), new DrtFaresConfigGroup(), new SwissRailRaptorConfigGroup(), new DrtSpeedUpConfigGroup());
 
         config.qsim().setNumberOfThreads(1); //drt works single threaded
 
         //set up drt config
         DrtConfigs.adjustDrtConfig(DrtConfigGroup.getSingleModeDrtConfig(config), config.planCalcScore(), config.plansCalcRoute());
+
+        DrtSpeedUpModule.adjustConfig(config);
 
         // ------------------------------- Scenario ----------------------------------
         var scenario = BaseCaseRunner.loadScenario(config);
@@ -67,7 +71,9 @@ public class DrtRunner {
                 .collect(Collectors.toList());
 
         logger.info("apply service area marker to all links");
-        addDrtModeAndMarkServiceArea(scenario.getNetwork(), serviceArea, DrtConfigGroup.getSingleModeDrtConfig(config).getMode(), drtServiceAreaAttribute);
+        addDrtModeAndMarkServiceArea(scenario.getNetwork(), DrtConfigGroup.getSingleModeDrtConfig(config).getMode());
+        tagTransitStopsInServiceArea(serviceArea, scenario.getTransitSchedule());
+
         scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 
         // -------------------------------- Controler -----------------------------------
@@ -81,17 +87,17 @@ public class DrtRunner {
         controler.addOverridingModule(new DrtFareModule());
         controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtConfigGroup.getMode()));
 
-        controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtConfigGroup.getMode()) {
+        controler.addOverridingModule(new AbstractModule() {
             @Override
-            protected void configureQSim() {
-                bindModal(PassengerRequestValidator.class).toInstance(new DrtRunner.ServiceAreaRequestValidator(drtServiceAreaAttribute));
+            public void install() {
+                bind(RaptorIntermodalAccessEgress.class).to(NemoRaptorIntermodalAccessEgress.class);
             }
         });
 
         controler.run();
     }
 
-    private static void addDrtModeAndMarkServiceArea(Network network, Collection<org.locationtech.jts.geom.Geometry> serviceArea, String taxiNetworkMode, String serviceAreaAttribute) {
+    private static void addDrtModeAndMarkServiceArea(Network network, String taxiNetworkMode) {
 
         logger.info("Add taxi mode to allowed modes where car and ride is allowed. If in service area add service area attribute to link");
         network.getLinks().values().parallelStream()
@@ -103,59 +109,20 @@ public class DrtRunner {
                     Set<String> newModes = new HashSet<>(modes);
                     newModes.add(taxiNetworkMode);
                     link.setAllowedModes(newModes);
-
-                    // mark link to be in service area
-                    addServiceAreaAttribute(link, serviceArea, serviceAreaAttribute);
                 });
         logger.info("Added drt mode to allowed modes and marked links with service area attribute");
     }
 
-    private static void addServiceAreaAttribute(Link link, Collection<org.locationtech.jts.geom.Geometry> serviceArea, String attributeKey) {
+    private static void tagTransitStopsInServiceArea(List<Geometry> area, TransitSchedule schedule) {
 
-        if (isInGeometry(link.getCoord(), serviceArea))
-            link.getAttributes().putAttribute(attributeKey, true);
-        else
-            link.getAttributes().putAttribute(attributeKey, false);
+        schedule.getFacilities().values().parallelStream()
+                .filter(facility -> isInGeometry(facility.getCoord(), area))
+                .forEach(facility -> facility.getAttributes().putAttribute("drt-stop", "true"));
     }
 
     private static boolean isInGeometry(Coord coord, Collection<org.locationtech.jts.geom.Geometry> geometry) {
 
         Point point = MGC.coord2Point(coord);
         return geometry.stream().anyMatch(geometry1 -> geometry1.contains(point));
-    }
-
-    private static final class ServiceAreaRequestValidator implements PassengerRequestValidator {
-
-        private static final String FROM_LINK_NOT_IN_SERVICE_AREA_CAUSE = "from_link_not_in_service_area";
-        private static final String TO_LINK_NOT_IN_SERVICE_AREA_CAUSE = "to_link_not_in_service_area";
-
-        private final DefaultPassengerRequestValidator defaultValidator = new DefaultPassengerRequestValidator();
-
-        private final String serviceAreaAttribute;
-
-        private ServiceAreaRequestValidator(String serviceAreaAttribute) {
-            this.serviceAreaAttribute = serviceAreaAttribute;
-        }
-
-        @Override
-        public Set<String> validateRequest(PassengerRequest request) {
-
-            // the returned set is immutable
-            Set<String> invalidRequestCauses = new HashSet<>(defaultValidator.validateRequest(request));
-
-            boolean fromLinkInServiceArea = (boolean) request.getFromLink()
-                    .getAttributes()
-                    .getAttribute(serviceAreaAttribute);
-            boolean toLinkInServiceArea = (boolean) request.getToLink().getAttributes().getAttribute(serviceAreaAttribute);
-
-            if (!fromLinkInServiceArea) {
-                invalidRequestCauses.add(FROM_LINK_NOT_IN_SERVICE_AREA_CAUSE);
-            }
-            if (!toLinkInServiceArea) {
-                invalidRequestCauses.add(TO_LINK_NOT_IN_SERVICE_AREA_CAUSE);
-            }
-
-            return invalidRequestCauses;
-        }
     }
 }
