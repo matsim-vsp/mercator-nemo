@@ -3,6 +3,7 @@ package org.matsim.nemo;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureSource;
@@ -23,6 +24,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -124,15 +126,22 @@ public class TinderRelocator {
 				})
 				.collect(Collectors.toList());
 
-		Map<Integer, List<Person>> bla = movedAgents.stream()
+		Map<Integer, List<Person>> groupByTimesMoved = movedAgents.stream()
 				.collect(Collectors.groupingBy(person -> (int) person.getAttributes().getAttribute(WAS_MOVED_KEY)));
 
-		logger.info("sum of people to move: " + sumOfPeopleToMove);
+		var movedAllActivities = movedAgents.stream()
+				.filter(person -> {
+					Object movedAllActivitiesRaw = person.getAttributes().getAttribute("moved-all-activities");
+					return movedAllActivitiesRaw != null;
+				})
+				.collect(Collectors.toList());
+
 		logger.info("moved agents size: " + movedAgents.size());
+		logger.info("moved all activities: " + movedAllActivities.size());
 		logger.info("moved counter: " + movedPersonCounter);
 		logger.info("empty cells: " + emptySourceCellCounter);
 
-		for (Map.Entry<Integer, List<Person>> integerListEntry : bla.entrySet()) {
+		for (Map.Entry<Integer, List<Person>> integerListEntry : groupByTimesMoved.entrySet()) {
 			logger.info(integerListEntry.getValue().size() + " persons moved " + integerListEntry.getKey() + " times");
 		}
 
@@ -141,7 +150,7 @@ public class TinderRelocator {
 		new PopulationWriter(scenario.getPopulation()).write(sharedSvnPath.resolve("projects\\nemo_mercator\\data\\matsim_input\\deurbanisation").resolve(filename).toString());
 
 		// write out new popoulation as csv
-		/*try (CSVPrinter printer = CSVFormat.DEFAULT.withHeader("id", "homeX", "homeY", "was-moved")
+		try (CSVPrinter printer = CSVFormat.DEFAULT.withHeader("id", "homeX", "homeY", "was-moved", "moved-all-activities")
 				.print(sharedSvnPath.resolve("projects\\nemo_mercator\\data\\matsim_input\\deurbanisation\\population.csv"), Charset.defaultCharset())) {
 
 			for (Person p : scenario.getPopulation().getPersons().values()) {
@@ -153,9 +162,9 @@ public class TinderRelocator {
 
 				if (!homeActivity.isPresent()) throw new RuntimeException("no!");
 				Activity home = homeActivity.get();
-				printer.printRecord(p.getId(), home.getCoord().getX(), home.getCoord().getY(), p.getAttributes().getAttribute(WAS_MOVED_KEY));
+				printer.printRecord(p.getId(), home.getCoord().getX(), home.getCoord().getY(), p.getAttributes().getAttribute(WAS_MOVED_KEY), p.getAttributes().getAttribute("moved-all-activities"));
 			}
-		}*/
+		}
 	}
 
 	private void initializeSpatialIndex(Scenario scenario, ReferencedEnvelope bounds) {
@@ -222,7 +231,7 @@ public class TinderRelocator {
 
 		if (peopleWithinSource.size() > 0) {
 
-			double shareOfPeopleMoving = Math.abs(value) / baseInhabitants;
+			double shareOfPeopleMoving = Math.abs(value * 20) / baseInhabitants;
 			List<Person> matsimPeopleMoving = peopleWithinSource.stream()
 					.map(id -> scenario.getPopulation().getPersons().get(id))
 					.filter(person -> person.getAttributes().getAttribute(WAS_MOVED_KEY) == null)
@@ -238,8 +247,6 @@ public class TinderRelocator {
 				person.getAttributes().putAttribute("source-feature", sourceFeature.getAttribute("ID_Gitter_"));
 				person.getAttributes().putAttribute("destination-feature", destinationFeature.getAttribute("ID_Gitter_"));
 			}
-
-			sumOfPeopleToMove += value * scalingFactor;
 
 		} else {
 			emptySourceCellCounter++;
@@ -294,6 +301,7 @@ public class TinderRelocator {
 				Coord newActivityLocation = drawCoordFromGeometry(destinationGeometry);
 				activity.setCoord(newActivityLocation);
 			}
+			movingPerson.getAttributes().putAttribute("moved-all-activities", 1);
 		}
 	}
 
