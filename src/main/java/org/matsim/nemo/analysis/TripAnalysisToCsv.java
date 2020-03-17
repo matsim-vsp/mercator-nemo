@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +33,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public class TripAnalysisToCsv {
+
+	private static final Logger logger = Logger.getLogger(TripAnalysisToCsv.class);
 
 	@Parameter(names = {"-eventFile", "-ef"}, required = true)
 	private String eventFile = "";
@@ -78,6 +81,8 @@ public class TripAnalysisToCsv {
 		TripEventHandler handler = new TripEventHandler(new NemoModeLocationChoiceMainModeIdentifier(), includePerson);
 		manager.addHandler(handler);
 		new MatsimEventsReader(manager).readFile(file.toString());
+
+		logger.info("Writing files to: " + output.toString());
 
 		try (Writer writer = Files.newBufferedWriter(output)) {
 			try (CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT)) {

@@ -85,6 +85,7 @@ public class DrtRunner {
         controler.addOverridingModule(new DvrpModule());
         controler.addOverridingModule(new MultiModeDrtModule());
         controler.addOverridingModule(new DrtFareModule());
+        controler.addOverridingModule(new DrtSpeedUpModule());
         controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtConfigGroup.getMode()));
 
         controler.addOverridingModule(new AbstractModule() {

@@ -1,6 +1,7 @@
 package org.matsim.nemo.runners;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
@@ -14,6 +15,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.nemo.util.NEMOUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +69,6 @@ public class BaseCaseRunner {
 		// the scenario generation uses bike_speed_factor, but the bicycle module expects something else
 		// replace the attribute key with the bicycle contrib's key
 		scenario.getNetwork().getLinks().values().parallelStream()
-				.filter(link -> link.getAllowedModes().contains(TransportMode.bike))
 				.filter(link -> link.getAttributes().getAttribute("bike_speed_factor") != null)
 				.forEach(link -> {
 					var speedFactor = (Double) link.getAttributes().getAttribute("bike_speed_factor");
@@ -79,6 +81,14 @@ public class BaseCaseRunner {
 				.filter(link -> link.getAllowedModes().contains(TransportMode.bike))
 				.filter(link -> link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR) == null)
 				.forEach(link -> link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5));
+
+		// add mode vehicles from here, since I messed this up a thousand times already
+		var factory = scenario.getVehicles().getFactory();
+		scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.car, 7.5, 36.111111, 1.0, factory));
+		scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.ride, 7.5, 36.111111, 0.1, factory));
+
+		// use twice the speed of 3.42, so that max speed ~25km/h on bike links and ~12km/h on regular streets with speed-factor of 0.5
+		scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.bike, 2.0, 6.84, 0.1, factory));
 		return scenario;
 	}
 
@@ -122,5 +132,15 @@ public class BaseCaseRunner {
 
 		Controler controler = loadControler(scenario);
 		controler.run();
+	}
+
+	private static VehicleType createVehicleType(String id, double length, double maxV, double pce, VehiclesFactory factory) {
+		var vehicleType = factory.createVehicleType(Id.create(id, VehicleType.class));
+		vehicleType.setNetworkMode(id);
+		vehicleType.setPcuEquivalents(pce);
+		vehicleType.setLength(length);
+		vehicleType.setMaximumVelocity(maxV);
+		vehicleType.setWidth(1.0);
+		return vehicleType;
 	}
 }
