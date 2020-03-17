@@ -27,8 +27,8 @@ import org.matsim.drtSpeedUp.DrtSpeedUpConfigGroup;
 import org.matsim.drtSpeedUp.DrtSpeedUpModule;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -38,11 +38,10 @@ import java.util.stream.Collectors;
 public class DrtRunner {
 
     private static final String shapeFileOption = "shapeFile";
-    private static final String drtServiceAreaAttribute = "drtServiceArea";
 
     private static final Logger logger = Logger.getLogger(DrtRunner.class);
 
-    public static void main(String[] args) throws CommandLine.ConfigurationException, URISyntaxException {
+    public static void main(String[] args) throws CommandLine.ConfigurationException, MalformedURLException {
 
         var commandLine = new CommandLine.Builder(args)
                 .allowPositionalArguments(true)
@@ -65,8 +64,8 @@ public class DrtRunner {
         var scenario = BaseCaseRunner.loadScenario(config);
 
         logger.info("creating drt service area. Start reading in ruhr shape file");
-        var shapePath = Paths.get(config.getContext().toURI()).getParent().resolve(commandLine.getOptionStrict(shapeFileOption));
-        var serviceArea = ShapeFileReader.getAllFeatures(shapePath.toString()).stream()
+        var shapePath = commandLine.getOptionStrict(shapeFileOption);
+        var serviceArea = ShapeFileReader.getAllFeatures(new URL(shapePath)).stream()
                 .map(feature -> (Geometry) feature.getDefaultGeometry())
                 .collect(Collectors.toList());
 
@@ -80,7 +79,7 @@ public class DrtRunner {
 
         var controler = BaseCaseRunner.loadControler(scenario);
 
-        logger.info("Start configuring drt. Add DrtModeModule, DvrpModule, DrtFareModule and activate drt-mode");
+        logger.info("Start configuring drt. Add DrtModeModule, DvrpModule, DrtFareModule, DrtSpeedUpModule and activate drt-mode");
         DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
         controler.addOverridingModule(new DvrpModule());
         controler.addOverridingModule(new MultiModeDrtModule());
