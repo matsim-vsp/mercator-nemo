@@ -54,6 +54,9 @@ public class TripAnalysisToCsv {
 	@Parameter(names = {"-outputFile", "-of"})
 	private String outputFile;
 
+	@Parameter(names = {"onlyMovedAgents", "-om"})
+	private boolean onlyMovedAgentsByMurmo = false;
+
 	private Network network;
 	private Scenario scenario;
 
@@ -72,7 +75,13 @@ public class TripAnalysisToCsv {
 
 		network = NetworkUtils.readNetwork(networkFile);
 
-		parseEventsFile(Paths.get(eventFile), Paths.get(outputFile), agentsFilter::includeAgent);
+		if (onlyMovedAgentsByMurmo) logger.info("Only counting moved agents.");
+
+		Predicate<Id<Person>> includePerson = onlyMovedAgentsByMurmo ?
+				id -> scenario.getPopulation().getPersons().get(id).getAttributes().getAttribute("was_moved") != null && scenario.getPopulation().getPersons().get(id).getAttributes().getAttribute("moved-all-activities") != null && agentsFilter.includeAgent(id) :
+				agentsFilter::includeAgent;
+
+		parseEventsFile(Paths.get(eventFile), Paths.get(outputFile), includePerson);
 	}
 
 	private void parseEventsFile(Path file, Path output, Predicate<Id<Person>> includePerson) throws IOException {
