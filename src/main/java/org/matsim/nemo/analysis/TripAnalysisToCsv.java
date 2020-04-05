@@ -8,18 +8,24 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.nemo.RuhrAgentsFilter;
 import org.matsim.nemo.runners.NemoModeLocationChoiceMainModeIdentifier;
 
@@ -44,6 +50,9 @@ public class TripAnalysisToCsv {
 
 	@Parameter(names = {"-populationFile", "-pf"}, required = true)
 	private String populationFile = "";
+
+	@Parameter(names = {"-facilitiesFile", "-ff"}, required = true)
+	private String facilitiesFile = "";
 
 	@Parameter(names = {"-scalingFactor", "-sf"})
 	private double scalingFactor = 100;
@@ -71,6 +80,7 @@ public class TripAnalysisToCsv {
 
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenario).readFile(populationFile);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		RuhrAgentsFilter agentsFilter = new RuhrAgentsFilter(this.scenario, ShapeFileReader.getAllFeatures(this.ruhrShapeFile));
 
 		network = NetworkUtils.readNetwork(networkFile);
@@ -91,6 +101,8 @@ public class TripAnalysisToCsv {
 		manager.addHandler(handler);
 		new MatsimEventsReader(manager).readFile(file.toString());
 
+		var testPerson = handler.getTrips().get(Id.createPersonId("1016010401"));
+
 		logger.info("Writing files to: " + output.toString());
 
 		try (Writer writer = Files.newBufferedWriter(output)) {
@@ -99,13 +111,22 @@ public class TripAnalysisToCsv {
 
 				for (Map.Entry<Id<Person>, List<TripEventHandler.Trip>> tripWithId : handler.getTrips().entrySet()) {
 
+					var person = scenario.getPopulation().getPersons().get(tripWithId.getKey());
+					var selectedPlan = person.getSelectedPlan();
+
+
 					for (int i = 0; i < tripWithId.getValue().size(); i++) {
 
+
 						var trip = tripWithId.getValue().get(i);
-						// this should take facilities for accurate results, but we don't have those at this place, so go for links intsead for now
-						Coord departureCoord = network.getLinks().get(trip.getDepartureLink()).getToNode().getCoord();
-						Coord arrivalCoord = network.getLinks().get(trip.getArrivalLink()).getToNode().getCoord();
-						double distance = CoordUtils.calcEuclideanDistance(departureCoord, arrivalCoord);
+
+						if (person.getAttributes().getAttribute("was_moved") != null && trip.getMainMode().equals(TransportMode.car)) {
+							logger.info("upsi");
+						}
+						var departureCoord = getCoord(selectedPlan, trip.getDepartureFacility(), trip.getDepartureLink());
+						var arrivalCoord = getCoord(selectedPlan, trip.getArrivalFacility(), trip.getArrivalLink());
+						var distance = CoordUtils.calcEuclideanDistance(departureCoord, arrivalCoord);
+
 						printer.printRecord(
 								tripWithId.getKey().toString(), // person id
 								i, // trip index in combination with person id results in distinct index. This is important for joining results from different runs
@@ -125,10 +146,31 @@ public class TripAnalysisToCsv {
 		}
 	}
 
-	private double calculateBeelineDistance(TripEventHandler.Trip trip) {
+	/**
+	 * 1. Tries to get the coordinate from the scenario's facility which has the supplied facilityId
+	 * 2. If the facility can't be found within the scenario the activity from the plan with the corresponding facilityId
+	 * is retrieved and the coordinate of the activity is returned
+	 * 3. If no activity is found or no coordinate is set on the activity the coordinate of the supplied link is taken
+	 * from the network as a fallback - this is less accurate than the facility or activity id
+	 */
+	private Coord getCoord(Plan plan, Id<ActivityFacility> facilityId, Id<Link> linkId) {
 
-		ActivityFacility departureFacility = scenario.getActivityFacilities().getFacilities().get(trip.getDepartureFacility());
-		ActivityFacility arrivalFacility = scenario.getActivityFacilities().getFacilities().get(trip.getArrivalFacility());
-		return CoordUtils.calcEuclideanDistance(departureFacility.getCoord(), arrivalFacility.getCoord());
+		if (scenario.getActivityFacilities().getFacilities().size() > 0 || scenario.getActivityFacilities().getFacilities().containsKey(facilityId)) {
+			return scenario.getActivityFacilities().getFacilities().get(facilityId).getCoord();
+		}
+
+		var optionalActivity = plan.getPlanElements().stream()
+				.filter(element -> element instanceof Activity)
+				.map(element -> (Activity) element)
+				.filter(activity -> !StageActivityTypeIdentifier.isStageActivity(activity.getType()))
+				.filter(activity -> activity.getFacilityId().equals(facilityId))
+				.findAny();
+
+		if (optionalActivity.isPresent() && optionalActivity.get().getCoord() != null) {
+			return optionalActivity.get().getCoord();
+		}
+
+		logger.warn("Falling back to link coord. This is not as accurate as Facility or Activity coordinates");
+		return network.getLinks().get(linkId).getCoord();
 	}
 }
