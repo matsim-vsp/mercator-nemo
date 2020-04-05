@@ -13,13 +13,19 @@ import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.nemo.runners.NemoModeLocationChoiceMainModeIdentifier;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.FileReader;
@@ -32,11 +38,14 @@ import java.util.stream.Collectors;
 
 public class TinderRelocator {
 
-	private static final String BASE_CASE_CONFIG = "projects\\nemo_mercator\\data\\matsim_input\\baseCase\\config_baseCase.xml";
 	private static final String MURMO_SHAPE_FILE = "projects\\nemo_mercator\\data\\original_files\\murmo\\Ruhr_Grid_1km\\Ruhr_Grid_1km_EW.shp";
 	private static final String MURMO_TRANSITION_DATA = "projects\\nemo_mercator\\data\\original_files\\murmo\\p_anti.csv";
-	private static final Comparator<SimpleFeature> featureComparator = Comparator.comparingLong(feature -> (Long) (feature.getAttribute("ID_Gitter_")));
+	public static final String MOVED_ALL_ACTIVITIES = "moved_all_activities";
+
 	private static final String WAS_MOVED_KEY = "was_moved";
+	public static final MainModeIdentifier mainModeIdentifier = new NemoModeLocationChoiceMainModeIdentifier();
+	private static final String SOURCE_POPULATION = "nemo\\baseCaseCalibration2\\baseCase_021\\output\\baseCase_021.output_plans.xml.gz";
+	private static final Comparator<SimpleFeature> featureComparator = Comparator.comparingLong(feature -> (Long) (feature.getAttribute("ID_Gitter_")));
 
 	private static final Logger logger = Logger.getLogger(TinderRelocator.class);
 	private static final Random random = MatsimRandom.getRandom();
@@ -57,10 +66,7 @@ public class TinderRelocator {
 	private List<SimpleFeature> murmoFeatures;
 	private QuadTree<Id<Person>> spatialPersonIndex;
 
-	private int movedPersonCounter = 0;
 	private int emptySourceCellCounter = 0;
-	private double sumOfPeopleToMove;
-
 
 	public static void main(String[] args) throws IOException {
 
@@ -74,32 +80,12 @@ public class TinderRelocator {
 		final Path sharedSvnPath = Paths.get(sharedSvn);
 		final Path runsSvnPath = Paths.get(runsSvn);
 
-		// read in the base case scenario
-		//scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(sharedSvnPath.resolve(BASE_CASE_CONFIG).toString()));
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		new PopulationReader(scenario).readFile(runsSvnPath.resolve("nemo\\baseCaseCalibration2\\baseCase_021\\output\\baseCase_021.output_plans.xml.gz").toString());
-
-		// remove all plans other than the selected plan
-		// also remove all route informations
-		scenario.getPopulation().getPersons().values().parallelStream()
-				.forEach(person -> {
-
-					Plan selectedPlan = person.getSelectedPlan();
-					person.getPlans().clear();
-					person.addPlan(selectedPlan);
-					person.setSelectedPlan(selectedPlan);
-
-					person.getSelectedPlan().getPlanElements().stream()
-							.filter(element -> element instanceof Leg)
-							.map(element -> (Leg) element)
-							.forEach(leg -> leg.setRoute(null));
-				});
+		new PopulationReader(scenario).readFile(runsSvnPath.resolve(SOURCE_POPULATION).toString());
 
 		// get the feature source of the murmo grid, to extract bounds from it
 		SimpleFeatureSource featureSource = ShapeFileReader.readDataFile(sharedSvnPath.resolve(MURMO_SHAPE_FILE).toString());
 
-		// create a spacial index of agents
 		initializeSpatialIndex(scenario, featureSource.getBounds());
 
 		// read in murmo transition raster
@@ -111,11 +97,8 @@ public class TinderRelocator {
 		try (FileReader reader = new FileReader(sharedSvnPath.resolve(MURMO_TRANSITION_DATA).toString())) {
 
 			for (CSVRecord record : CSVFormat.newFormat(',').parse(reader)) {
-				if (record.getRecordNumber() == 1)
-					handleHeaderRecord(record);
-				else {
+				if (record.getRecordNumber() != 1) // skip the header row
 					handleRecord(record);
-				}
 			}
 		}
 
@@ -131,15 +114,13 @@ public class TinderRelocator {
 
 		var movedAllActivities = movedAgents.stream()
 				.filter(person -> {
-					Object movedAllActivitiesRaw = person.getAttributes().getAttribute("moved-all-activities");
+					Object movedAllActivitiesRaw = person.getAttributes().getAttribute(MOVED_ALL_ACTIVITIES);
 					return movedAllActivitiesRaw != null;
 				})
 				.collect(Collectors.toList());
 
 		logger.info("moved agents size: " + movedAgents.size());
 		logger.info("moved all activities: " + movedAllActivities.size());
-		logger.info("moved counter: " + movedPersonCounter);
-		logger.info("empty cells: " + emptySourceCellCounter);
 
 		for (Map.Entry<Integer, List<Person>> integerListEntry : groupByTimesMoved.entrySet()) {
 			logger.info(integerListEntry.getValue().size() + " persons moved " + integerListEntry.getKey() + " times");
@@ -160,7 +141,7 @@ public class TinderRelocator {
 						.filter(activity -> activity.getType().startsWith("home"))
 						.findAny();
 
-				if (!homeActivity.isPresent()) throw new RuntimeException("no!");
+				if (homeActivity.isEmpty()) throw new RuntimeException("no!");
 				Activity home = homeActivity.get();
 				printer.printRecord(p.getId(), home.getCoord().getX(), home.getCoord().getY(), p.getAttributes().getAttribute(WAS_MOVED_KEY), p.getAttributes().getAttribute("moved-all-activities"));
 			}
@@ -193,16 +174,9 @@ public class TinderRelocator {
 		// get the source shape
 		SimpleFeature sourceFeature = murmoFeatures.get((int) index);
 
-		Double baseInhabitants = (Double) sourceFeature.getAttribute("EW_2011");
-		Geometry geometry = (Geometry) sourceFeature.getDefaultGeometry();
-		List<Id<Person>> peopleWithinSource = getPersonsFromSpatialIndex(geometry);
-
-		//logger.info("#" + index + " baseInhabitants=" + baseInhabitants + ", sourceInhabitants=" + peopleWithinSource.size());
-
-		double rowSum = 0;
 		for (int columnIndex = 0; columnIndex < record.size(); columnIndex++) {
 
-			// the we just need the lower half of the matrix since it is anti-symmetrical now
+			// we just need the lower half of the matrix since it is anti-symmetrical now
 			if (columnIndex == index) {
 				break;
 			}
@@ -212,14 +186,12 @@ public class TinderRelocator {
 
 			// number of people moving from cell (index) to cell (columnIndex)
 			double value = Double.parseDouble(record.get(columnIndex));
-			rowSum += value;
 
 			if (value >= 0)
 				move(sourceFeature, destinationFeature, value);
 			else
 				move(destinationFeature, sourceFeature, value);
 		}
-		//	logger.info("# " + index + " is: " + rowSum);
 	}
 
 	private void move(SimpleFeature sourceFeature, SimpleFeature destinationFeature, double value) {
@@ -231,16 +203,13 @@ public class TinderRelocator {
 
 		if (peopleWithinSource.size() > 0) {
 
+			// multiplying the value by 20, to move more people, because otherwise too few persons are moved to see any effect
 			double shareOfPeopleMoving = Math.abs(value * 20) / baseInhabitants;
 			List<Person> matsimPeopleMoving = peopleWithinSource.stream()
 					.map(id -> scenario.getPopulation().getPersons().get(id))
 					.filter(person -> person.getAttributes().getAttribute(WAS_MOVED_KEY) == null)
 					.filter(person -> random.nextDouble() < shareOfPeopleMoving)
 					.collect(Collectors.toList());
-
-			if (matsimPeopleMoving.size() > 0) {
-				logger.info("moving " + matsimPeopleMoving.size() + " people. Share=" + shareOfPeopleMoving + " base=" + baseInhabitants + " value=" + value);
-			}
 
 			for (Person person : matsimPeopleMoving) {
 				movePerson(person, (Geometry) destinationFeature.getDefaultGeometry());
@@ -255,57 +224,56 @@ public class TinderRelocator {
 
 	private void movePerson(Person movingPerson, Geometry destinationGeometry) {
 
-		// this only moves the home activities for now. Later we should also move other stuff.
-		List<Activity> homeActivities = movingPerson.getSelectedPlan().getPlanElements().stream()
-				.filter(element -> element instanceof Activity)
-				.map(element -> (Activity) element)
-				.filter(activity -> activity.getType().startsWith("home"))
-				.collect(Collectors.toList());
+		var isMovingAllActivities = random.nextDouble() > shareOfTinderMatches;
 
-		//Coord newHomeCoord = drawCoordFromGeometry((Geometry) murmoFeatures.get(10).getDefaultGeometry());
-		Coord newHomeCoord = drawCoordFromGeometry(destinationGeometry);
-		boolean isSpatialIndexUpdated = false;
+		var selectedPlan = movingPerson.getSelectedPlan();
+		var newPlan = scenario.getPopulation().getFactory().createPlan();
 
-		for (Activity homeActivity : homeActivities) {
-			if (!isSpatialIndexUpdated) {
-				spatialPersonIndex.remove(homeActivity.getCoord().getX(), homeActivity.getCoord().getY(), movingPerson.getId());
-				spatialPersonIndex.put(newHomeCoord.getX(), newHomeCoord.getY(), movingPerson.getId());
-				isSpatialIndexUpdated = true;
+		movingPerson.getPlans().clear();
+
+		// collect all trip elements between 'real'-activities here
+		List<PlanElement> trip = new ArrayList<>();
+
+		for (PlanElement element : selectedPlan.getPlanElements()) {
+
+			// relocate home activities and if is tinder match all other real activities as well
+			if (element instanceof Activity && !StageActivityTypeIdentifier.isStageActivity(((Activity) element).getType())) {
+
+				var activity = (Activity) element;
+
+				if (isMovingAllActivities || activity.getType().startsWith("home")) {
+					var newActivityLocation = drawCoordFromGeometry(destinationGeometry);
+
+					if (activity.getType().startsWith("home")) {
+						spatialPersonIndex.remove(activity.getCoord().getX(), activity.getCoord().getY(), movingPerson.getId());
+						spatialPersonIndex.put(newActivityLocation.getX(), newActivityLocation.getY(), movingPerson.getId());
+						movingPerson.getAttributes().putAttribute(WAS_MOVED_KEY, 1);
+					} else if (movingPerson.getAttributes().getAttribute(MOVED_ALL_ACTIVITIES) == null) {
+						movingPerson.getAttributes().putAttribute(MOVED_ALL_ACTIVITIES, 1);
+					}
+					activity.setCoord(newActivityLocation);
+					activity.setLinkId(null);
+					activity.setFacilityId(null);
+				}
+
+				// now handle simplifying of trips. Staging activties mustbe removed, because they contain references to
+				// links wich don't make sense anymore
+				if (trip.size() > 0) {
+					var mainMode = mainModeIdentifier.identifyMainMode(trip);
+					var leg = scenario.getPopulation().getFactory().createLeg(mainMode);
+					newPlan.addLeg(leg);
+					trip.clear();
+				}
+
+				newPlan.addActivity(activity);
+			} else {
+				//element is leg or staging activity
+				trip.add(element);
 			}
-
-			homeActivity.setCoord(newHomeCoord);
 		}
 
-
-		Object wasMovedAttribute = movingPerson.getAttributes().getAttribute(WAS_MOVED_KEY);
-		if (wasMovedAttribute == null) {
-			movingPerson.getAttributes().putAttribute(WAS_MOVED_KEY, 1);
-		} else {
-			int timesMoved = (int) wasMovedAttribute + 1;
-			movingPerson.getAttributes().putAttribute(WAS_MOVED_KEY, timesMoved);
-		}
-		movedPersonCounter++;
-
-		// people who are not a tinder match relocate their other activities as well
-		// all tinder matches move with somebody else but keep their remaining activity context
-		if (random.nextDouble() > shareOfTinderMatches) {
-			List<Activity> nonHomeActivities = movingPerson.getSelectedPlan().getPlanElements().stream()
-					.filter(element -> element instanceof Activity)
-					.map(element -> (Activity) element)
-					.filter(activity -> !activity.getType().startsWith("home"))
-					.collect(Collectors.toList());
-
-			for (Activity activity : nonHomeActivities) {
-
-				// assuming that all activities are within the same square
-				Coord newActivityLocation = drawCoordFromGeometry(destinationGeometry);
-				activity.setCoord(newActivityLocation);
-			}
-			movingPerson.getAttributes().putAttribute("moved-all-activities", 1);
-		}
-	}
-
-	private void handleHeaderRecord(CSVRecord record) {
+		movingPerson.addPlan(newPlan);
+		movingPerson.setSelectedPlan(newPlan);
 	}
 
 	private boolean isWithinBounds(Coord homeCoord) {
