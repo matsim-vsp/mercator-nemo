@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -25,7 +24,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.nemo.RuhrAgentsFilter;
 import org.matsim.nemo.runners.NemoModeLocationChoiceMainModeIdentifier;
 
@@ -41,6 +39,8 @@ import java.util.function.Predicate;
 public class TripAnalysisToCsv {
 
 	private static final Logger logger = Logger.getLogger(TripAnalysisToCsv.class);
+	private static final String MOVED_ALL_ACTIVITIES = "moved_all_activities";
+	private static final String WAS_MOVED_KEY = "was_moved";
 
 	@Parameter(names = {"-eventFile", "-ef"}, required = true)
 	private String eventFile = "";
@@ -50,9 +50,6 @@ public class TripAnalysisToCsv {
 
 	@Parameter(names = {"-populationFile", "-pf"}, required = true)
 	private String populationFile = "";
-
-	@Parameter(names = {"-facilitiesFile", "-ff"}, required = true)
-	private String facilitiesFile = "";
 
 	@Parameter(names = {"-scalingFactor", "-sf"})
 	private double scalingFactor = 100;
@@ -80,7 +77,6 @@ public class TripAnalysisToCsv {
 
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenario).readFile(populationFile);
-		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		RuhrAgentsFilter agentsFilter = new RuhrAgentsFilter(this.scenario, ShapeFileReader.getAllFeatures(this.ruhrShapeFile));
 
 		network = NetworkUtils.readNetwork(networkFile);
@@ -88,7 +84,7 @@ public class TripAnalysisToCsv {
 		if (onlyMovedAgentsByMurmo) logger.info("Only counting moved agents.");
 
 		Predicate<Id<Person>> includePerson = onlyMovedAgentsByMurmo ?
-				id -> scenario.getPopulation().getPersons().get(id).getAttributes().getAttribute("was_moved") != null && scenario.getPopulation().getPersons().get(id).getAttributes().getAttribute("moved-all-activities") != null && agentsFilter.includeAgent(id) :
+				id -> scenario.getPopulation().getPersons().get(id).getAttributes().getAttribute(WAS_MOVED_KEY) != null && agentsFilter.includeAgent(id) :
 				agentsFilter::includeAgent;
 
 		parseEventsFile(Paths.get(eventFile), Paths.get(outputFile), includePerson);
@@ -120,9 +116,6 @@ public class TripAnalysisToCsv {
 
 						var trip = tripWithId.getValue().get(i);
 
-						if (person.getAttributes().getAttribute("was_moved") != null && trip.getMainMode().equals(TransportMode.car)) {
-							logger.info("upsi");
-						}
 						var departureCoord = getCoord(selectedPlan, trip.getDepartureFacility(), trip.getDepartureLink());
 						var arrivalCoord = getCoord(selectedPlan, trip.getArrivalFacility(), trip.getArrivalLink());
 						var distance = CoordUtils.calcEuclideanDistance(departureCoord, arrivalCoord);
@@ -163,6 +156,7 @@ public class TripAnalysisToCsv {
 				.filter(element -> element instanceof Activity)
 				.map(element -> (Activity) element)
 				.filter(activity -> !StageActivityTypeIdentifier.isStageActivity(activity.getType()))
+				.filter(activity -> activity.getFacilityId() != null)
 				.filter(activity -> activity.getFacilityId().equals(facilityId))
 				.findAny();
 

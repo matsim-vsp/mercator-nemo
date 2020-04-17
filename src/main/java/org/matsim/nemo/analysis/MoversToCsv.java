@@ -60,7 +60,7 @@ public class MoversToCsv {
             try (CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
 
                 //print header
-                printer.printRecord("id", "fromId", "fromLat", "fromLon", "toId", "toLat", "toLon", "moved_all_acts");
+                printer.printRecord("id", "fromId", "fromLat", "fromLon", "toId", "toLat", "toLon", "moved", "moved_all_acts");
 
                 //print moving relations of all persons
                 scenario.getPopulation().getPersons().values().stream()
@@ -69,7 +69,8 @@ public class MoversToCsv {
 
                             long sourceFeatureIndex = (long) person.getAttributes().getAttribute("source-feature");
                             long destinationFeatureIndex = (long) person.getAttributes().getAttribute("destination-feature");
-                            boolean movedAllActivities = person.getAttributes().getAttribute("moved-all-activities") != null;
+                            boolean moved = person.getAttributes().getAttribute("was_moved") != null;
+                            boolean movedAllActivities = person.getAttributes().getAttribute("moved_all_activities") != null;
                             var sourceFeature = murmoFeatures.get((int) sourceFeatureIndex);
                             var destinationFeature = murmoFeatures.get((int) destinationFeatureIndex);
 
@@ -79,7 +80,7 @@ public class MoversToCsv {
                             // iih, this is ugly
                             try {
                                 printer.printRecord(person.getId(), sourceFeatureIndex, fromCoord.getY(), fromCoord.getX(),
-                                        destinationFeatureIndex, toCoord.getY(), toCoord.getX(), movedAllActivities);
+                                        destinationFeatureIndex, toCoord.getY(), toCoord.getX(), moved, movedAllActivities);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

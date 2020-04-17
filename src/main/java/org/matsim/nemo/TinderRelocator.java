@@ -233,6 +233,7 @@ public class TinderRelocator {
 
 		// collect all trip elements between 'real'-activities here
 		List<PlanElement> trip = new ArrayList<>();
+		Coord homeCoord = null;
 
 		for (PlanElement element : selectedPlan.getPlanElements()) {
 
@@ -245,15 +246,22 @@ public class TinderRelocator {
 					var newActivityLocation = drawCoordFromGeometry(destinationGeometry);
 
 					if (activity.getType().startsWith("home")) {
+
+						if (homeCoord == null) {
+							homeCoord = newActivityLocation;
+						} else {
+							newActivityLocation = homeCoord;
+						}
+
 						spatialPersonIndex.remove(activity.getCoord().getX(), activity.getCoord().getY(), movingPerson.getId());
 						spatialPersonIndex.put(newActivityLocation.getX(), newActivityLocation.getY(), movingPerson.getId());
 						movingPerson.getAttributes().putAttribute(WAS_MOVED_KEY, 1);
+
 					} else if (movingPerson.getAttributes().getAttribute(MOVED_ALL_ACTIVITIES) == null) {
 						movingPerson.getAttributes().putAttribute(MOVED_ALL_ACTIVITIES, 1);
 					}
 					activity.setCoord(newActivityLocation);
 					activity.setLinkId(null);
-					activity.setFacilityId(null);
 				}
 
 				// now handle simplifying of trips. Staging activties mustbe removed, because they contain references to
