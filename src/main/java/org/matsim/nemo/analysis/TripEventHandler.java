@@ -21,7 +21,7 @@ public class TripEventHandler implements ActivityEndEventHandler, ActivityStartE
 	private final Map<Id<Person>, List<TripEventHandler.Trip>> tripToPerson = new HashMap<>();
 	private final MainModeIdentifier mainModeIdentifier;
 	private final Predicate<Id<Person>> agentFilter;
-    private Set<Id<Person>> stuck = new HashSet<>();
+	private final Set<Id<Person>> stuck = new HashSet<>();
 
 	public TripEventHandler(MainModeIdentifier mainModeIdentifier, Predicate<Id<Person>> agentFilter) {
 
@@ -92,7 +92,7 @@ public class TripEventHandler implements ActivityEndEventHandler, ActivityStartE
 
 		TripEventHandler.Trip trip = getCurrentTrip(event.getPersonId());
 		Leg leg = trip.legs.get(trip.legs.size() - 1);
-		leg.setTravelTime(event.getTime() - leg.getDepartureTime());
+		leg.setTravelTime(event.getTime() - leg.getDepartureTime().seconds());
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class TripEventHandler implements ActivityEndEventHandler, ActivityStartE
 		private Id<ActivityFacility> arrivalFacility;
 		private String mainMode = TransportMode.other;
 
-		private List<Leg> legs = new ArrayList<>();
+		private final List<Leg> legs = new ArrayList<>();
 
 		public Id<Link> getDepartureLink() {
 			return departureLink;

@@ -17,9 +17,9 @@ public class ReducePopulation {
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         StreamingPopulationReader reader = new StreamingPopulationReader(scenario);
-		StreamingPopulationWriter writer = new StreamingPopulationWriter(); // take all persons
+        StreamingPopulationWriter writer = new StreamingPopulationWriter(0.001); // take all persons
 
-		reader.addAlgorithm(writer);
+        reader.addAlgorithm(writer);
 
         try {
             writer.startStreaming(input.outputFile);

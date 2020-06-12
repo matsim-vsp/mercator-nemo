@@ -232,9 +232,9 @@ public class NemoModeLocationChoiceCalibratorV2 {
         String runId;
 
         @Parameter(names = "-countsWeight")
-        double countsWeight = 15;
+        double countsWeight = 150;
 
         @Parameter(names = "-marginalsWeight")
-        double marginalsWeight = 5.0;
+        double marginalsWeight = 150;
     }
 }

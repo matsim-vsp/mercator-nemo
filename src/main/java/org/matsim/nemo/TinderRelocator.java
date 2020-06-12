@@ -57,10 +57,10 @@ public class TinderRelocator {
 	private String runsSvn;
 
 	@Parameter(names = {"-scalingFactor", "-sf"})
-	private double scalingFactor = 0.01;
+	private final double scalingFactor = 0.01;
 
 	@Parameter(names = {"-tinderMatches", "-tm"})
-	private double shareOfTinderMatches = 0.5;
+	private final double shareOfTinderMatches = 0.5;
 
 	private Scenario scenario;
 	private List<SimpleFeature> murmoFeatures;
@@ -204,7 +204,7 @@ public class TinderRelocator {
 		if (peopleWithinSource.size() > 0) {
 
 			// multiplying the value by 20, to move more people, because otherwise too few persons are moved to see any effect
-			double shareOfPeopleMoving = Math.abs(value * 20) / baseInhabitants;
+			double shareOfPeopleMoving = Math.abs(value) / baseInhabitants;
 			List<Person> matsimPeopleMoving = peopleWithinSource.stream()
 					.map(id -> scenario.getPopulation().getPersons().get(id))
 					.filter(person -> person.getAttributes().getAttribute(WAS_MOVED_KEY) == null)
