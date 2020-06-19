@@ -46,6 +46,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
     private final String outputDirectory;
     private final double cadytsCountsWeight;
     private final double cadytsMarginalsWeight;
+    private final String startMode;
     private Config config;
     private Scenario scenario;
     private Controler controler;
@@ -60,6 +61,7 @@ public class NemoModeLocationChoiceCalibratorV2 {
         this.outputDirectory = arguments.outputDir;
         this.cadytsCountsWeight = arguments.countsWeight;
         this.cadytsMarginalsWeight = arguments.marginalsWeight;
+        this.startMode = arguments.startMode;
     }
 
     public static void main(String[] args) {
@@ -170,11 +172,11 @@ public class NemoModeLocationChoiceCalibratorV2 {
         for (Person person : result.getPopulation().getPersons().values()) {
 
 			// use pt as starting mode, because it is teleported and safes runtime
-			person.getPlans().stream()
-					.flatMap(plan -> plan.getPlanElements().stream())
-					.filter(element -> element instanceof Leg)
-					.map(element -> (Leg) element)
-					.forEach(leg -> leg.setMode(TransportMode.pt));
+            person.getPlans().stream()
+                    .flatMap(plan -> plan.getPlanElements().stream())
+                    .filter(element -> element instanceof Leg)
+                    .map(element -> (Leg) element)
+                    .forEach(leg -> leg.setMode(startMode));
 
             if (person.getPlans().stream().noneMatch(pl -> pl.getPlanElements().size() == 1)) {
 
@@ -236,5 +238,8 @@ public class NemoModeLocationChoiceCalibratorV2 {
 
         @Parameter(names = "-marginalsWeight")
         double marginalsWeight = 150;
+
+        @Parameter(names = "-startMode")
+        String startMode = "pt";
     }
 }
