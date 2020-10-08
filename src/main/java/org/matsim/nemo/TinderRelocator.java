@@ -1,6 +1,5 @@
 package org.matsim.nemo;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -60,7 +59,7 @@ public class TinderRelocator {
 	private final double scalingFactor = 0.01;
 
 	@Parameter(names = {"-tinderMatches", "-tm"})
-	private final double shareOfTinderMatches = 0.5;
+	private double shareOfTinderMatches = 0.5;
 
 	private Scenario scenario;
 	private List<SimpleFeature> murmoFeatures;
@@ -68,11 +67,39 @@ public class TinderRelocator {
 
 	private int emptySourceCellCounter = 0;
 
-	public static void main(String[] args) throws IOException {
+	/*public static void main(String[] args) throws IOException {
 
 		TinderRelocator relocator = new TinderRelocator();
 		JCommander.newBuilder().addObject(relocator).build().parse(args);
 		relocator.run();
+
+		-sharedSvn
+C:\Users\Janekdererste\repos\shared-svn
+-runsSvn
+C:\Users\Janekdererste\repos\runs-svn
+-tm
+0.1
+	}*/
+
+	public TinderRelocator() {
+	}
+
+	public TinderRelocator(double shareOfTinderMatches, String sharedSvn, String runsSvn) {
+		this.shareOfTinderMatches = shareOfTinderMatches;
+		this.sharedSvn = sharedSvn;
+		this.runsSvn = runsSvn;
+	}
+
+	public static void main(String[] args) throws IOException {
+
+		final String sharedSvn = "C:\\Users\\Janekdererste\\repos\\shared-svn";
+		final String runsSvn = "C:\\Users\\Janekdererste\\repos\\runs-svn";
+
+		for (double i = 0.1; i < 1; i += 0.1) {
+
+			var relocator = new TinderRelocator(i, sharedSvn, runsSvn);
+			relocator.run();
+		}
 	}
 
 	private void run() throws IOException {
@@ -204,7 +231,7 @@ public class TinderRelocator {
 		if (peopleWithinSource.size() > 0) {
 
 			// multiplying the value by 20, to move more people, because otherwise too few persons are moved to see any effect
-			double shareOfPeopleMoving = Math.abs(value) / baseInhabitants;
+			double shareOfPeopleMoving = Math.abs(value * 20) / baseInhabitants;
 			List<Person> matsimPeopleMoving = peopleWithinSource.stream()
 					.map(id -> scenario.getPopulation().getPersons().get(id))
 					.filter(person -> person.getAttributes().getAttribute(WAS_MOVED_KEY) == null)
